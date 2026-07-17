@@ -1,0 +1,35 @@
+{
+  "test": {
+    "class_counts": {
+      "broke": 150,
+      "dirty": 110,
+      "double": 100,
+      "miss": 100
+    },
+    "group_count": 40,
+    "object_count": 460,
+    "sample_count": 400
+  },
+  "train": {
+    "class_counts": {
+      "broke": 1280,
+      "dirty": 870,
+      "double": 820,
+      "miss": 820
+    },
+    "group_count": 320,
+    "object_count": 3790,
+    "sample_count": 3200
+  },
+  "val": {
+    "class_counts": {
+      "broke": 160,
+      "dirty": 110,
+      "double": 110,
+      "miss": 80
+    },
+    "group_count": 40,
+    "object_count": 460,
+    "sample_count": 400
+  }
+}

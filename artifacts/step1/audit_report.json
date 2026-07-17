@@ -1,0 +1,59 @@
+{
+  "class_counts": {
+    "broke": 1590,
+    "dirty": 1090,
+    "double": 1030,
+    "miss": 1000
+  },
+  "duplicate_summary": {
+    "query": {
+      "cross_source_group_count": 0,
+      "duplicate_extra_files": 0,
+      "duplicate_group_count": 0
+    },
+    "template": {
+      "cross_source_group_count": 70,
+      "duplicate_extra_files": 70,
+      "duplicate_group_count": 70
+    }
+  },
+  "fatal_issue_count": 0,
+  "group_count": 400,
+  "inventory_counts": {
+    "annotation": 4000,
+    "query": 4000,
+    "template": 4000
+  },
+  "issue_counts": {
+    "xml_filename_mismatch": 3600
+  },
+  "object_count": 4710,
+  "original_split": {
+    "sample_counts": {
+      "test": 400,
+      "train": 3240,
+      "trainval": 3600,
+      "val": 360
+    },
+    "sample_overlaps": {
+      "train_test": 0,
+      "train_val": 0,
+      "val_test": 0
+    },
+    "source_counts": {
+      "test": 255,
+      "train": 400,
+      "trainval": 400,
+      "val": 240
+    },
+    "source_overlaps": {
+      "train_test": 255,
+      "train_val": 240,
+      "val_test": 144
+    },
+    "trainval_matches_union": true
+  },
+  "sample_count": 4000,
+  "schema_version": "step1-v1",
+  "warning_count": 3600
+}

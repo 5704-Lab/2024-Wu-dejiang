@@ -1,0 +1,44 @@
+# Python caches and test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments and local environment files
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# IDE and Claude local settings
+.vscode/
+.idea/
+.claude/
+
+# Generated Step 1 audit artifacts
+# Recreate with: python scripts/run_step1.py all --config configs/step1_dataset.yaml
+artifacts/step1/source_inventory.jsonl
+artifacts/step1/source_snapshot_before.json
+artifacts/step1/source_snapshot_after.json
+artifacts/step1/samples.jsonl
+artifacts/step1/objects.csv
+artifacts/step1/issues.csv
+artifacts/step1/groups.jsonl
+artifacts/step1/duplicate_report.json
+artifacts/step1/run_manifest.json
+
+# Model outputs and large generated data
+outputs/
+checkpoints/
+*.pt
+*.pth
+*.onnx
+
+# Local report extraction/recovery files
+opening_report.doc
+opening_report.txt
+opening_report_strings.txt
+report_core_context.txt
+extract_report*.ps1

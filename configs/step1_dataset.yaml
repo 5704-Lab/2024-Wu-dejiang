@@ -1,0 +1,22 @@
+dataset:
+  root: "D:/WuDJ/Desktop/工作室文档/project/数据集/VOCdevkit/VOC2007"
+  query_dir: JPEGImages
+  template_dir: TemplateImages
+  annotation_dir: Annotations
+  split_dir: ImageSets/Main
+  read_only: true
+output:
+  root: artifacts/step1
+classes: [broke, dirty, double, miss]
+expected:
+  width: 800
+  height: 800
+  mode: RGB
+  variants: [test, b_test, b1_test, c_test, f_test, h_test, rc_test, rc1_test, s_test, s1_test]
+split:
+  ratios: {train: 0.8, val: 0.1, test: 0.1}
+  seed: 20260717
+  search_iterations: 2000
+  algorithm_version: grouped-balanced-v1
+hash_algorithm: sha256
+schema_version: step1-v1
