@@ -37,8 +37,15 @@ class AlignmentResult:
     num_raw_matches: int = 0
     num_inlier_matches: int = 0
     inlier_match_indices: list[int] = field(default_factory=list, repr=False)
+    valid_mask: np.ndarray | None = field(default=None, repr=False)
+    ssim_valid_mask: np.ndarray | None = field(default=None, repr=False)
     homography_matrix: list[list[float]] = field(default_factory=lambda: [[1, 0, 0], [0, 1, 0], [0, 0, 1]])
     ransac_reprojection_error: float = 0.0
+    valid_pixel_count: int = 0
+    valid_pixel_ratio: float = 0.0
+    ssim_valid_pixel_count: int = 0
+    ssim_valid_pixel_ratio: float = 0.0
+    metrics_valid: bool = False
     ssim_before: float = 0.0
     ssim_after: float = 0.0
     mutual_info_before: float = 0.0
@@ -76,6 +83,12 @@ class SIFTAligner:
         quality_cfg = cfg.get("quality", {})
         self.ssim_window = int(quality_cfg.get("ssim_window", 11))
         self.mi_bins = int(quality_cfg.get("mutual_info_bins", 64))
+        self.erode_ssim_mask = bool(quality_cfg.get("erode_ssim_mask", True))
+        self.min_valid_pixels = int(quality_cfg.get("min_valid_pixels", 1))
+        if self.ssim_window < 1 or self.ssim_window % 2 == 0:
+            raise ValueError("quality.ssim_window must be a positive odd integer")
+        if self.min_valid_pixels < 1:
+            raise ValueError("quality.min_valid_pixels must be at least 1")
 
     # ------------------------------------------------------------------
     def align(
@@ -146,9 +159,28 @@ class SIFTAligner:
 
         h, w = template.shape[:2]
         warped = cv2.warpPerspective(query, H, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=(0, 0, 0))
+        valid_mask = _warp_valid_mask(query.shape[:2], H, (w, h))
+        ssim_valid_mask = (
+            _erode_valid_mask(valid_mask, self.ssim_window)
+            if self.erode_ssim_mask
+            else valid_mask.copy()
+        )
+        report.valid_mask = valid_mask
+        report.ssim_valid_mask = ssim_valid_mask
+        report.valid_pixel_count = int(valid_mask.sum())
+        report.valid_pixel_ratio = report.valid_pixel_count / valid_mask.size
+        report.ssim_valid_pixel_count = int(ssim_valid_mask.sum())
+        report.ssim_valid_pixel_ratio = report.ssim_valid_pixel_count / ssim_valid_mask.size
+        report.metrics_valid = (
+            report.valid_pixel_count >= self.min_valid_pixels
+            and report.ssim_valid_pixel_count >= self.min_valid_pixels
+        )
 
-        report.ssim_before, report.mutual_info_before = _pair_metrics(query, template, self.ssim_window, self.mi_bins)
-        report.ssim_after, report.mutual_info_after = _pair_metrics(warped, template, self.ssim_window, self.mi_bins)
+        if report.metrics_valid:
+            report.ssim_before = _ssim(query, template, self.ssim_window, ssim_valid_mask)
+            report.ssim_after = _ssim(warped, template, self.ssim_window, ssim_valid_mask)
+            report.mutual_info_before = _mutual_info(query, template, self.mi_bins, valid_mask)
+            report.mutual_info_after = _mutual_info(warped, template, self.mi_bins, valid_mask)
         report.success = True
         return warped, report
 
@@ -206,21 +238,35 @@ def render_comparison(
     for text, pos in labels:
         cv2.putText(canvas, text, pos, font, 0.55, (11, 11, 11), 1, cv2.LINE_AA)
 
-    info = f"SSIM {report.ssim_before:.3f}->{report.ssim_after:.3f}  MI {report.mutual_info_before:.3f}->{report.mutual_info_after:.3f}"
+    info = (
+        f"Masked SSIM {report.ssim_before:.3f}->{report.ssim_after:.3f}  "
+        f"MI {report.mutual_info_before:.3f}->{report.mutual_info_after:.3f}  "
+        f"overlap {report.valid_pixel_ratio:.1%}"
+    )
     cv2.putText(canvas, info, (8, h + 54), font, 0.45, (82, 81, 78), 1, cv2.LINE_AA)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     _imwrite(output_path, cv2.cvtColor(canvas, cv2.COLOR_RGB2BGR))
 
 
-def render_diff(query: np.ndarray, template: np.ndarray, title: str, output_path: Path) -> None:
-    """Save an absolute-difference heatmap."""
+def render_diff(
+    query: np.ndarray,
+    template: np.ndarray,
+    title: str,
+    output_path: Path,
+    mask: np.ndarray | None = None,
+) -> None:
+    """Save an absolute-difference heatmap with invalid pixels in neutral gray."""
+    valid = _validate_mask(mask, query.shape[:2]) if mask is not None else None
     diff = np.abs(query.astype(np.float32) - template.astype(np.float32))
     diff_gray = diff.mean(axis=2)
-    diff_gray = np.clip(diff_gray / max(diff_gray.max(), 1.0), 0, 1)
+    normalization_values = diff_gray[valid] if valid is not None and valid.any() else diff_gray
+    scale = max(float(normalization_values.max()) if normalization_values.size else 0.0, 1.0)
+    diff_gray = np.clip(diff_gray / scale, 0, 1)
     heatmap = (diff_gray * 255).astype(np.uint8)
     colored = cv2.applyColorMap(heatmap, cv2.COLORMAP_HOT)
-    h, w = colored.shape[:2]
+    if valid is not None:
+        colored[~valid] = (128, 128, 128)
     canvas = colored
     font = cv2.FONT_HERSHEY_SIMPLEX
     cv2.putText(canvas, title, (10, 28), font, 0.65, (255, 255, 255), 2, cv2.LINE_AA)
@@ -246,7 +292,46 @@ def _to_gray(image: np.ndarray) -> np.ndarray:
     return cv2.cvtColor(image, cv2.COLOR_RGB2GRAY) if image.ndim == 3 else image
 
 
-def _ssim(a: np.ndarray, b: np.ndarray, window: int = 11) -> float:
+def _validate_mask(mask: np.ndarray, shape: tuple[int, int]) -> np.ndarray:
+    valid = np.asarray(mask, dtype=bool)
+    if valid.shape != shape:
+        raise ValueError(f"Mask shape {valid.shape} does not match image shape {shape}")
+    return valid
+
+
+def _warp_valid_mask(
+    source_shape: tuple[int, int],
+    homography: np.ndarray,
+    output_size: tuple[int, int],
+) -> np.ndarray:
+    """Warp a full-valid source footprint into the destination frame."""
+    source = np.full(source_shape, 255, dtype=np.uint8)
+    warped = cv2.warpPerspective(
+        source,
+        homography,
+        output_size,
+        flags=cv2.INTER_LINEAR,
+        borderMode=cv2.BORDER_CONSTANT,
+        borderValue=0,
+    )
+    return warped == 255
+
+
+def _erode_valid_mask(mask: np.ndarray, window: int) -> np.ndarray:
+    """Remove pixels whose SSIM support window crosses an invalid boundary."""
+    valid = np.asarray(mask, dtype=bool)
+    if window <= 1:
+        return valid.copy()
+    kernel = np.ones((window, window), dtype=np.uint8)
+    return cv2.erode(valid.astype(np.uint8), kernel, iterations=1) > 0
+
+
+def _ssim(
+    a: np.ndarray,
+    b: np.ndarray,
+    window: int = 11,
+    mask: np.ndarray | None = None,
+) -> float:
     """Structural similarity (scalar mean over channels)."""
     a_f = a.astype(np.float32)
     b_f = b.astype(np.float32)
@@ -255,6 +340,7 @@ def _ssim(a: np.ndarray, b: np.ndarray, window: int = 11) -> float:
     kernel = cv2.getGaussianKernel(window, 1.5)
     window_2d = kernel @ kernel.T
     window_2d = window_2d / window_2d.sum()
+    valid = _validate_mask(mask, a.shape[:2]) if mask is not None else None
     ssim_sum = 0.0
     channels = a_f.shape[2] if a_f.ndim == 3 else 1
     for ch in range(channels):
@@ -268,16 +354,39 @@ def _ssim(a: np.ndarray, b: np.ndarray, window: int = 11) -> float:
         sigma_ab = cv2.filter2D(a_ch * b_ch, -1, window_2d) - mu_a * mu_b
         num = (2 * mu_a * mu_b + C1) * (2 * sigma_ab + C2)
         den = (mu_a2 + mu_b2 + C1) * (sigma_a2 + sigma_b2 + C2)
-        ssim_sum += (num / (den + 1e-10)).mean()
+        ssim_map = num / (den + 1e-10)
+        if valid is not None:
+            if not valid.any():
+                return 0.0
+            ssim_sum += float(ssim_map[valid].mean())
+        else:
+            ssim_sum += float(ssim_map.mean())
     return float(ssim_sum / channels)
 
 
-def _mutual_info(a: np.ndarray, b: np.ndarray, bins: int = 64) -> float:
-    """Mutual information estimated via 2-D histogram."""
-    a_g = _to_gray(a).ravel()
-    b_g = _to_gray(b).ravel()
+def _mutual_info(
+    a: np.ndarray,
+    b: np.ndarray,
+    bins: int = 64,
+    mask: np.ndarray | None = None,
+) -> float:
+    """Mutual information estimated from valid grayscale pixel pairs."""
+    a_gray = _to_gray(a)
+    b_gray = _to_gray(b)
+    if mask is not None:
+        valid = _validate_mask(mask, a_gray.shape)
+        if not valid.any():
+            return 0.0
+        a_g = a_gray[valid]
+        b_g = b_gray[valid]
+    else:
+        a_g = a_gray.ravel()
+        b_g = b_gray.ravel()
     hist_2d, _, _ = np.histogram2d(a_g, b_g, bins=bins, range=[[0, 256], [0, 256]])
-    hist_2d = hist_2d / hist_2d.sum()
+    total = hist_2d.sum()
+    if total <= 0:
+        return 0.0
+    hist_2d = hist_2d / total
     marginal_a = hist_2d.sum(axis=1)
     marginal_b = hist_2d.sum(axis=0)
     mi = 0.0
@@ -291,7 +400,14 @@ def _mutual_info(a: np.ndarray, b: np.ndarray, bins: int = 64) -> float:
     return float(mi)
 
 
-def _pair_metrics(query: np.ndarray, template: np.ndarray, ssim_window: int, mi_bins: int) -> tuple[float, float]:
-    s = _ssim(query, template, ssim_window)
-    m = _mutual_info(query, template, mi_bins)
+def _pair_metrics(
+    query: np.ndarray,
+    template: np.ndarray,
+    ssim_window: int,
+    mi_bins: int,
+    mask: np.ndarray | None = None,
+    ssim_mask: np.ndarray | None = None,
+) -> tuple[float, float]:
+    s = _ssim(query, template, ssim_window, ssim_mask if ssim_mask is not None else mask)
+    m = _mutual_info(query, template, mi_bins, mask)
     return s, m

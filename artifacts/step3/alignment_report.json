@@ -4,48 +4,64 @@
       "count": 1,
       "mean_inliers": 1652.0,
       "mean_reprojection_error": 0.04717354103922844,
-      "mi_after_mean": 3.038770818092398,
-      "mi_before_mean": 3.040225279551252,
-      "mi_delta_mean": -0.0014544614588540838,
-      "ssim_after_mean": 0.9828718304634094,
-      "ssim_before_mean": 0.9829158186912537,
-      "ssim_delta_mean": -4.398822784423828e-05
+      "metrics_valid_count": 1,
+      "mi_after_mean": 3.0393732582985624,
+      "mi_before_mean": 3.0397511714856913,
+      "mi_delta_mean": -0.00037791318712887545,
+      "ssim_after_mean": 0.9828512668609619,
+      "ssim_before_mean": 0.9828524788220724,
+      "ssim_delta_mean": -1.2119611104699501e-06,
+      "ssim_valid_pixel_ratio_mean": 0.995715625,
+      "valid_pixel_ratio_mean": 0.99929375,
+      "valid_pixel_ratio_min": 0.99929375
     },
     "train": {
       "count": 8,
       "mean_inliers": 1099.625,
       "mean_reprojection_error": 0.04666722076945007,
-      "mi_after_mean": 2.531199378101155,
-      "mi_before_mean": 2.5377126714525,
-      "mi_delta_mean": -0.006513293351345095,
-      "ssim_after_mean": 0.9782607704401016,
-      "ssim_before_mean": 0.9789662659168243,
-      "ssim_delta_mean": -0.0007054954767227173
+      "metrics_valid_count": 8,
+      "mi_after_mean": 2.5370389071797996,
+      "mi_before_mean": 2.5385183836105245,
+      "mi_delta_mean": -0.0014794764307247132,
+      "ssim_after_mean": 0.9788011536002159,
+      "ssim_before_mean": 0.9788030410806339,
+      "ssim_delta_mean": -1.887480417878118e-06,
+      "ssim_valid_pixel_ratio_mean": 0.9923640625000001,
+      "valid_pixel_ratio_mean": 0.998729296875,
+      "valid_pixel_ratio_min": 0.99723125
     },
     "val": {
       "count": 1,
       "mean_inliers": 1395.0,
       "mean_reprojection_error": 0.045360952615737915,
-      "mi_after_mean": 3.195619719923494,
-      "mi_before_mean": 3.2265242199629665,
-      "mi_delta_mean": -0.030904500039472538,
-      "ssim_after_mean": 0.9887121319770813,
-      "ssim_before_mean": 0.9899969100952148,
-      "ssim_delta_mean": -0.001284778118133545
+      "metrics_valid_count": 1,
+      "mi_after_mean": 3.2122781687339157,
+      "mi_before_mean": 3.2318723094876947,
+      "mi_delta_mean": -0.019594140753778966,
+      "ssim_after_mean": 0.9898166457811991,
+      "ssim_before_mean": 0.9898491104443868,
+      "ssim_delta_mean": -3.2464663187736775e-05,
+      "ssim_valid_pixel_ratio_mean": 0.985440625,
+      "valid_pixel_ratio_mean": 0.9975890625,
+      "valid_pixel_ratio_min": 0.9975890625
     }
   },
   "failure_count": 0,
   "failures": [],
-  "generated_at_utc": "2026-08-10T09:18:45.363943+00:00",
+  "generated_at_utc": "2026-08-10T09:43:04.797868+00:00",
   "overall": {
     "mean_inliers": 1184.4,
     "mean_reprojection_error": 0.04658722598105669,
-    "mi_after_mean": 2.6483985562825128,
-    "mi_before_mean": 2.656845087113422,
-    "mi_delta_mean": -0.008446530830908738,
-    "ssim_after_mean": 0.9797670125961304,
-    "ssim_before_mean": 0.9804642856121063,
-    "ssim_delta_mean": -0.0006972730159759521
+    "metrics_valid_count": 10,
+    "mi_after_mean": 2.6547962684470874,
+    "mi_before_mean": 2.657977054985758,
+    "mi_delta_mean": -0.003180786538670555,
+    "ssim_after_mean": 0.9803077141443888,
+    "ssim_before_mean": 0.9803125917911532,
+    "ssim_delta_mean": -4.8776467641231666e-06,
+    "ssim_valid_pixel_ratio_mean": 0.9920068750000002,
+    "valid_pixel_ratio_mean": 0.99867171875,
+    "valid_pixel_ratio_min": 0.99723125
   },
   "python": "3.12.6",
   "samples": [
@@ -68,9 +84,10 @@
           1.0
         ]
       ],
-      "mutual_info_after": 2.9290720397001793,
-      "mutual_info_before": 2.941262799549351,
-      "mutual_info_delta": -0.01219075984917195,
+      "metrics_valid": true,
+      "mutual_info_after": 2.942901744538355,
+      "mutual_info_before": 2.9421481356119408,
+      "mutual_info_delta": 0.0007536089264141843,
       "num_inlier_matches": 1064,
       "num_keypoints_query": 2000,
       "num_keypoints_template": 1674,
@@ -78,10 +95,14 @@
       "ransac_reprojection_error": 0.08738336712121964,
       "sample_id": "0038_s_test",
       "split": "train",
-      "ssim_after": 0.938873827457428,
-      "ssim_before": 0.9401226043701172,
-      "ssim_delta": -0.001248776912689209,
-      "success": true
+      "ssim_after": 0.9391434987386068,
+      "ssim_before": 0.9391377766927084,
+      "ssim_delta": 5.7220458984375e-06,
+      "ssim_valid_pixel_count": 629338,
+      "ssim_valid_pixel_ratio": 0.983340625,
+      "success": true,
+      "valid_pixel_count": 638228,
+      "valid_pixel_ratio": 0.99723125
     },
     {
       "error": null,
@@ -102,9 +123,10 @@
           1.0
         ]
       ],
-      "mutual_info_after": 2.130530445493294,
-      "mutual_info_before": 2.1402876524183285,
-      "mutual_info_delta": -0.009757206925034456,
+      "metrics_valid": true,
+      "mutual_info_after": 2.140044554907889,
+      "mutual_info_before": 2.140726824219285,
+      "mutual_info_delta": -0.0006822693113961442,
       "num_inlier_matches": 813,
       "num_keypoints_query": 876,
       "num_keypoints_template": 889,
@@ -112,10 +134,14 @@
       "ransac_reprojection_error": 0.0329812616109848,
       "sample_id": "0176_s_test",
       "split": "train",
-      "ssim_after": 0.9934259057044983,
-      "ssim_before": 0.9938624501228333,
-      "ssim_delta": -0.00043654441833496094,
-      "success": true
+      "ssim_after": 0.9938257336616516,
+      "ssim_before": 0.9938280781110128,
+      "ssim_delta": -2.344449361202372e-06,
+      "ssim_valid_pixel_count": 636424,
+      "ssim_valid_pixel_ratio": 0.9944125,
+      "success": true,
+      "valid_pixel_count": 639414,
+      "valid_pixel_ratio": 0.999084375
     },
     {
       "error": null,
@@ -136,6 +162,7 @@
           1.0
         ]
       ],
+      "metrics_valid": true,
       "mutual_info_after": 2.662959455896885,
       "mutual_info_before": 2.662959455896885,
       "mutual_info_delta": 0.0,
@@ -146,10 +173,14 @@
       "ransac_reprojection_error": 0.028636367991566658,
       "sample_id": "0066_b_test",
       "split": "train",
-      "ssim_after": 0.9783196449279785,
-      "ssim_before": 0.9783196449279785,
+      "ssim_after": 0.9783196647961935,
+      "ssim_before": 0.9783196647961935,
       "ssim_delta": 0.0,
-      "success": true
+      "ssim_valid_pixel_count": 640000,
+      "ssim_valid_pixel_ratio": 1.0,
+      "success": true,
+      "valid_pixel_count": 640000,
+      "valid_pixel_ratio": 1.0
     },
     {
       "error": null,
@@ -170,6 +201,7 @@
           1.0
         ]
       ],
+      "metrics_valid": true,
       "mutual_info_after": 2.229387094294621,
       "mutual_info_before": 2.229387094294621,
       "mutual_info_delta": 0.0,
@@ -180,10 +212,14 @@
       "ransac_reprojection_error": 0.052250247448682785,
       "sample_id": "0000_rc_test",
       "split": "train",
-      "ssim_after": 0.9851810932159424,
-      "ssim_before": 0.9851812720298767,
-      "ssim_delta": -1.7881393432617188e-07,
-      "success": true
+      "ssim_after": 0.9851810534795126,
+      "ssim_before": 0.9851812521616617,
+      "ssim_delta": -1.9868214917728722e-07,
+      "ssim_valid_pixel_count": 640000,
+      "ssim_valid_pixel_ratio": 1.0,
+      "success": true,
+      "valid_pixel_count": 640000,
+      "valid_pixel_ratio": 1.0
     },
     {
       "error": null,
@@ -204,6 +240,7 @@
           0.9999999999999999
         ]
       ],
+      "metrics_valid": true,
       "mutual_info_after": 3.096030840440209,
       "mutual_info_before": 3.096030840440209,
       "mutual_info_delta": 0.0,
@@ -214,10 +251,14 @@
       "ransac_reprojection_error": 0.029788941144943237,
       "sample_id": "0027_rc1_test",
       "split": "train",
-      "ssim_after": 0.9597117900848389,
-      "ssim_before": 0.9597117900848389,
+      "ssim_after": 0.9597118099530538,
+      "ssim_before": 0.9597118099530538,
       "ssim_delta": 0.0,
-      "success": true
+      "ssim_valid_pixel_count": 640000,
+      "ssim_valid_pixel_ratio": 1.0,
+      "success": true,
+      "valid_pixel_count": 640000,
+      "valid_pixel_ratio": 1.0
     },
     {
       "error": null,
@@ -238,9 +279,10 @@
           1.0
         ]
       ],
-      "mutual_info_after": 2.230008224360828,
-      "mutual_info_before": 2.241333953363953,
-      "mutual_info_delta": -0.011325729003125229,
+      "metrics_valid": true,
+      "mutual_info_after": 2.238038373989885,
+      "mutual_info_before": 2.241556146821909,
+      "mutual_info_delta": -0.0035177728320241464,
       "num_inlier_matches": 320,
       "num_keypoints_query": 467,
       "num_keypoints_template": 434,
@@ -248,10 +290,14 @@
       "ransac_reprojection_error": 0.043509237468242645,
       "sample_id": "0054_s_test",
       "split": "train",
-      "ssim_after": 0.9859902262687683,
-      "ssim_before": 0.9875848889350891,
-      "ssim_delta": -0.0015946626663208008,
-      "success": true
+      "ssim_after": 0.987428883711497,
+      "ssim_before": 0.9874294201532999,
+      "ssim_delta": -5.364418029785156e-07,
+      "ssim_valid_pixel_count": 630694,
+      "ssim_valid_pixel_ratio": 0.985459375,
+      "success": true,
+      "valid_pixel_count": 638449,
+      "valid_pixel_ratio": 0.9975765625
     },
     {
       "error": null,
@@ -272,9 +318,10 @@
           1.0
         ]
       ],
-      "mutual_info_after": 2.6887486622566565,
-      "mutual_info_before": 2.6927764999746633,
-      "mutual_info_delta": -0.004027837718006744,
+      "metrics_valid": true,
+      "mutual_info_after": 2.692219563472997,
+      "mutual_info_before": 2.6940443056208268,
+      "mutual_info_delta": -0.0018247421478299053,
       "num_inlier_matches": 574,
       "num_keypoints_query": 702,
       "num_keypoints_template": 639,
@@ -282,10 +329,14 @@
       "ransac_reprojection_error": 0.04649360477924347,
       "sample_id": "0179_b1_test",
       "split": "train",
-      "ssim_after": 0.9904642701148987,
-      "ssim_before": 0.9909431338310242,
-      "ssim_delta": -0.0004788637161254883,
-      "success": true
+      "ssim_after": 0.9908724625905355,
+      "ssim_before": 0.9908698797225952,
+      "ssim_delta": 2.5828679403039345e-06,
+      "ssim_valid_pixel_count": 634864,
+      "ssim_valid_pixel_ratio": 0.991975,
+      "success": true,
+      "valid_pixel_count": 639144,
+      "valid_pixel_ratio": 0.9986625
     },
     {
       "error": null,
@@ -306,9 +357,10 @@
           1.0
         ]
       ],
-      "mutual_info_after": 2.282858262366566,
-      "mutual_info_before": 2.2976630756819882,
-      "mutual_info_delta": -0.014804813315422383,
+      "metrics_valid": true,
+      "mutual_info_after": 2.2947296298975584,
+      "mutual_info_before": 2.30129426597852,
+      "mutual_info_delta": -0.006564636080961694,
       "num_inlier_matches": 1618,
       "num_keypoints_query": 1825,
       "num_keypoints_template": 1824,
@@ -316,10 +368,14 @@
       "ransac_reprojection_error": 0.052294738590717316,
       "sample_id": "0211_rc1_test",
       "split": "train",
-      "ssim_after": 0.99411940574646,
-      "ssim_before": 0.9960043430328369,
-      "ssim_delta": -0.0018849372863769531,
-      "success": true
+      "ssim_after": 0.9959261218706766,
+      "ssim_before": 0.995946447054545,
+      "ssim_delta": -2.0325183868408203e-05,
+      "ssim_valid_pixel_count": 629584,
+      "ssim_valid_pixel_ratio": 0.983725,
+      "success": true,
+      "valid_pixel_count": 638259,
+      "valid_pixel_ratio": 0.9972796875
     },
     {
       "error": null,
@@ -340,9 +396,10 @@
           1.0
         ]
       ],
-      "mutual_info_after": 3.195619719923494,
-      "mutual_info_before": 3.2265242199629665,
-      "mutual_info_delta": -0.030904500039472538,
+      "metrics_valid": true,
+      "mutual_info_after": 3.2122781687339157,
+      "mutual_info_before": 3.2318723094876947,
+      "mutual_info_delta": -0.019594140753778966,
       "num_inlier_matches": 1395,
       "num_keypoints_query": 1676,
       "num_keypoints_template": 1582,
@@ -350,10 +407,14 @@
       "ransac_reprojection_error": 0.045360952615737915,
       "sample_id": "0095_f_test",
       "split": "val",
-      "ssim_after": 0.9887121319770813,
-      "ssim_before": 0.9899969100952148,
-      "ssim_delta": -0.001284778118133545,
-      "success": true
+      "ssim_after": 0.9898166457811991,
+      "ssim_before": 0.9898491104443868,
+      "ssim_delta": -3.2464663187736775e-05,
+      "ssim_valid_pixel_count": 630682,
+      "ssim_valid_pixel_ratio": 0.985440625,
+      "success": true,
+      "valid_pixel_count": 638457,
+      "valid_pixel_ratio": 0.9975890625
     },
     {
       "error": null,
@@ -374,9 +435,10 @@
           0.9999999999999999
         ]
       ],
-      "mutual_info_after": 3.038770818092398,
-      "mutual_info_before": 3.040225279551252,
-      "mutual_info_delta": -0.0014544614588540838,
+      "metrics_valid": true,
+      "mutual_info_after": 3.0393732582985624,
+      "mutual_info_before": 3.0397511714856913,
+      "mutual_info_delta": -0.00037791318712887545,
       "num_inlier_matches": 1652,
       "num_keypoints_query": 2000,
       "num_keypoints_template": 2000,
@@ -384,13 +446,17 @@
       "ransac_reprojection_error": 0.04717354103922844,
       "sample_id": "0135_rc_test",
       "split": "test",
-      "ssim_after": 0.9828718304634094,
-      "ssim_before": 0.9829158186912537,
-      "ssim_delta": -4.398822784423828e-05,
-      "success": true
+      "ssim_after": 0.9828512668609619,
+      "ssim_before": 0.9828524788220724,
+      "ssim_delta": -1.2119611104699501e-06,
+      "ssim_valid_pixel_count": 637258,
+      "ssim_valid_pixel_ratio": 0.995715625,
+      "success": true,
+      "valid_pixel_count": 639548,
+      "valid_pixel_ratio": 0.99929375
     }
   ],
-  "schema_version": "step3-alignment-v2",
+  "schema_version": "step3-alignment-v3",
   "success_count": 10,
   "success_rate": 1.0,
   "total_samples": 10

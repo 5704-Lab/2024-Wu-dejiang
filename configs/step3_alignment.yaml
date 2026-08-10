@@ -22,6 +22,8 @@ ransac:
 quality:
   ssim_window: 11
   mutual_info_bins: 64
+  erode_ssim_mask: true
+  min_valid_pixels: 1024
 validation:
   sample_count: 10
   seed: 20260717

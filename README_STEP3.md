@@ -29,14 +29,17 @@ python scripts/run_step3.py align --config configs/step3_alignment.yaml
 - `artifacts/step3/alignment_report.json`：汇总指标和逐样本结果，纳入 Git。
 - `artifacts/step3/alignment/<split>/*.png`：对比图、差异热图和 RANSAC 内点匹配图，可重复生成，不纳入 Git。
 
-报告中的 `success` 表示 Homography 成功求得并满足最小内点数量，不代表 SSIM 或互信息一定改善。应分别检查：
+报告中的 `success` 表示 Homography 成功求得并满足最小内点数量，不代表 SSIM 或互信息一定改善。Step 3.2-A 起，报告 schema 为 `step3-alignment-v3`，其中 SSIM 和互信息都在 Homography 生成的有效 footprint 内计算：配准前和配准后使用同一组像素，SSIM 还会腐蚀 mask 边界，避免高斯局部窗口跨入无效区域。报告同时记录有效像素数量、占比和指标是否有效。
+
+应分别检查：
 
 - 关键点、ratio matches 和 RANSAC 内点数量；
 - RANSAC 内点重投影误差；
-- 配准前后的 SSIM 与互信息变化；
+- Homography 有效重叠比例及 SSIM 腐蚀后有效比例；
+- 配准前后的 masked SSIM 与 masked 互信息变化；
 - 逐样本 Homography 和失败原因。
 
-当前 10 样本探针能够完成几何估计，但既有结果的平均 SSIM/MI 略有下降。因此 Step 3.1 当前结论是“宏观配准链路可运行”，不是“配准质量已达到最终验收标准”。下一步需要使用有效重叠区域 mask 和更严格的 Homography 合法性/质量阈值继续评估。
+历史 v2 探针能够完成几何估计，但整图 SSIM/MI 会受到 warp 无效边界影响。v3 报告改用同一有效重叠区域的 masked 指标，用于判断负 delta 是否来自边界污染；它仍然只证明评价口径更公平，不等同于最终配准质量验收。下一步 Step 3.2-B 还需要增加 Homography 合法性、内点比例和质量阈值。
 
 ## 只读保证
 

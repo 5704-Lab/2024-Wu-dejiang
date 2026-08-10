@@ -62,6 +62,9 @@ def run_alignment_validation(config: dict[str, Any]) -> dict[str, Any]:
             "mutual_info_after": report.mutual_info_after,
             "num_inliers": report.num_inlier_matches,
             "reprojection_error": report.ransac_reprojection_error,
+            "valid_pixel_ratio": report.valid_pixel_ratio,
+            "ssim_valid_pixel_ratio": report.ssim_valid_pixel_ratio,
+            "metrics_valid": report.metrics_valid,
         })
 
         out_dir = output_root / "alignment" / split
@@ -75,14 +78,16 @@ def run_alignment_validation(config: dict[str, Any]) -> dict[str, Any]:
         render_diff(
             query,
             template,
-            "Diff BEFORE alignment",
+            "Masked diff BEFORE alignment",
             out_dir / f"{sample_id}_diff_before.png",
+            report.valid_mask,
         )
         render_diff(
             warped,
             template,
-            "Diff AFTER alignment",
+            "Masked diff AFTER alignment",
             out_dir / f"{sample_id}_diff_after.png",
+            report.valid_mask,
         )
         aligner.render_matches(
             query,
@@ -208,17 +213,29 @@ def _summarize(
     for split, entries in metrics_by_split.items():
         if not entries:
             continue
+        valid_entries = [entry for entry in entries if entry["metrics_valid"]]
         per_split[split] = {
             "count": len(entries),
-            "ssim_before_mean": _mean([entry["ssim_before"] for entry in entries]),
-            "ssim_after_mean": _mean([entry["ssim_after"] for entry in entries]),
+            "metrics_valid_count": len(valid_entries),
+            "ssim_before_mean": _mean([entry["ssim_before"] for entry in valid_entries]),
+            "ssim_after_mean": _mean([entry["ssim_after"] for entry in valid_entries]),
             "ssim_delta_mean": _mean([
-                entry["ssim_after"] - entry["ssim_before"] for entry in entries
+                entry["ssim_after"] - entry["ssim_before"] for entry in valid_entries
             ]),
-            "mi_before_mean": _mean([entry["mutual_info_before"] for entry in entries]),
-            "mi_after_mean": _mean([entry["mutual_info_after"] for entry in entries]),
+            "mi_before_mean": _mean([entry["mutual_info_before"] for entry in valid_entries]),
+            "mi_after_mean": _mean([entry["mutual_info_after"] for entry in valid_entries]),
             "mi_delta_mean": _mean([
-                entry["mutual_info_after"] - entry["mutual_info_before"] for entry in entries
+                entry["mutual_info_after"] - entry["mutual_info_before"] for entry in valid_entries
+            ]),
+            "valid_pixel_ratio_mean": _mean([
+                entry["valid_pixel_ratio"] for entry in entries
+            ]),
+            "valid_pixel_ratio_min": min(
+                (entry["valid_pixel_ratio"] for entry in entries),
+                default=None,
+            ),
+            "ssim_valid_pixel_ratio_mean": _mean([
+                entry["ssim_valid_pixel_ratio"] for entry in entries
             ]),
             "mean_inliers": _mean([entry["num_inliers"] for entry in entries]),
             "mean_reprojection_error": _mean([
@@ -240,6 +257,11 @@ def _summarize(
             "num_inlier_matches": result.num_inlier_matches,
             "homography_matrix": result.homography_matrix,
             "ransac_reprojection_error": result.ransac_reprojection_error,
+            "valid_pixel_count": result.valid_pixel_count,
+            "valid_pixel_ratio": result.valid_pixel_ratio,
+            "ssim_valid_pixel_count": result.ssim_valid_pixel_count,
+            "ssim_valid_pixel_ratio": result.ssim_valid_pixel_ratio,
+            "metrics_valid": result.metrics_valid,
             "ssim_before": result.ssim_before,
             "ssim_after": result.ssim_after,
             "ssim_delta": result.ssim_after - result.ssim_before,
@@ -251,8 +273,9 @@ def _summarize(
         for result in results
     ]
 
+    metric_results = [result for result in results if result.metrics_valid]
     return {
-        "schema_version": "step3-alignment-v2",
+        "schema_version": "step3-alignment-v3",
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "python": platform.python_version(),
         "total_samples": len(results),
@@ -261,15 +284,26 @@ def _summarize(
         "success_rate": len(successes) / max(len(results), 1),
         "by_split": per_split,
         "overall": {
-            "ssim_before_mean": _mean([result.ssim_before for result in results]),
-            "ssim_after_mean": _mean([result.ssim_after for result in results]),
+            "metrics_valid_count": len(metric_results),
+            "ssim_before_mean": _mean([result.ssim_before for result in metric_results]),
+            "ssim_after_mean": _mean([result.ssim_after for result in metric_results]),
             "ssim_delta_mean": _mean([
-                result.ssim_after - result.ssim_before for result in results
+                result.ssim_after - result.ssim_before for result in metric_results
             ]),
-            "mi_before_mean": _mean([result.mutual_info_before for result in results]),
-            "mi_after_mean": _mean([result.mutual_info_after for result in results]),
+            "mi_before_mean": _mean([result.mutual_info_before for result in metric_results]),
+            "mi_after_mean": _mean([result.mutual_info_after for result in metric_results]),
             "mi_delta_mean": _mean([
-                result.mutual_info_after - result.mutual_info_before for result in results
+                result.mutual_info_after - result.mutual_info_before for result in metric_results
+            ]),
+            "valid_pixel_ratio_mean": _mean([
+                result.valid_pixel_ratio for result in results
+            ]),
+            "valid_pixel_ratio_min": min(
+                (result.valid_pixel_ratio for result in results),
+                default=None,
+            ),
+            "ssim_valid_pixel_ratio_mean": _mean([
+                result.ssim_valid_pixel_ratio for result in results
             ]),
             "mean_inliers": _mean([result.num_inlier_matches for result in results]),
             "mean_reprojection_error": _mean([

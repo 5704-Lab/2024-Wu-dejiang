@@ -7,9 +7,12 @@ import pytest
 from step3_model.alignment import (
     AlignmentResult,
     SIFTAligner,
+    _erode_valid_mask,
     _mutual_info,
     _ssim,
     _to_gray,
+    _warp_valid_mask,
+    render_diff,
 )
 
 
@@ -64,6 +67,52 @@ class TestHelpers:
         assert _mutual_info(white_800, white_800) >= 0.0
         assert _mutual_info(white_800, black_800) >= 0.0
 
+    def test_masked_ssim_ignores_invalid_region(self):
+        left = np.zeros((64, 64, 3), dtype=np.uint8)
+        right = left.copy()
+        right[:, 32:] = 255
+        mask = np.zeros((64, 64), dtype=bool)
+        mask[:, :24] = True
+
+        assert _ssim(left, right) < 0.8
+        assert _ssim(left, right, mask=mask) == pytest.approx(1.0)
+
+    def test_masked_mutual_info_ignores_invalid_region(self):
+        ramp = np.tile(np.arange(64, dtype=np.uint8), (64, 1))
+        left = np.repeat(ramp[..., None], 3, axis=2)
+        right_a = left.copy()
+        right_b = left.copy()
+        right_b[:, 32:] = np.flip(right_b[:, 32:], axis=1)
+        mask = np.zeros((64, 64), dtype=bool)
+        mask[:, :32] = True
+
+        assert _mutual_info(left, right_a, mask=mask) == pytest.approx(
+            _mutual_info(left, right_b, mask=mask)
+        )
+
+    def test_empty_mask_metrics_are_finite(self):
+        image = np.zeros((32, 32, 3), dtype=np.uint8)
+        mask = np.zeros((32, 32), dtype=bool)
+        assert _ssim(image, image, mask=mask) == 0.0
+        assert _mutual_info(image, image, mask=mask) == 0.0
+
+    def test_wrong_mask_shape_is_rejected(self):
+        image = np.zeros((32, 32, 3), dtype=np.uint8)
+        with pytest.raises(ValueError, match="Mask shape"):
+            _ssim(image, image, mask=np.ones((16, 16), dtype=bool))
+
+    def test_warp_mask_and_ssim_erosion(self):
+        homography = np.array(
+            [[1.0, 0.0, -10.0], [0.0, 1.0, -5.0], [0.0, 0.0, 1.0]]
+        )
+        mask = _warp_valid_mask((100, 100), homography, (100, 100))
+        eroded = _erode_valid_mask(mask, 11)
+
+        assert mask.shape == (100, 100)
+        assert not mask[-1, -1]
+        assert mask.sum() == 90 * 95
+        assert eroded.sum() < mask.sum()
+
 
 class TestSIFTAligner:
     def test_rejects_unknown_matcher_backend(self):
@@ -101,6 +150,11 @@ class TestSIFTAligner:
         assert report.num_inlier_matches >= 8
         assert len(report.inlier_match_indices) == report.num_inlier_matches
         assert report.ransac_reprojection_error < 1.5
+        assert report.metrics_valid
+        assert report.valid_pixel_count < template.shape[0] * template.shape[1]
+        assert report.ssim_valid_pixel_count < report.valid_pixel_count
+        assert report.valid_mask is not None
+        assert report.ssim_valid_mask is not None
         recovered = np.asarray(report.homography_matrix)
         assert recovered[0, 2] == pytest.approx(-14.0, abs=1.5)
         assert recovered[1, 2] == pytest.approx(-9.0, abs=1.5)
@@ -129,3 +183,16 @@ class TestSIFTAligner:
         loaded = load_image_rgb(path)
         assert loaded.shape == (64, 64, 3)
         assert np.array_equal(loaded, image)
+
+    def test_render_diff_marks_invalid_pixels_gray(self, tmp_path: Path):
+        query = np.zeros((32, 32, 3), dtype=np.uint8)
+        template = np.full((32, 32, 3), 255, dtype=np.uint8)
+        mask = np.ones((32, 32), dtype=bool)
+        mask[:, :8] = False
+        output = tmp_path / "masked_diff.png"
+
+        render_diff(query, template, "masked", output, mask)
+
+        rendered = cv2.imread(str(output))
+        assert rendered is not None
+        assert np.array_equal(rendered[20, 2], np.array([128, 128, 128]))

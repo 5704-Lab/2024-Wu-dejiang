@@ -40,6 +40,11 @@ def test_summary_contains_auditable_sample_records():
         num_raw_matches=12,
         num_inlier_matches=10,
         ransac_reprojection_error=0.4,
+        valid_pixel_count=900,
+        valid_pixel_ratio=0.9,
+        ssim_valid_pixel_count=800,
+        ssim_valid_pixel_ratio=0.8,
+        metrics_valid=True,
         ssim_before=0.8,
         ssim_after=0.85,
         mutual_info_before=1.2,
@@ -53,6 +58,9 @@ def test_summary_contains_auditable_sample_records():
         "mutual_info_after": 1.3,
         "num_inliers": 10,
         "reprojection_error": 0.4,
+        "valid_pixel_ratio": 0.9,
+        "ssim_valid_pixel_ratio": 0.8,
+        "metrics_valid": True,
     })
 
     summary = _summarize(
@@ -61,9 +69,13 @@ def test_summary_contains_auditable_sample_records():
         [{"sample_id": "sample-1", "split": "val"}],
     )
 
-    assert summary["schema_version"] == "step3-alignment-v2"
+    assert summary["schema_version"] == "step3-alignment-v3"
     assert len(summary["samples"]) == summary["total_samples"]
     assert summary["samples"][0]["split"] == "val"
+    assert summary["samples"][0]["valid_pixel_ratio"] == pytest.approx(0.9)
+    assert summary["samples"][0]["metrics_valid"] is True
+    assert summary["overall"]["metrics_valid_count"] == 1
+    assert summary["overall"]["valid_pixel_ratio_mean"] == pytest.approx(0.9)
     assert summary["samples"][0]["ssim_delta"] == pytest.approx(0.05)
 
 
