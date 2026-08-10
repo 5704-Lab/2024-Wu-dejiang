@@ -1,0 +1,8 @@
+# Install torch/torchvision from the matching official PyTorch index for your CUDA runtime.
+torch>=2.7,<2.12
+torchvision>=0.22,<0.27
+numpy>=2.0
+Pillow>=10.0
+PyYAML>=6.0
+opencv-python>=4.10
+pytest>=8.0

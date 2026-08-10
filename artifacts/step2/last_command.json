@@ -1,0 +1,41 @@
+{
+  "command": "visualize",
+  "result": {
+    "test": {
+      "contact_sheet": "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\contact_sheet_test.png",
+      "pairs": [
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\test\\000_0004_b1_test.png",
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\test\\001_0004_b_test.png",
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\test\\002_0004_c_test.png",
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\test\\003_0004_f_test.png",
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\test\\004_0004_h_test.png",
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\test\\005_0004_rc1_test.png"
+      ],
+      "sha256": "aa7b0e1944a85c42556e62f3f85640a208c68e432c988d243617773833806f6d"
+    },
+    "train": {
+      "contact_sheet": "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\contact_sheet_train.png",
+      "pairs": [
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\train\\000_0000_b1_test.png",
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\train\\001_0000_b_test.png",
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\train\\002_0000_c_test.png",
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\train\\003_0000_f_test.png",
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\train\\004_0000_h_test.png",
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\train\\005_0000_rc1_test.png"
+      ],
+      "sha256": "8cbb7d31188e06437becbeccf4256b83b3c1239d12203c20cc67d6b2ac870c03"
+    },
+    "val": {
+      "contact_sheet": "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\contact_sheet_val.png",
+      "pairs": [
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\val\\000_0008_b1_test.png",
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\val\\001_0008_b_test.png",
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\val\\002_0008_c_test.png",
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\val\\003_0008_f_test.png",
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\val\\004_0008_h_test.png",
+        "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2\\visualizations\\val\\005_0008_rc1_test.png"
+      ],
+      "sha256": "d2de76ece44ce748e359d31ca44b0b7036efc85a1bb39394c05d1748b1549f66"
+    }
+  }
+}

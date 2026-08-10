@@ -1,0 +1,1221 @@
+{
+  "batch_query_shape": [
+    2,
+    3,
+    800,
+    800
+  ],
+  "batch_template_shape": [
+    2,
+    3,
+    800,
+    800
+  ],
+  "deterministic_replay": true,
+  "epoch_changes_training_stream": true,
+  "independent_photometry": true,
+  "independent_targets": true,
+  "samples": [
+    {
+      "sample_id": "0000_b1_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0493718742386509,
+          "contrast": 0.8816169512030954,
+          "hue_shift": 0.016120034642385116,
+          "noise_seed": 9764077477881896740,
+          "noise_std": 0.0,
+          "saturation": 1.050909107281508
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0250891896589647,
+          "contrast": 1.1367179227990374,
+          "hue_shift": 0.006466787129450438,
+          "noise_seed": 17485276305420031198,
+          "noise_std": 0.0,
+          "saturation": 1.0685516938918929
+        }
+      }
+    },
+    {
+      "sample_id": "0000_b_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.8948736345118415,
+          "contrast": 0.9619803823232529,
+          "hue_shift": 0.005495537604529581,
+          "noise_seed": 11211196042147087210,
+          "noise_std": 0.004742786728874777,
+          "saturation": 1.0581397863860682
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.1459261867716606,
+          "contrast": 1.06102758170608,
+          "hue_shift": -0.02238956409465737,
+          "noise_seed": 14314821973740997572,
+          "noise_std": 0.0,
+          "saturation": 0.937279020616938
+        }
+      }
+    },
+    {
+      "sample_id": "0000_c_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.9246335577441827,
+          "contrast": 0.8586046638002355,
+          "hue_shift": 0.02638558128204426,
+          "noise_seed": 12439564765463222711,
+          "noise_std": 0.0,
+          "saturation": 1.099899755127101
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.8594961382826097,
+          "contrast": 0.9420259071582248,
+          "hue_shift": 0.006741680363161022,
+          "noise_seed": 9948574565002013908,
+          "noise_std": 0.0,
+          "saturation": 1.0773637249160812
+        }
+      }
+    },
+    {
+      "sample_id": "0000_f_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.5265408315740585,
+          "brightness": 1.0566925678510068,
+          "contrast": 1.0365496692169838,
+          "hue_shift": 0.029124606320918518,
+          "noise_seed": 2787030228386440784,
+          "noise_std": 0.0,
+          "saturation": 0.902968806309402
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0132374849037096,
+          "contrast": 1.0073136848717705,
+          "hue_shift": 0.024105071833342373,
+          "noise_seed": 3414366550607099817,
+          "noise_std": 0.0,
+          "saturation": 0.9857606534844776
+        }
+      }
+    },
+    {
+      "sample_id": "0000_h_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.9888757407140338,
+          "contrast": 0.9409722500031226,
+          "hue_shift": -0.0037310127156681,
+          "noise_seed": 9588050127734339724,
+          "noise_std": 0.0,
+          "saturation": 1.0489956249451453
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.9098706845712643,
+          "contrast": 0.9717949777191646,
+          "hue_shift": -0.00045018593324809564,
+          "noise_seed": 7329502681221216353,
+          "noise_std": 0.0,
+          "saturation": 0.9218973220031631
+        }
+      }
+    },
+    {
+      "sample_id": "0000_rc1_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.7203933972089162,
+          "brightness": 1.0678400731024755,
+          "contrast": 0.9944734882891844,
+          "hue_shift": -0.028525321014644674,
+          "noise_seed": 6692740909508201780,
+          "noise_std": 0.0,
+          "saturation": 0.9737213269427547
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.902647516344086,
+          "contrast": 1.106640643647359,
+          "hue_shift": -0.007142182602384379,
+          "noise_seed": 12862868756620812711,
+          "noise_std": 0.0,
+          "saturation": 0.912872413778812
+        }
+      }
+    },
+    {
+      "sample_id": "0000_rc_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.7482100503570971,
+          "brightness": 0.9528378788329767,
+          "contrast": 0.8860128582901312,
+          "hue_shift": 0.028381920483199215,
+          "noise_seed": 8670252955779377446,
+          "noise_std": 0.0,
+          "saturation": 1.0419464407004606
+        },
+        "template_photometry": {
+          "blur_radius": 0.3968718573162965,
+          "brightness": 1.1110812434295008,
+          "contrast": 1.0541413523934111,
+          "hue_shift": -0.01854918240891692,
+          "noise_seed": 5767527010212292265,
+          "noise_std": 0.0,
+          "saturation": 1.0563563032515488
+        }
+      }
+    },
+    {
+      "sample_id": "0000_s1_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.070361673242469,
+          "contrast": 0.8552018335064059,
+          "hue_shift": -0.0018398872998846363,
+          "noise_seed": 13614904637047095185,
+          "noise_std": 0.0,
+          "saturation": 1.0352515621883633
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.9762805440429809,
+          "contrast": 0.930196429214937,
+          "hue_shift": -0.014744750598299836,
+          "noise_seed": 17302183353957186296,
+          "noise_std": 0.0,
+          "saturation": 1.0541547627628192
+        }
+      }
+    },
+    {
+      "sample_id": "0000_s_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0572784272527602,
+          "contrast": 1.0886113690749535,
+          "hue_shift": -0.00035854180887764237,
+          "noise_seed": 8087934823415043534,
+          "noise_std": 0.0,
+          "saturation": 1.067623164929466
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0659077041197706,
+          "contrast": 0.8808640529534041,
+          "hue_shift": -0.02906292101327734,
+          "noise_seed": 15329014789425598550,
+          "noise_std": 0.0,
+          "saturation": 0.9404542449954171
+        }
+      }
+    },
+    {
+      "sample_id": "0000_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.9370326389198076,
+          "contrast": 1.1270479404330436,
+          "hue_shift": 0.023517377582298528,
+          "noise_seed": 12011312716560393630,
+          "noise_std": 0.0,
+          "saturation": 0.9640378245982727
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.1261471088185915,
+          "contrast": 1.0734443094445363,
+          "hue_shift": 0.0016336174478032983,
+          "noise_seed": 13972335930310532759,
+          "noise_std": 0.0,
+          "saturation": 0.9930674262093923
+        }
+      }
+    },
+    {
+      "sample_id": "0001_b1_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.999631182575635,
+          "contrast": 0.9311012216146388,
+          "hue_shift": -0.006764352879481045,
+          "noise_seed": 10571914004855566998,
+          "noise_std": 0.0,
+          "saturation": 1.000277838029791
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.969764801436606,
+          "contrast": 1.0807647955140105,
+          "hue_shift": -0.01711803210398561,
+          "noise_seed": 4159922009210447694,
+          "noise_std": 0.0,
+          "saturation": 1.0794352972837606
+        }
+      }
+    },
+    {
+      "sample_id": "0001_b_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.9477529149501223,
+          "contrast": 0.9652419019901466,
+          "hue_shift": 0.009872079858069677,
+          "noise_seed": 17500712420299775368,
+          "noise_std": 0.0,
+          "saturation": 1.0993674824483568
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.9891239609032566,
+          "contrast": 1.0017516065986496,
+          "hue_shift": 0.005304648565425306,
+          "noise_seed": 9886607826490837823,
+          "noise_std": 0.009812046642272605,
+          "saturation": 1.0548341203511447
+        }
+      }
+    },
+    {
+      "sample_id": "0001_c_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 1,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0857189345070375,
+          "contrast": 0.9389833059494371,
+          "hue_shift": -0.004046325025598863,
+          "noise_seed": 6378126422897150335,
+          "noise_std": 0.0,
+          "saturation": 1.0317237309508076
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.9823329611082203,
+          "contrast": 1.1240206541309288,
+          "hue_shift": -0.026366810413555503,
+          "noise_seed": 7481506611483040871,
+          "noise_std": 0.0,
+          "saturation": 0.9239339403178143
+        }
+      }
+    },
+    {
+      "sample_id": "0001_f_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0901772345290812,
+          "contrast": 0.9079631590542203,
+          "hue_shift": 0.00018421180292834197,
+          "noise_seed": 6599803842883547265,
+          "noise_std": 0.0,
+          "saturation": 0.9230835054182677
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0626577685244443,
+          "contrast": 1.1268307778429678,
+          "hue_shift": 0.029061377788203425,
+          "noise_seed": 5605052745151171868,
+          "noise_std": 0.0,
+          "saturation": 0.9338817047568162
+        }
+      }
+    },
+    {
+      "sample_id": "0001_h_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.9522345156606543,
+          "contrast": 1.0418506153380243,
+          "hue_shift": -0.00464922371304868,
+          "noise_seed": 12107018005263749140,
+          "noise_std": 0.0,
+          "saturation": 1.0569341092967566
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.850965920696052,
+          "contrast": 0.8785633831029407,
+          "hue_shift": 0.01617018915339566,
+          "noise_seed": 10084721450196362541,
+          "noise_std": 0.0,
+          "saturation": 1.0299818340375355
+        }
+      }
+    },
+    {
+      "sample_id": "0001_rc1_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.7395149820114695,
+          "brightness": 1.1314118780988471,
+          "contrast": 0.85151146678764,
+          "hue_shift": 0.010749022506912752,
+          "noise_seed": 11460164303548610659,
+          "noise_std": 0.0,
+          "saturation": 0.9601994059535783
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0952419921645236,
+          "contrast": 1.0155599903974724,
+          "hue_shift": 0.023395944241552814,
+          "noise_seed": 3433220702535329302,
+          "noise_std": 0.0,
+          "saturation": 1.0793731794439183
+        }
+      }
+    },
+    {
+      "sample_id": "0001_rc_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0313757970482234,
+          "contrast": 0.8835207424393345,
+          "hue_shift": -0.017915295750854852,
+          "noise_seed": 4206114105114816476,
+          "noise_std": 0.0,
+          "saturation": 0.9595378594822677
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0400706113878235,
+          "contrast": 0.8689411632866355,
+          "hue_shift": 0.026645086320149558,
+          "noise_seed": 15633357032132153068,
+          "noise_std": 0.0,
+          "saturation": 1.0854644206071375
+        }
+      }
+    },
+    {
+      "sample_id": "0001_s1_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.6379763843397559,
+          "brightness": 1.028428711712973,
+          "contrast": 0.9104883703248189,
+          "hue_shift": -0.019260090561904586,
+          "noise_seed": 16404392972705098804,
+          "noise_std": 0.0,
+          "saturation": 0.9294973125152934
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.8623201458912715,
+          "contrast": 0.9393376128087944,
+          "hue_shift": 0.027090115040699497,
+          "noise_seed": 3909979053464695813,
+          "noise_std": 0.0,
+          "saturation": 1.0331683793563187
+        }
+      }
+    },
+    {
+      "sample_id": "0001_s_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0818986463978342,
+          "contrast": 1.072107303479466,
+          "hue_shift": -0.027453587390468697,
+          "noise_seed": 4663256887176564279,
+          "noise_std": 0.0,
+          "saturation": 1.0843707304388037
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.9773882484579803,
+          "contrast": 0.8521987506643942,
+          "hue_shift": 0.024256607046903952,
+          "noise_seed": 6467114020490449066,
+          "noise_std": 0.0,
+          "saturation": 0.9549410648437504
+        }
+      }
+    },
+    {
+      "sample_id": "0001_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0883161061917033,
+          "contrast": 1.0802453107721748,
+          "hue_shift": -0.021559521389815685,
+          "noise_seed": 16861385319511699860,
+          "noise_std": 0.001438622264283374,
+          "saturation": 1.097794166865175
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0999070969179605,
+          "contrast": 0.9247258848360144,
+          "hue_shift": -0.019084086969650804,
+          "noise_seed": 4451951758938398803,
+          "noise_std": 0.0,
+          "saturation": 0.9041830549202764
+        }
+      }
+    },
+    {
+      "sample_id": "0002_b1_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0781607986369108,
+          "contrast": 0.9689326547309223,
+          "hue_shift": 0.02170223102496733,
+          "noise_seed": 10514959570684969401,
+          "noise_std": 0.008882151738647391,
+          "saturation": 1.0935303168897708
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.035747368399044,
+          "contrast": 1.0251872869256171,
+          "hue_shift": 0.0026331780981082714,
+          "noise_seed": 6444639388400290786,
+          "noise_std": 0.0,
+          "saturation": 1.0414714534693936
+        }
+      }
+    },
+    {
+      "sample_id": "0002_b_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.97157115742657,
+          "contrast": 0.9040705283563268,
+          "hue_shift": -0.01885903725251188,
+          "noise_seed": 9710973508775245238,
+          "noise_std": 0.0,
+          "saturation": 1.0116152166763226
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.9254638861710843,
+          "contrast": 0.9960887754403285,
+          "hue_shift": -0.006582024502095225,
+          "noise_seed": 17763347814173907833,
+          "noise_std": 0.0,
+          "saturation": 0.9022504247145812
+        }
+      }
+    },
+    {
+      "sample_id": "0002_c_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 2,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.049298342751082,
+          "contrast": 1.0950048026138273,
+          "hue_shift": -0.0032422963230693096,
+          "noise_seed": 1840814862874520440,
+          "noise_std": 0.0,
+          "saturation": 0.9974126228038833
+        },
+        "template_photometry": {
+          "blur_radius": 0.5941127688979352,
+          "brightness": 1.1377226835903524,
+          "contrast": 1.0907005980482847,
+          "hue_shift": -0.025718596550974727,
+          "noise_seed": 12133123224853236204,
+          "noise_std": 0.0,
+          "saturation": 0.9290420297500149
+        }
+      }
+    },
+    {
+      "sample_id": "0002_f_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.915203115856157,
+          "contrast": 1.1136897195614257,
+          "hue_shift": 0.02059686929499998,
+          "noise_seed": 12993192163669196731,
+          "noise_std": 0.0,
+          "saturation": 0.9619954112816697
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.9734101842273339,
+          "contrast": 1.11556174953558,
+          "hue_shift": -0.017113432852550556,
+          "noise_seed": 3585766602523982183,
+          "noise_std": 0.0,
+          "saturation": 1.0673288305910666
+        }
+      }
+    },
+    {
+      "sample_id": "0002_h_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.863497648323393,
+          "contrast": 0.8835839394260082,
+          "hue_shift": 0.024998295870373208,
+          "noise_seed": 8774768620034451094,
+          "noise_std": 0.0,
+          "saturation": 1.067490962791022
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.1255784495317265,
+          "contrast": 0.8932239556186693,
+          "hue_shift": -0.005359169493931067,
+          "noise_seed": 9463568000168473750,
+          "noise_std": 0.0,
+          "saturation": 0.9056044032079036
+        }
+      }
+    },
+    {
+      "sample_id": "0002_rc1_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 1,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.099941710538895,
+          "contrast": 0.945804143664845,
+          "hue_shift": 0.01701358225872638,
+          "noise_seed": 2563094786926776257,
+          "noise_std": 0.0,
+          "saturation": 1.0873162124918536
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0477940464404818,
+          "contrast": 0.9841469224579145,
+          "hue_shift": 0.013629943810539655,
+          "noise_seed": 2836302471049941234,
+          "noise_std": 0.0,
+          "saturation": 0.9699777014083325
+        }
+      }
+    },
+    {
+      "sample_id": "0002_rc_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.8857290846551658,
+          "contrast": 1.062981702870901,
+          "hue_shift": -0.010877642220603011,
+          "noise_seed": 12455753808263279554,
+          "noise_std": 0.0,
+          "saturation": 0.9052465580442778
+        },
+        "template_photometry": {
+          "blur_radius": 0.6742813375253928,
+          "brightness": 0.9168804650339687,
+          "contrast": 1.0589848572050107,
+          "hue_shift": 0.0246453318010487,
+          "noise_seed": 13695378209845309001,
+          "noise_std": 0.0,
+          "saturation": 0.9014626797171789
+        }
+      }
+    },
+    {
+      "sample_id": "0002_s1_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 3,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.9205512481941832,
+          "contrast": 1.000103935518466,
+          "hue_shift": -0.02203032650185717,
+          "noise_seed": 18077326403770292620,
+          "noise_std": 0.0,
+          "saturation": 1.0789422965105975
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0944468098845208,
+          "contrast": 0.9546048892156177,
+          "hue_shift": 0.01508649254361017,
+          "noise_seed": 10471376719819699972,
+          "noise_std": 0.0,
+          "saturation": 1.0232787449330873
+        }
+      }
+    },
+    {
+      "sample_id": "0002_s_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.1026080972499588,
+          "contrast": 1.0619803796946101,
+          "hue_shift": -0.02853591352525952,
+          "noise_seed": 16056929206098104478,
+          "noise_std": 0.0,
+          "saturation": 1.0670918280136585
+        },
+        "template_photometry": {
+          "blur_radius": 0.17011186099083125,
+          "brightness": 1.0753341942633179,
+          "contrast": 0.980906584935233,
+          "hue_shift": -0.0038120166753475362,
+          "noise_seed": 13731353092673406431,
+          "noise_std": 0.0,
+          "saturation": 1.0074647723712522
+        }
+      }
+    },
+    {
+      "sample_id": "0002_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 1,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0966925131222758,
+          "contrast": 0.9914697718693414,
+          "hue_shift": 0.01981056934167523,
+          "noise_seed": 7137441368895448100,
+          "noise_std": 0.0,
+          "saturation": 0.9553865099696537
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.8709693657924331,
+          "contrast": 1.0987711502459776,
+          "hue_shift": 0.006715773364677942,
+          "noise_seed": 1108477120443386080,
+          "noise_std": 0.0,
+          "saturation": 1.0378588658460726
+        }
+      }
+    },
+    {
+      "sample_id": "0003_b1_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.4737942490448641,
+          "brightness": 1.1245445410447639,
+          "contrast": 1.0085036289052296,
+          "hue_shift": 0.02121637805106407,
+          "noise_seed": 18360175091191843644,
+          "noise_std": 0.0,
+          "saturation": 0.9167925394415082
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.1411578620586362,
+          "contrast": 1.0142690487169974,
+          "hue_shift": 0.006768623443876576,
+          "noise_seed": 466478248308074619,
+          "noise_std": 0.016897380282399368,
+          "saturation": 0.952264401148472
+        }
+      }
+    },
+    {
+      "sample_id": "0003_b_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.9256899076128071,
+          "contrast": 1.0790621549978556,
+          "hue_shift": -0.01445429026159741,
+          "noise_seed": 2676595062656370216,
+          "noise_std": 0.0,
+          "saturation": 0.9906797625268574
+        },
+        "template_photometry": {
+          "blur_radius": 0.7707364320527731,
+          "brightness": 1.089243630691384,
+          "contrast": 1.0573174717097336,
+          "hue_shift": 0.013774840396027874,
+          "noise_seed": 9744272734392858986,
+          "noise_std": 0.0,
+          "saturation": 0.9194334598079781
+        }
+      }
+    },
+    {
+      "sample_id": "0003_c_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 2,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.1183888557288382,
+          "contrast": 1.0873889573757158,
+          "hue_shift": 0.006055187933059494,
+          "noise_seed": 4864395489978155569,
+          "noise_std": 0.0,
+          "saturation": 1.003609103313675
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0242598790119009,
+          "contrast": 1.0791926161572318,
+          "hue_shift": -0.003531728906725068,
+          "noise_seed": 933212063513720365,
+          "noise_std": 0.0,
+          "saturation": 1.0963457435258082
+        }
+      }
+    },
+    {
+      "sample_id": "0003_f_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.1334156906939603,
+          "contrast": 1.0136652086013285,
+          "hue_shift": 0.02642154454313078,
+          "noise_seed": 1946222352083596459,
+          "noise_std": 0.0,
+          "saturation": 0.9617935243907353
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.8865651253324247,
+          "contrast": 1.1391961706018667,
+          "hue_shift": -0.008379475071957361,
+          "noise_seed": 738796579302739484,
+          "noise_std": 0.0,
+          "saturation": 1.0086438880662678
+        }
+      }
+    },
+    {
+      "sample_id": "0003_h_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.1209077004037533,
+          "contrast": 0.8722025594375753,
+          "hue_shift": 0.02285391043187516,
+          "noise_seed": 11719120653605953962,
+          "noise_std": 0.0,
+          "saturation": 0.9291469743159454
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.1322533889840753,
+          "contrast": 0.9172027246095777,
+          "hue_shift": -0.00541263257310378,
+          "noise_seed": 17456169333401763138,
+          "noise_std": 0.0,
+          "saturation": 1.0272944103211072
+        }
+      }
+    },
+    {
+      "sample_id": "0003_rc1_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.8765626523240007,
+          "contrast": 1.0375489117970598,
+          "hue_shift": -0.027574501565176317,
+          "noise_seed": 14710373022439843856,
+          "noise_std": 0.0,
+          "saturation": 0.9300217941510323
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.0205089574371462,
+          "contrast": 0.9326270366502842,
+          "hue_shift": -0.019535653491789307,
+          "noise_seed": 17228109539409426251,
+          "noise_std": 0.0,
+          "saturation": 1.046278102130119
+        }
+      }
+    },
+    {
+      "sample_id": "0003_rc_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.1482735815723077,
+          "contrast": 1.0023696404280549,
+          "hue_shift": 0.028253417756816376,
+          "noise_seed": 8323447742606961784,
+          "noise_std": 0.0,
+          "saturation": 0.9009728415077157
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.922222105258147,
+          "contrast": 0.9821307623246177,
+          "hue_shift": 0.02244195339752779,
+          "noise_seed": 16555895282280252236,
+          "noise_std": 0.0,
+          "saturation": 1.0141687308434086
+        }
+      }
+    },
+    {
+      "sample_id": "0003_s1_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 1.012909600582063,
+          "contrast": 1.0398330900502926,
+          "hue_shift": 0.02944276823137585,
+          "noise_seed": 1951002289250229230,
+          "noise_std": 0.0,
+          "saturation": 0.9443719709967564
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.8708973935026451,
+          "contrast": 0.9153964644937637,
+          "hue_shift": 0.02320759946488895,
+          "noise_seed": 5822971277213319873,
+          "noise_std": 0.0,
+          "saturation": 1.0193852570960862
+        }
+      }
+    },
+    {
+      "sample_id": "0003_s_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": true,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.9964332890977772,
+          "contrast": 1.039106610652897,
+          "hue_shift": 0.015159067770049044,
+          "noise_seed": 15886340123281406303,
+          "noise_std": 0.0,
+          "saturation": 1.0864652386046254
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.9166386649757997,
+          "contrast": 0.9471656634109611,
+          "hue_shift": 0.024779015039639397,
+          "noise_seed": 3909123544665491673,
+          "noise_std": 0.0,
+          "saturation": 0.9490659386934301
+        }
+      }
+    },
+    {
+      "sample_id": "0003_test",
+      "transform_params": {
+        "geometry": {
+          "horizontal_flip": false,
+          "output_height": 800,
+          "output_width": 800,
+          "rotation_k": 0,
+          "vertical_flip": false
+        },
+        "query_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.8717748835832333,
+          "contrast": 0.917491413511816,
+          "hue_shift": 0.002596885783692819,
+          "noise_seed": 630256943537783735,
+          "noise_std": 0.0,
+          "saturation": 0.9877358602643093
+        },
+        "template_photometry": {
+          "blur_radius": 0.0,
+          "brightness": 0.988936378730122,
+          "contrast": 1.1374245553587388,
+          "hue_shift": -0.013655932060553173,
+          "noise_seed": 6663326989209847519,
+          "noise_std": 0.0,
+          "saturation": 0.9044251295263802
+        }
+      }
+    }
+  ],
+  "verified": true
+}

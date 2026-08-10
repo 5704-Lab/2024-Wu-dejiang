@@ -1,0 +1,12 @@
+{
+  "cuda_available": true,
+  "cuda_device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "dataset_root": "D:\\WuDJ\\Desktop\\工作室文档\\project\\数据集\\VOCdevkit\\VOC2007",
+  "generated_at_utc": "2026-07-17T09:30:02.355515+00:00",
+  "output_root": "D:\\WuDJ\\Desktop\\工作室文档\\毕业论文\\SimeseUltraMaxPlus+\\artifacts\\step2",
+  "python": "3.12.6",
+  "schema_version": "step2-v1",
+  "source_digest": "1e8c83146414f501caa05e2f4a6b719732523d6a196859370abda43add40fd13",
+  "torch": "2.11.0+cu128",
+  "torchvision": "0.26.0+cu128"
+}

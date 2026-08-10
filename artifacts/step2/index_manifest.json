@@ -1,0 +1,14 @@
+{
+  "schema_version": "step2-v1",
+  "split_counts": {
+    "test": 400,
+    "train": 3200,
+    "val": 400
+  },
+  "split_sha256": {
+    "test": "4a72e03dd726e621fd0c8b99f8b52f15ea2d9b4229353e959f1c6e3c8b96dd1f",
+    "train": "fa78e8d5e1cab6f9c1508e48708b06ab2a32e6320eca0a6c844c2cce7b0d51cf",
+    "val": "f28f38eed9e7895f3dc758c71f12be76cf073c843522dc189b85d215142ce3bf"
+  },
+  "step1_samples_sha256": "ac2f64d39fdff5adba0f432e8ef9c4734dcdeb0102bc3de784e4b82388a6b66b"
+}

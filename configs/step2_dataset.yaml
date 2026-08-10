@@ -1,0 +1,45 @@
+inputs:
+  step1_root: artifacts/step1
+  samples: samples.jsonl
+  splits_dir: splits
+  step1_manifest: run_manifest.json
+  dataset_root: "D:/WuDJ/Desktop/工作室文档/project/数据集/VOCdevkit/VOC2007"
+output:
+  root: artifacts/step2
+classes: [broke, dirty, double, miss]
+image:
+  width: 800
+  height: 800
+  mode: RGB
+  output_width: 800
+  output_height: 800
+seed: 20260717
+schema_version: step2-v1
+augmentation:
+  train:
+    horizontal_flip_p: 0.5
+    vertical_flip_p: 0.0
+    rotate90_p: 0.25
+    brightness: 0.15
+    contrast: 0.15
+    saturation: 0.10
+    hue: 0.03
+    blur_p: 0.10
+    blur_radius_max: 1.2
+    noise_p: 0.10
+    noise_std_max: 0.02
+  eval:
+    enabled: false
+visualization:
+  samples_per_split: 6
+  panel_width: 640
+  background: "#fcfcfb"
+  class_colors:
+    broke: "#2a78d6"
+    dirty: "#1baf7a"
+    double: "#eda100"
+    miss: "#008300"
+validation:
+  expected_split_counts: {train: 3200, val: 400, test: 400}
+  sample_count: 40
+  probe_samples: 40
