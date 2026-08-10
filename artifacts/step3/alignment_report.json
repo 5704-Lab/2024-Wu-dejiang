@@ -1,0 +1,397 @@
+{
+  "by_split": {
+    "test": {
+      "count": 1,
+      "mean_inliers": 1652.0,
+      "mean_reprojection_error": 0.04717354103922844,
+      "mi_after_mean": 3.038770818092398,
+      "mi_before_mean": 3.040225279551252,
+      "mi_delta_mean": -0.0014544614588540838,
+      "ssim_after_mean": 0.9828718304634094,
+      "ssim_before_mean": 0.9829158186912537,
+      "ssim_delta_mean": -4.398822784423828e-05
+    },
+    "train": {
+      "count": 8,
+      "mean_inliers": 1099.625,
+      "mean_reprojection_error": 0.04666722076945007,
+      "mi_after_mean": 2.531199378101155,
+      "mi_before_mean": 2.5377126714525,
+      "mi_delta_mean": -0.006513293351345095,
+      "ssim_after_mean": 0.9782607704401016,
+      "ssim_before_mean": 0.9789662659168243,
+      "ssim_delta_mean": -0.0007054954767227173
+    },
+    "val": {
+      "count": 1,
+      "mean_inliers": 1395.0,
+      "mean_reprojection_error": 0.045360952615737915,
+      "mi_after_mean": 3.195619719923494,
+      "mi_before_mean": 3.2265242199629665,
+      "mi_delta_mean": -0.030904500039472538,
+      "ssim_after_mean": 0.9887121319770813,
+      "ssim_before_mean": 0.9899969100952148,
+      "ssim_delta_mean": -0.001284778118133545
+    }
+  },
+  "failure_count": 0,
+  "failures": [],
+  "generated_at_utc": "2026-08-10T09:18:45.363943+00:00",
+  "overall": {
+    "mean_inliers": 1184.4,
+    "mean_reprojection_error": 0.04658722598105669,
+    "mi_after_mean": 2.6483985562825128,
+    "mi_before_mean": 2.656845087113422,
+    "mi_delta_mean": -0.008446530830908738,
+    "ssim_after_mean": 0.9797670125961304,
+    "ssim_before_mean": 0.9804642856121063,
+    "ssim_delta_mean": -0.0006972730159759521
+  },
+  "python": "3.12.6",
+  "samples": [
+    {
+      "error": null,
+      "homography_matrix": [
+        [
+          0.9999522234392634,
+          1.7890082385647546e-05,
+          0.012836908510571433
+        ],
+        [
+          -3.988643002025668e-05,
+          0.9999799293357261,
+          0.028716741727766847
+        ],
+        [
+          -7.097583631807228e-08,
+          6.667947807366239e-08,
+          1.0
+        ]
+      ],
+      "mutual_info_after": 2.9290720397001793,
+      "mutual_info_before": 2.941262799549351,
+      "mutual_info_delta": -0.01219075984917195,
+      "num_inlier_matches": 1064,
+      "num_keypoints_query": 2000,
+      "num_keypoints_template": 1674,
+      "num_ratio_matches": 1162,
+      "ransac_reprojection_error": 0.08738336712121964,
+      "sample_id": "0038_s_test",
+      "split": "train",
+      "ssim_after": 0.938873827457428,
+      "ssim_before": 0.9401226043701172,
+      "ssim_delta": -0.001248776912689209,
+      "success": true
+    },
+    {
+      "error": null,
+      "homography_matrix": [
+        [
+          1.0002069888097103,
+          -2.2785069279707757e-05,
+          -0.04577842332993535
+        ],
+        [
+          6.267437276148087e-05,
+          1.0000846464447053,
+          -0.02707386144205533
+        ],
+        [
+          2.1834647775392507e-07,
+          -4.130943739230114e-08,
+          1.0
+        ]
+      ],
+      "mutual_info_after": 2.130530445493294,
+      "mutual_info_before": 2.1402876524183285,
+      "mutual_info_delta": -0.009757206925034456,
+      "num_inlier_matches": 813,
+      "num_keypoints_query": 876,
+      "num_keypoints_template": 889,
+      "num_ratio_matches": 821,
+      "ransac_reprojection_error": 0.0329812616109848,
+      "sample_id": "0176_s_test",
+      "split": "train",
+      "ssim_after": 0.9934259057044983,
+      "ssim_before": 0.9938624501228333,
+      "ssim_delta": -0.00043654441833496094,
+      "success": true
+    },
+    {
+      "error": null,
+      "homography_matrix": [
+        [
+          0.999972928225593,
+          4.590112530817072e-06,
+          0.004403973478881409
+        ],
+        [
+          -1.9211716102288876e-05,
+          0.9999941694432145,
+          0.005172390975873055
+        ],
+        [
+          -2.4647170343873758e-08,
+          1.7901246694559486e-09,
+          1.0
+        ]
+      ],
+      "mutual_info_after": 2.662959455896885,
+      "mutual_info_before": 2.662959455896885,
+      "mutual_info_delta": 0.0,
+      "num_inlier_matches": 1533,
+      "num_keypoints_query": 2000,
+      "num_keypoints_template": 2000,
+      "num_ratio_matches": 1617,
+      "ransac_reprojection_error": 0.028636367991566658,
+      "sample_id": "0066_b_test",
+      "split": "train",
+      "ssim_after": 0.9783196449279785,
+      "ssim_before": 0.9783196449279785,
+      "ssim_delta": 0.0,
+      "success": true
+    },
+    {
+      "error": null,
+      "homography_matrix": [
+        [
+          0.9999519702870014,
+          -8.957536731122149e-06,
+          0.009257658362313466
+        ],
+        [
+          -1.4292197928694257e-05,
+          0.9999623167426915,
+          0.0009177239724027685
+        ],
+        [
+          -5.124926168587049e-08,
+          -4.427349469550995e-08,
+          1.0
+        ]
+      ],
+      "mutual_info_after": 2.229387094294621,
+      "mutual_info_before": 2.229387094294621,
+      "mutual_info_delta": 0.0,
+      "num_inlier_matches": 1345,
+      "num_keypoints_query": 1693,
+      "num_keypoints_template": 1616,
+      "num_ratio_matches": 1383,
+      "ransac_reprojection_error": 0.052250247448682785,
+      "sample_id": "0000_rc_test",
+      "split": "train",
+      "ssim_after": 0.9851810932159424,
+      "ssim_before": 0.9851812720298767,
+      "ssim_delta": -1.7881393432617188e-07,
+      "success": true
+    },
+    {
+      "error": null,
+      "homography_matrix": [
+        [
+          0.9999553939712391,
+          -1.4776853442430284e-05,
+          0.012770489792025878
+        ],
+        [
+          -1.0511316936033287e-05,
+          0.9999386528587185,
+          0.012594965019299437
+        ],
+        [
+          -3.386501728361492e-08,
+          -4.465980829870742e-08,
+          0.9999999999999999
+        ]
+      ],
+      "mutual_info_after": 3.096030840440209,
+      "mutual_info_before": 3.096030840440209,
+      "mutual_info_delta": 0.0,
+      "num_inlier_matches": 1530,
+      "num_keypoints_query": 2000,
+      "num_keypoints_template": 2000,
+      "num_ratio_matches": 1554,
+      "ransac_reprojection_error": 0.029788941144943237,
+      "sample_id": "0027_rc1_test",
+      "split": "train",
+      "ssim_after": 0.9597117900848389,
+      "ssim_before": 0.9597117900848389,
+      "ssim_delta": 0.0,
+      "success": true
+    },
+    {
+      "error": null,
+      "homography_matrix": [
+        [
+          1.0003218875278672,
+          9.315963090453927e-05,
+          -0.07983648243837921
+        ],
+        [
+          0.0001688964241321807,
+          1.0002563771101365,
+          -0.08291508097676162
+        ],
+        [
+          3.1503835014480657e-07,
+          1.8136888295121187e-07,
+          1.0
+        ]
+      ],
+      "mutual_info_after": 2.230008224360828,
+      "mutual_info_before": 2.241333953363953,
+      "mutual_info_delta": -0.011325729003125229,
+      "num_inlier_matches": 320,
+      "num_keypoints_query": 467,
+      "num_keypoints_template": 434,
+      "num_ratio_matches": 369,
+      "ransac_reprojection_error": 0.043509237468242645,
+      "sample_id": "0054_s_test",
+      "split": "train",
+      "ssim_after": 0.9859902262687683,
+      "ssim_before": 0.9875848889350891,
+      "ssim_delta": -0.0015946626663208008,
+      "success": true
+    },
+    {
+      "error": null,
+      "homography_matrix": [
+        [
+          0.9998568406351054,
+          1.4899743261218317e-05,
+          0.025534155007458932
+        ],
+        [
+          -2.7922256284870274e-05,
+          0.9999521576092312,
+          0.005526569213663617
+        ],
+        [
+          -1.427418515254544e-07,
+          -1.9072626129360015e-08,
+          1.0
+        ]
+      ],
+      "mutual_info_after": 2.6887486622566565,
+      "mutual_info_before": 2.6927764999746633,
+      "mutual_info_delta": -0.004027837718006744,
+      "num_inlier_matches": 574,
+      "num_keypoints_query": 702,
+      "num_keypoints_template": 639,
+      "num_ratio_matches": 576,
+      "ransac_reprojection_error": 0.04649360477924347,
+      "sample_id": "0179_b1_test",
+      "split": "train",
+      "ssim_after": 0.9904642701148987,
+      "ssim_before": 0.9909431338310242,
+      "ssim_delta": -0.0004788637161254883,
+      "success": true
+    },
+    {
+      "error": null,
+      "homography_matrix": [
+        [
+          0.9998045256079913,
+          -7.91034212082379e-05,
+          0.07994267806621277
+        ],
+        [
+          -3.3268911317203037e-06,
+          0.9998297052147965,
+          0.018520191015703433
+        ],
+        [
+          -1.0511600711466491e-07,
+          -1.4163690464093878e-07,
+          1.0
+        ]
+      ],
+      "mutual_info_after": 2.282858262366566,
+      "mutual_info_before": 2.2976630756819882,
+      "mutual_info_delta": -0.014804813315422383,
+      "num_inlier_matches": 1618,
+      "num_keypoints_query": 1825,
+      "num_keypoints_template": 1824,
+      "num_ratio_matches": 1637,
+      "ransac_reprojection_error": 0.052294738590717316,
+      "sample_id": "0211_rc1_test",
+      "split": "train",
+      "ssim_after": 0.99411940574646,
+      "ssim_before": 0.9960043430328369,
+      "ssim_delta": -0.0018849372863769531,
+      "success": true
+    },
+    {
+      "error": null,
+      "homography_matrix": [
+        [
+          0.9998718307048362,
+          -7.791742743753878e-05,
+          0.05317414021673439
+        ],
+        [
+          -2.272258359992402e-05,
+          0.9998286198734846,
+          0.03306547078554353
+        ],
+        [
+          -6.17968235943292e-08,
+          -1.2596331106745346e-07,
+          1.0
+        ]
+      ],
+      "mutual_info_after": 3.195619719923494,
+      "mutual_info_before": 3.2265242199629665,
+      "mutual_info_delta": -0.030904500039472538,
+      "num_inlier_matches": 1395,
+      "num_keypoints_query": 1676,
+      "num_keypoints_template": 1582,
+      "num_ratio_matches": 1410,
+      "ransac_reprojection_error": 0.045360952615737915,
+      "sample_id": "0095_f_test",
+      "split": "val",
+      "ssim_after": 0.9887121319770813,
+      "ssim_before": 0.9899969100952148,
+      "ssim_delta": -0.001284778118133545,
+      "success": true
+    },
+    {
+      "error": null,
+      "homography_matrix": [
+        [
+          1.0000661613166235,
+          2.513712506023932e-05,
+          -0.023707279002733644
+        ],
+        [
+          1.884256984012506e-05,
+          1.000021398743452,
+          -0.006005325810606499
+        ],
+        [
+          3.93198015468563e-08,
+          3.501188580998976e-08,
+          0.9999999999999999
+        ]
+      ],
+      "mutual_info_after": 3.038770818092398,
+      "mutual_info_before": 3.040225279551252,
+      "mutual_info_delta": -0.0014544614588540838,
+      "num_inlier_matches": 1652,
+      "num_keypoints_query": 2000,
+      "num_keypoints_template": 2000,
+      "num_ratio_matches": 1675,
+      "ransac_reprojection_error": 0.04717354103922844,
+      "sample_id": "0135_rc_test",
+      "split": "test",
+      "ssim_after": 0.9828718304634094,
+      "ssim_before": 0.9829158186912537,
+      "ssim_delta": -4.398822784423828e-05,
+      "success": true
+    }
+  ],
+  "schema_version": "step3-alignment-v2",
+  "success_count": 10,
+  "success_rate": 1.0,
+  "total_samples": 10
+}

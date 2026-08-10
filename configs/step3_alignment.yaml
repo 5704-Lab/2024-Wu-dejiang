@@ -1,0 +1,27 @@
+# Step 3.1: SIFT + RANSAC macro-geometric alignment configuration
+inputs:
+  step1_root: artifacts/step1
+  step2_root: artifacts/step2
+  dataset_root: "D:/WuDJ/Desktop/工作室文档/project/数据集/VOCdevkit/VOC2007"
+output:
+  root: artifacts/step3
+sift:
+  nfeatures: 2000
+  n_octave_layers: 3
+  contrast_threshold: 0.04
+  edge_threshold: 10
+  sigma: 1.6
+matcher:
+  backend: bf
+  lowe_ratio: 0.7
+ransac:
+  reprojection_threshold: 5.0
+  max_iterations: 2000
+  confidence: 0.995
+  min_inliers: 10
+quality:
+  ssim_window: 11
+  mutual_info_bins: 64
+validation:
+  sample_count: 10
+  seed: 20260717
