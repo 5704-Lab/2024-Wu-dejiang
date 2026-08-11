@@ -1,8 +1,8 @@
-# Step 3.2-C / 3.2-D / 3.3-A：配准冻结、Test 评估与共享 Backbone
+# Step 3.2-C / 3.2-D / 3.3-A / 3.3-B：配准冻结、Test 评估与共享多尺度 Backbone
 
-Step 3.3-A 已实现一个单实例、共享权重的 Siamese ResNet-50 Backbone。它直接消费 Step 2 的 raw paired tensors，不在线重算配准；Step 3.2 Validation/Test 的 800 个样本最终均选择 original，且当前没有训练集 aligned-image 索引。Step 3.3-B 尚未开始。
+Step 3.3-B 已将共享 Backbone 公开为有序多尺度输出。模型仍是 Step 3.3-A 的单实例、共享权重 Siamese ResNet-50，直接消费 Step 2 的 raw paired tensors，不在线重算配准；Step 3.2 Validation/Test 的 800 个样本最终均选择 original，且当前没有训练集 aligned-image 索引。Step 3.4-A 尚未开始。
 
-## Step 3.3-A Backbone
+## Step 3.3-B 多尺度 Backbone
 
 正式命令：
 
@@ -10,26 +10,35 @@ Step 3.3-A 已实现一个单实例、共享权重的 Siamese ResNet-50 Backbone
 python scripts/run_step3.py backbone-smoke --config configs/step3_backbone.yaml
 ```
 
-模型使用 torchvision `ResNet50_Weights.IMAGENET1K_V2`，只保留 stem 和 `layer1`–`layer4`，移除分类 avgpool/fc。Query 和 Template 调用同一个 encoder：
+模型使用 torchvision `ResNet50_Weights.IMAGENET1K_V2`，只保留 stem 和 `layer1`–`layer4`，移除分类 avgpool/fc。Query 和 Template 调用同一个 encoder，单次前向中按以下固定顺序返回多尺度特征：
+
+| key | 来源 stage | channels | stride | 800×800 空间尺寸 |
+|-----|-----------|----------|--------|------------------|
+| C3 | layer2 | 512 | 8 | 100×100 |
+| C4 | layer3 | 1024 | 16 | 50×50 |
+| C5 | layer4 | 2048 | 32 | 25×25 |
 
 - 输入：RGB float32 `[B, 3, 800, 800]`，值域 `[0,1]`
 - 模型内 normalization：mean `[0.485,0.456,0.406]`，std `[0.229,0.224,0.225]`
-- 单尺度输出：每分支 `[B, 2048, 25, 25]`
-- output stride：32
-- 参数：23,508,032，全部 trainable
-- multi-scale output：false
+- 输出：有序 `dict[str, Tensor]`，key 顺序固定 `["C3", "C4", "C5"]`
+- 参数：23,508,032，全部 trainable，无新增层；多尺度为纯 tap，不含 FPN/neck/通道投影
+- `feature_stages` 配置必须与代码常量 `FEATURE_STAGES` 严格一致，否则 fail closed
 
-真实 smoke 使用 ordered Validation prefix 的 2 对图像、batch size 1，并在 CUDA 可用时选择 CUDA。共享证明包括：只注册一个 encoder、state dict 无 branch-specific keys、159 个参数对象全部唯一、同一 encoder 被双分支实际调用、同输入双分支输出完全一致。
+真实 smoke 使用 ordered Validation prefix 的 2 对图像、batch size 1，并在 CUDA 可用时选择 CUDA。共享证明包括：只注册一个 encoder、state dict 无 branch-specific keys、159 个参数对象全部唯一、同一 encoder 被双分支实际调用、同输入逐尺度输出逐 bit 完全一致（每个尺度 max-abs-diff 均为 0）。
 
-本次真实环境为 PyTorch 2.11.0+cu128、torchvision 0.26.0+cu128，选择 CUDA；下载并缓存官方 `resnet50-11ad3fa6.pth`，checkpoint SHA-256 为 `11ad3fa62ca79e40addfd354a8ec4b7c75143b3038b8d2a807fbc68deab379ca`。权重保存在 PyTorch Hub cache，不复制到仓库，也不生成模型 checkpoint。
+权重为官方 `resnet50-11ad3fa6.pth`（已在 PyTorch Hub cache），checkpoint SHA-256 为 `11ad3fa62ca79e40addfd354a8ec4b7c75143b3038b8d2a807fbc68deab379ca`。权重保存在 cache，不复制到仓库，也不生成模型 checkpoint。
 
-产物：
+产物（schema v2）：
 
 - `artifacts/step3/backbone/backbone_contract.json`
 - `artifacts/step3/backbone/smoke_report.json`
 - `artifacts/step3/backbone/run_manifest.json`
 
-Step 3.3-A 不实现 layer2/layer3/layer4 多尺度公开输出、FPN/channel projection、feature fusion、attention、DCN、loss、optimizer、训练或 RT-DETR。多尺度输出和对应测试属于 Step 3.3-B。
+Step 3.3-B 不实现 FPN/neck、channel projection、feature fusion、attention、DCN、loss、optimizer、训练或 RT-DETR。Offset Predictor 属于 Step 3.4-A，尚未开始。
+
+## Step 3.3-A 历史记录
+
+Step 3.3-A 建立了共享 ResNet-50 Backbone 基础与单尺度 layer4 契约（真实 smoke 已验证共享权重、CUDA 前向与源数据只读）；3.3-B 在其上公开了有序多尺度输出，A 的单尺度 API 已由 B 的多尺度契约替代，A 阶段的 artifacts 由 B 的 v2 artifacts 继承覆盖。
 
 
 Step 3.2-C 使用完整 Validation split 冻结配准参数；Step 3.2-D 使用这份不可变参数运行完整外部 Test split。Test 结果只作描述性泛化评估，不用于调参、阈值选择或重新冻结。Step 3.3-A 尚未开始。

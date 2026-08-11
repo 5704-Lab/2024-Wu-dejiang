@@ -20,7 +20,7 @@ from step2_dataset.collate import build_dataloader
 from step2_dataset.dataset import PairedQueryTemplateDataset
 from step2_dataset.index import build_dataset_index, load_config as load_step2_config
 
-from .backbone import SharedSiameseBackbone
+from .backbone import FEATURE_STAGES, SharedSiameseBackbone
 
 _EVIDENCE_KEYS = (
     "alignment_validation_report", "alignment_frozen_parameters",
@@ -44,15 +44,18 @@ def load_backbone_config(path: Path) -> dict[str, Any]:
 
 def _validate_config(config: dict[str, Any]) -> None:
     model, run = config.get("model", {}), config.get("run", {})
-    if config.get("roadmap_step") != "3.3-A" or config.get("schema_version") != "step3-backbone-config-v1":
-        raise ValueError("Invalid Step 3.3-A config schema")
-    expected_model = {
-        "architecture": "resnet50", "output_stage": "layer4", "output_channels": 2048,
-        "output_stride": 32, "multi_scale_output": False,
-    }
-    for key, value in expected_model.items():
-        if model.get(key) != value:
-            raise ValueError(f"Invalid backbone setting {key}: {model.get(key)}")
+    if config.get("roadmap_step") != "3.3-B" or config.get("schema_version") != "step3-backbone-config-v1":
+        raise ValueError("Invalid Step 3.3-B config schema")
+    if model.get("architecture") != "resnet50":
+        raise ValueError("Invalid backbone architecture")
+    if model.get("multi_scale_output") is not True:
+        raise ValueError("multi_scale_output must be true for Step 3.3-B")
+    declared = [
+        (item["name"], item["stage"], item["channels"], item["stride"])
+        for item in model.get("feature_stages", [])
+    ]
+    if tuple(declared) != FEATURE_STAGES:
+        raise ValueError(f"feature_stages must exactly match {FEATURE_STAGES}")
     if model.get("weights") not in {"IMAGENET1K_V2", "none", None}:
         raise ValueError("Unsupported backbone weights")
     if model.get("normalization", {}).get("mean") != [0.485, 0.456, 0.406] or model.get("normalization", {}).get("std") != [0.229, 0.224, 0.225]:
@@ -120,24 +123,40 @@ def run_backbone_smoke(config: dict[str, Any]) -> dict[str, Any]:
     handle = model.encoder.register_forward_hook(count_call)
     batches = []
     sample_ids = []
+    stage_names = [name for name, _, _, _ in FEATURE_STAGES]
     with torch.inference_mode():
         for batch in loader:
             query, template = batch["query"].to(device), batch["template"].to(device)
             qf, tf = model(query, template)
-            if not torch.isfinite(qf).all() or not torch.isfinite(tf).all():
-                raise RuntimeError("Backbone produced non-finite features")
+            for features in (qf, tf):
+                if list(features) != stage_names:
+                    raise RuntimeError("Backbone feature keys differ from FEATURE_STAGES")
+                for name in stage_names:
+                    if not torch.isfinite(features[name]).all():
+                        raise RuntimeError(f"Backbone produced non-finite features at {name}")
             identical_q, identical_t = model(query, query)
-            max_identical_difference = float((identical_q - identical_t).abs().max().item())
+            per_scale_difference = {
+                name: float((identical_q[name] - identical_t[name]).abs().max().item())
+                for name in stage_names
+            }
+            feature_stats = {
+                name: {
+                    "query_mean": float(qf[name].mean().item()),
+                    "query_std": float(qf[name].std().item()),
+                    "template_mean": float(tf[name].mean().item()),
+                    "template_std": float(tf[name].std().item()),
+                }
+                for name in stage_names
+            }
             batches.append({
                 "sample_ids": [meta["sample_id"] for meta in batch["meta"]],
-                "input_shape": list(query.shape), "query_output_shape": list(qf.shape),
-                "template_output_shape": list(tf.shape), "dtype": str(qf.dtype),
-                "device": str(qf.device), "finite": True,
-                "query_feature_mean": float(qf.mean().item()),
-                "query_feature_std": float(qf.std().item()),
-                "template_feature_mean": float(tf.mean().item()),
-                "template_feature_std": float(tf.std().item()),
-                "identical_input_max_abs_difference": max_identical_difference,
+                "input_shape": list(query.shape),
+                "query_feature_shapes": {name: list(qf[name].shape) for name in stage_names},
+                "template_feature_shapes": {name: list(tf[name].shape) for name in stage_names},
+                "dtype": str(qf[stage_names[0]].dtype),
+                "device": str(qf[stage_names[0]].device), "finite": True,
+                "feature_stats": feature_stats,
+                "identical_input_max_abs_difference_per_scale": per_scale_difference,
             })
             sample_ids.extend(meta["sample_id"] for meta in batch["meta"])
     handle.remove()
@@ -152,11 +171,20 @@ def run_backbone_smoke(config: dict[str, Any]) -> dict[str, Any]:
         "trainable_parameter_count": sum(parameter.numel() for parameter in model.parameters() if parameter.requires_grad),
         "encoder_forward_calls": hook_calls,
         "expected_encoder_forward_calls": len(batches) * 4,
-        "identical_inputs_equal": all(batch["identical_input_max_abs_difference"] == 0 for batch in batches),
+        "identical_inputs_equal": all(
+            value == 0
+            for batch in batches
+            for value in batch["identical_input_max_abs_difference_per_scale"].values()
+        ),
+    }
+    expected_shapes = {
+        name: [1, channels, 800 // stride, 800 // stride]
+        for name, _, channels, stride in FEATURE_STAGES
     }
     verified = (
         len(sample_ids) == count
-        and all(batch["query_output_shape"][1:] == [2048, 25, 25] for batch in batches)
+        and all(batch["query_feature_shapes"] == expected_shapes for batch in batches)
+        and all(batch["template_feature_shapes"] == expected_shapes for batch in batches)
         and sharing["no_branch_specific_state_keys"]
         and sharing["parameter_object_count"] == sharing["unique_parameter_object_count"]
         and sharing["encoder_forward_calls"] == sharing["expected_encoder_forward_calls"]
@@ -171,18 +199,25 @@ def run_backbone_smoke(config: dict[str, Any]) -> dict[str, Any]:
         raise RuntimeError("Shared backbone smoke verification failed")
 
     contract = {
-        "schema_version": "step3-backbone-contract-v1", "roadmap_step": "3.3-A",
+        "schema_version": "step3-backbone-contract-v2", "roadmap_step": "3.3-B",
         "architecture": "resnet50", "weights": config["model"]["weights"],
         "input": {"shape": ["B", 3, 800, 800], "range": [0.0, 1.0], "channel_order": "RGB",
                   "normalization_owner": "model", "mean": [0.485, 0.456, 0.406],
                   "std": [0.229, 0.224, 0.225]},
-        "output": {"stage": "layer4", "shape": ["B", 2048, 25, 25], "channels": 2048,
-                   "stride": 32, "multi_scale_output": False},
-        "shared_encoder": True, "trainable": True, "deferred_step": "3.3-B",
+        "output": {
+            "multi_scale_output": True,
+            "key_order": [name for name, _, _, _ in FEATURE_STAGES],
+            "features": [
+                {"name": name, "stage": stage, "channels": channels, "stride": stride,
+                 "shape": ["B", channels, 800 // stride, 800 // stride]}
+                for name, stage, channels, stride in FEATURE_STAGES
+            ],
+        },
+        "shared_encoder": True, "trainable": True, "deferred_step": "3.4-A",
     }
     weight_info = _weight_provenance(config["model"].get("weights"))
     report = {
-        "schema_version": "step3-backbone-smoke-v1", "roadmap_step": "3.3-A",
+        "schema_version": "step3-backbone-smoke-v2", "roadmap_step": "3.3-B",
         "verified": True, "processed_sample_count": len(sample_ids), "expected_sample_count": count,
         "ordered_validation_sample_ids": sample_ids, "selected_device": str(device),
         "batches": batches, "sharing": sharing, "weights": weight_info,
@@ -196,7 +231,7 @@ def run_backbone_smoke(config: dict[str, Any]) -> dict[str, Any]:
     contract_path, report_path = output_root / "backbone_contract.json", output_root / "smoke_report.json"
     write_json(contract_path, contract); write_json(report_path, report)
     manifest = {
-        "schema_version": "step3-backbone-run-manifest-v1", "roadmap_step": "3.3-A",
+        "schema_version": "step3-backbone-run-manifest-v2", "roadmap_step": "3.3-B",
         "command": "backbone-smoke", "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "software": {"python": platform.python_version(), "torch": torch.__version__,
                      "torchvision": torchvision.__version__, "cuda_available": torch.cuda.is_available(),
@@ -210,7 +245,7 @@ def run_backbone_smoke(config: dict[str, Any]) -> dict[str, Any]:
         "controls": {"source_read_only_verified": True, "alignment_evidence_integrity_verified": True,
                      "alignment_recomputed": False, "alignment_evidence_modified": False,
                      "alignment_applied": False, "test_images_decoded": False,
-                     "multi_scale_started": False, "detector_head_started": False,
+                     "multi_scale_started": True, "detector_head_started": False,
                      "training_started": False},
     }
     write_json(output_root / "run_manifest.json", manifest)

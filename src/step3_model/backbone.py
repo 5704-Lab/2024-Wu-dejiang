@@ -1,4 +1,4 @@
-"""Single-scale shared Siamese ResNet-50 backbone for Step 3.3-A."""
+"""Multi-scale shared Siamese ResNet-50 backbone for Step 3.3-B."""
 
 from __future__ import annotations
 
@@ -6,26 +6,47 @@ import torch
 from torch import nn
 from torchvision.models import ResNet50_Weights, resnet50
 
+FEATURE_STAGES: tuple[tuple[str, str, int, int], ...] = (
+    ("C3", "layer2", 512, 8),
+    ("C4", "layer3", 1024, 16),
+    ("C5", "layer4", 2048, 32),
+)
+
+
+class _ResNetStages(nn.Module):
+    """Single shared ResNet-50 encoder exposing ordered multi-scale taps."""
+
+    def __init__(self, weights: ResNet50_Weights | None) -> None:
+        super().__init__()
+        network = resnet50(weights=weights)
+        self.stem = nn.Sequential(
+            network.conv1, network.bn1, network.relu, network.maxpool
+        )
+        self.layer1 = network.layer1
+        self.layer2 = network.layer2
+        self.layer3 = network.layer3
+        self.layer4 = network.layer4
+
+    def forward(self, x: torch.Tensor) -> dict[str, torch.Tensor]:
+        x = self.stem(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        features = {"C3": x}
+        x = self.layer3(x)
+        features["C4"] = x
+        x = self.layer4(x)
+        features["C5"] = x
+        return features
+
 
 class SharedSiameseBackbone(nn.Module):
     architecture = "resnet50"
-    out_channels = 2048
-    output_stride = 32
+    feature_spec = FEATURE_STAGES
 
     def __init__(self, weights: str | None = "IMAGENET1K_V2") -> None:
         super().__init__()
         resolved_weights = _resolve_weights(weights)
-        network = resnet50(weights=resolved_weights)
-        self.encoder = nn.Sequential(
-            network.conv1,
-            network.bn1,
-            network.relu,
-            network.maxpool,
-            network.layer1,
-            network.layer2,
-            network.layer3,
-            network.layer4,
-        )
+        self.encoder = _ResNetStages(resolved_weights)
         self.weights_name = weights or "none"
         self.register_buffer("mean", torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1))
         self.register_buffer("std", torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1))
@@ -46,12 +67,12 @@ class SharedSiameseBackbone(nn.Module):
         self._validate_images(images, "images")
         return (images - self.mean.to(dtype=images.dtype)) / self.std.to(dtype=images.dtype)
 
-    def encode(self, images: torch.Tensor) -> torch.Tensor:
+    def encode(self, images: torch.Tensor) -> dict[str, torch.Tensor]:
         return self.encoder(self.normalize(images))
 
     def forward(
         self, query: torch.Tensor, template: torch.Tensor
-    ) -> tuple[torch.Tensor, torch.Tensor]:
+    ) -> tuple[dict[str, torch.Tensor], dict[str, torch.Tensor]]:
         self._validate_images(query, "query")
         self._validate_images(template, "template")
         if query.shape != template.shape:

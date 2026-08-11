@@ -1,22 +1,43 @@
 import pytest
 import torch
 
-from step3_model.backbone import SharedSiameseBackbone
+from step3_model.backbone import FEATURE_STAGES, SharedSiameseBackbone
+
+KEYS = [name for name, _, _, _ in FEATURE_STAGES]
 
 
 @pytest.fixture(scope="module")
 def model():
-    return SharedSiameseBackbone(weights=None)
+    return SharedSiameseBackbone(weights=None).eval()
 
 
-def test_shared_backbone_returns_single_tensor_per_branch(model):
-    model.eval()
+def test_forward_returns_ordered_multiscale_dicts(model):
     images = torch.rand(1, 3, 64, 64)
     with torch.inference_mode():
         query, template = model(images, images.clone())
-    assert isinstance(query, torch.Tensor) and isinstance(template, torch.Tensor)
-    assert query.shape == template.shape == (1, 2048, 2, 2)
-    assert torch.equal(query, template)
+    assert isinstance(query, dict) and isinstance(template, dict)
+    assert list(query) == KEYS and list(template) == KEYS
+    assert query["C3"].shape == (1, 512, 8, 8)
+    assert query["C4"].shape == (1, 1024, 4, 4)
+    assert query["C5"].shape == (1, 2048, 2, 2)
+    for name in KEYS:
+        assert torch.equal(query[name], template[name])
+
+
+def test_feature_spec_matches_800x800_shapes(model):
+    images = torch.rand(1, 3, 800, 800)
+    with torch.inference_mode():
+        features, _ = model(images, images)
+    for name, _, channels, stride in FEATURE_STAGES:
+        assert features[name].shape == (1, channels, 800 // stride, 800 // stride)
+
+
+def test_scale_monotonicity(model):
+    with torch.inference_mode():
+        features, _ = model(torch.rand(1, 3, 800, 800), torch.rand(1, 3, 800, 800))
+    c3, c4, c5 = (features[name] for name in KEYS)
+    assert c3.shape[2] == 2 * c4.shape[2] == 4 * c5.shape[2]
+    assert c3.shape[1] * 2 == c4.shape[1] and c4.shape[1] * 2 == c5.shape[1]
 
 
 def test_backbone_has_only_one_parameter_set(model):
@@ -60,11 +81,14 @@ def test_branch_shape_mismatch_is_rejected(model):
         model(torch.rand(1, 3, 32, 32), torch.rand(1, 3, 64, 64))
 
 
-def test_both_branches_backpropagate_to_shared_parameters():
+def test_backward_reaches_all_feature_stages():
     model = SharedSiameseBackbone(weights=None).train()
-    query, template = model(torch.rand(2, 3, 32, 32), torch.rand(2, 3, 32, 32))
-    (query.mean() + template.mean()).backward()
-    assert any(parameter.grad is not None for parameter in model.parameters())
+    query, template = model(torch.rand(2, 3, 64, 64), torch.rand(2, 3, 64, 64))
+    loss = sum(features[name].mean() for features in (query, template) for name in KEYS)
+    loss.backward()
+    for _, stage, _, _ in FEATURE_STAGES:
+        grads = [parameter.grad for parameter in getattr(model.encoder, stage).parameters()]
+        assert any(grad is not None and grad.abs().sum() > 0 for grad in grads)
 
 
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA unavailable")
@@ -73,4 +97,4 @@ def test_cuda_forward():
     images = torch.rand(1, 3, 64, 64, device="cuda")
     with torch.inference_mode():
         query, template = model(images, images)
-    assert query.is_cuda and template.is_cuda
+    assert all(value.is_cuda for value in list(query.values()) + list(template.values()))

@@ -1,6 +1,6 @@
 {
   "architecture": "resnet50",
-  "deferred_step": "3.3-B",
+  "deferred_step": "3.4-A",
   "input": {
     "channel_order": "RGB",
     "mean": [
@@ -26,19 +26,53 @@
     ]
   },
   "output": {
-    "channels": 2048,
-    "multi_scale_output": false,
-    "shape": [
-      "B",
-      2048,
-      25,
-      25
+    "features": [
+      {
+        "channels": 512,
+        "name": "C3",
+        "shape": [
+          "B",
+          512,
+          100,
+          100
+        ],
+        "stage": "layer2",
+        "stride": 8
+      },
+      {
+        "channels": 1024,
+        "name": "C4",
+        "shape": [
+          "B",
+          1024,
+          50,
+          50
+        ],
+        "stage": "layer3",
+        "stride": 16
+      },
+      {
+        "channels": 2048,
+        "name": "C5",
+        "shape": [
+          "B",
+          2048,
+          25,
+          25
+        ],
+        "stage": "layer4",
+        "stride": 32
+      }
     ],
-    "stage": "layer4",
-    "stride": 32
+    "key_order": [
+      "C3",
+      "C4",
+      "C5"
+    ],
+    "multi_scale_output": true
   },
-  "roadmap_step": "3.3-A",
-  "schema_version": "step3-backbone-contract-v1",
+  "roadmap_step": "3.3-B",
+  "schema_version": "step3-backbone-contract-v2",
   "shared_encoder": true,
   "trainable": true,
   "weights": "IMAGENET1K_V2"
