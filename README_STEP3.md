@@ -1,4 +1,36 @@
-# Step 3.2-C / 3.2-D：参数冻结与外部 Test 评估
+# Step 3.2-C / 3.2-D / 3.3-A：配准冻结、Test 评估与共享 Backbone
+
+Step 3.3-A 已实现一个单实例、共享权重的 Siamese ResNet-50 Backbone。它直接消费 Step 2 的 raw paired tensors，不在线重算配准；Step 3.2 Validation/Test 的 800 个样本最终均选择 original，且当前没有训练集 aligned-image 索引。Step 3.3-B 尚未开始。
+
+## Step 3.3-A Backbone
+
+正式命令：
+
+```bash
+python scripts/run_step3.py backbone-smoke --config configs/step3_backbone.yaml
+```
+
+模型使用 torchvision `ResNet50_Weights.IMAGENET1K_V2`，只保留 stem 和 `layer1`–`layer4`，移除分类 avgpool/fc。Query 和 Template 调用同一个 encoder：
+
+- 输入：RGB float32 `[B, 3, 800, 800]`，值域 `[0,1]`
+- 模型内 normalization：mean `[0.485,0.456,0.406]`，std `[0.229,0.224,0.225]`
+- 单尺度输出：每分支 `[B, 2048, 25, 25]`
+- output stride：32
+- 参数：23,508,032，全部 trainable
+- multi-scale output：false
+
+真实 smoke 使用 ordered Validation prefix 的 2 对图像、batch size 1，并在 CUDA 可用时选择 CUDA。共享证明包括：只注册一个 encoder、state dict 无 branch-specific keys、159 个参数对象全部唯一、同一 encoder 被双分支实际调用、同输入双分支输出完全一致。
+
+本次真实环境为 PyTorch 2.11.0+cu128、torchvision 0.26.0+cu128，选择 CUDA；下载并缓存官方 `resnet50-11ad3fa6.pth`，checkpoint SHA-256 为 `11ad3fa62ca79e40addfd354a8ec4b7c75143b3038b8d2a807fbc68deab379ca`。权重保存在 PyTorch Hub cache，不复制到仓库，也不生成模型 checkpoint。
+
+产物：
+
+- `artifacts/step3/backbone/backbone_contract.json`
+- `artifacts/step3/backbone/smoke_report.json`
+- `artifacts/step3/backbone/run_manifest.json`
+
+Step 3.3-A 不实现 layer2/layer3/layer4 多尺度公开输出、FPN/channel projection、feature fusion、attention、DCN、loss、optimizer、训练或 RT-DETR。多尺度输出和对应测试属于 Step 3.3-B。
+
 
 Step 3.2-C 使用完整 Validation split 冻结配准参数；Step 3.2-D 使用这份不可变参数运行完整外部 Test split。Test 结果只作描述性泛化评估，不用于调参、阈值选择或重新冻结。Step 3.3-A 尚未开始。
 

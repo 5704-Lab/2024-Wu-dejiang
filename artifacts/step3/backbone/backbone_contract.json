@@ -1,0 +1,45 @@
+{
+  "architecture": "resnet50",
+  "deferred_step": "3.3-B",
+  "input": {
+    "channel_order": "RGB",
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "normalization_owner": "model",
+    "range": [
+      0.0,
+      1.0
+    ],
+    "shape": [
+      "B",
+      3,
+      800,
+      800
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ]
+  },
+  "output": {
+    "channels": 2048,
+    "multi_scale_output": false,
+    "shape": [
+      "B",
+      2048,
+      25,
+      25
+    ],
+    "stage": "layer4",
+    "stride": 32
+  },
+  "roadmap_step": "3.3-A",
+  "schema_version": "step3-backbone-contract-v1",
+  "shared_encoder": true,
+  "trainable": true,
+  "weights": "IMAGENET1K_V2"
+}

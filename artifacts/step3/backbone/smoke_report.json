@@ -1,0 +1,101 @@
+{
+  "batches": [
+    {
+      "device": "cuda:0",
+      "dtype": "torch.float32",
+      "finite": true,
+      "identical_input_max_abs_difference": 0.0,
+      "input_shape": [
+        1,
+        3,
+        800,
+        800
+      ],
+      "query_feature_mean": 0.05739551782608032,
+      "query_feature_std": 0.49430468678474426,
+      "query_output_shape": [
+        1,
+        2048,
+        25,
+        25
+      ],
+      "sample_ids": [
+        "0008_b1_test"
+      ],
+      "template_feature_mean": 0.05741989612579346,
+      "template_feature_std": 0.49453750252723694,
+      "template_output_shape": [
+        1,
+        2048,
+        25,
+        25
+      ]
+    },
+    {
+      "device": "cuda:0",
+      "dtype": "torch.float32",
+      "finite": true,
+      "identical_input_max_abs_difference": 0.0,
+      "input_shape": [
+        1,
+        3,
+        800,
+        800
+      ],
+      "query_feature_mean": 0.051711924374103546,
+      "query_feature_std": 0.4614107012748718,
+      "query_output_shape": [
+        1,
+        2048,
+        25,
+        25
+      ],
+      "sample_ids": [
+        "0008_b_test"
+      ],
+      "template_feature_mean": 0.05111640691757202,
+      "template_feature_std": 0.4582192599773407,
+      "template_output_shape": [
+        1,
+        2048,
+        25,
+        25
+      ]
+    }
+  ],
+  "expected_sample_count": 2,
+  "input_policy": {
+    "alignment_applied": false,
+    "alignment_evidence_modified": false,
+    "alignment_selection_index_available": false,
+    "rationale": "Frozen Validation/Test selections retained original for all evaluated pairs.",
+    "source": "raw_step2_pair_tensors"
+  },
+  "ordered_validation_sample_ids": [
+    "0008_b1_test",
+    "0008_b_test"
+  ],
+  "processed_sample_count": 2,
+  "roadmap_step": "3.3-A",
+  "schema_version": "step3-backbone-smoke-v1",
+  "selected_device": "cuda",
+  "sharing": {
+    "encoder_forward_calls": 8,
+    "expected_encoder_forward_calls": 8,
+    "identical_inputs_equal": true,
+    "no_branch_specific_state_keys": true,
+    "parameter_count": 23508032,
+    "parameter_object_count": 159,
+    "single_encoder_registered": true,
+    "trainable_parameter_count": 23508032,
+    "unique_parameter_object_count": 159
+  },
+  "verified": true,
+  "weights": {
+    "checkpoint_cached": true,
+    "checkpoint_filename": "resnet50-11ad3fa6.pth",
+    "checkpoint_sha256": "11ad3fa62ca79e40addfd354a8ec4b7c75143b3038b8d2a807fbc68deab379ca",
+    "name": "IMAGENET1K_V2",
+    "url": "https://download.pytorch.org/models/resnet50-11ad3fa6.pth"
+  }
+}
