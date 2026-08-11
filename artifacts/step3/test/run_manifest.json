@@ -1,0 +1,48 @@
+{
+  "artifacts": {
+    "alignment_report.json": "39c8f575cb1a27621d73f988ebc4d28023345395ea64d162020c86f1fa54217d",
+    "val_test_comparison.json": "590791380b805f2ee115bfd6ca1964244817db79a148b15642ac8e1adb2e38cf"
+  },
+  "command": "test-evaluate",
+  "controls": {
+    "frozen_evidence_integrity_verified": true,
+    "parameter_freeze_written": false,
+    "parameters_loaded_exactly": true,
+    "source_read_only_verified": true,
+    "step_3_3_a_started": false,
+    "tuning_performed": false,
+    "validation_recomputed": false
+  },
+  "generated_at_utc": "2026-08-11T05:34:18.499825+00:00",
+  "inputs": {
+    "config_sha256": "571605d708d61d84cf3839c8ed94bdcf5f0caec8be1148b6ab9904b598eb530d",
+    "frozen_parameters_sha256": "0d04510fae052089f6a28593b81f3ed82322c28fed9faae71233ce0dc159cf21",
+    "ordered_test_ids_sha256": "4a72e03dd726e621fd0c8b99f8b52f15ea2d9b4229353e959f1c6e3c8b96dd1f",
+    "parameters_sha256": "2262bcc10235465a2138e602de584eff5ea976289b67ea920b96e694051efe8c",
+    "source_snapshot_digest": "1e8c83146414f501caa05e2f4a6b719732523d6a196859370abda43add40fd13",
+    "step1_samples_sha256": "ac2f64d39fdff5adba0f432e8ef9c4734dcdeb0102bc3de784e4b82388a6b66b",
+    "step1_split_manifest_sha256": "e70836308a12277896f5dad390dcbe4bd8a2ef73440a9cc669999cad31a61c45",
+    "step1_split_summary_sha256": "97d31eccf868ee1dd78427b22c2e0080c9b3c10d6c25c0df1d0c6c992d29398f",
+    "step1_test_split_sha256": "4a72e03dd726e621fd0c8b99f8b52f15ea2d9b4229353e959f1c6e3c8b96dd1f",
+    "step2_test_split_sha256": "4a72e03dd726e621fd0c8b99f8b52f15ea2d9b4229353e959f1c6e3c8b96dd1f",
+    "test_group_count": 40,
+    "test_sample_count": 400,
+    "validation_manifest_sha256": "5d6d9ea00d63c2bd16fbe9ae4e72b783a5c63fae31f93b7480b1cfebedce1c16",
+    "validation_report_sha256": "810699c9d3fb0ce28aec04a2580d8d0c3e48e5c2e8bf66310ec215ebeeab027b"
+  },
+  "roadmap_step": "3.2-D",
+  "schema_version": "step3-test-run-manifest-v1",
+  "scope": {
+    "complete": true,
+    "group_count": 40,
+    "sample_count": 400,
+    "split": "test"
+  },
+  "software": {
+    "numpy": "2.3.5",
+    "opencv": "4.10.0",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.6",
+    "pyyaml": "6.0.2"
+  }
+}

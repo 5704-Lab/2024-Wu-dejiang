@@ -1,4 +1,79 @@
-# Step 3.2-C：完整 Validation 与配准参数冻结
+# Step 3.2-C / 3.2-D：参数冻结与外部 Test 评估
+
+Step 3.2-C 使用完整 Validation split 冻结配准参数；Step 3.2-D 使用这份不可变参数运行完整外部 Test split。Test 结果只作描述性泛化评估，不用于调参、阈值选择或重新冻结。Step 3.3-A 尚未开始。
+
+## Step 3.2-D 正式范围
+
+- split：仅 `test`
+- 样本数：400
+- source groups：40
+- 参数来源：`artifacts/step3/alignment_parameters_frozen.json`
+- 冻结参数 digest：`2262bcc10235465a2138e602de584eff5ea976289b67ea920b96e694051efe8c`
+- tuning/refreeze：禁止
+- Validation 证据：保持字节内容不变，不重新计算
+- 原始数据集：严格只读
+
+运行命令：
+
+```bash
+python scripts/run_step1.py verify --config configs/step1_dataset.yaml
+python scripts/run_step3.py test-evaluate --config configs/step3_alignment_test.yaml
+python scripts/run_step1.py verify --config configs/step1_dataset.yaml
+```
+
+Test 配置不能包含任何 SIFT、matcher、RANSAC、geometry、near-identity 或 quality 参数。Runner 会先校验 Step 3.2-C Validation report、frozen parameters 和 manifest 的固定 hashes，再仅从 freeze artifact 构造 `SIFTAligner`。
+
+在 Windows 的 CRLF checkout 中，文本证据 hash 会先明确规范化为 LF；无效 UTF-8 或裸 CR 会被拒绝。该规则只用于验证已提交的 JSON 文本证据，不通过 JSON 重序列化改变其语义或覆盖 C 产物。
+
+## Step 3.2-D 产物
+
+- `artifacts/step3/test/alignment_report.json`：完整 Test 报告，400 条逐样本记录、判据、状态、分布和有限诊断。
+- `artifacts/step3/test/val_test_comparison.json`：Validation 与 Test 的描述性 count/rate/分布差异，不含综合分数、新阈值或自动通过结论。
+- `artifacts/step3/test/run_manifest.json`：Test provenance、冻结证据 hashes、输出 hashes、软件版本和 no-tuning/no-refreeze 控制状态。
+- `artifacts/step3/alignment/test/*.png`：最多 20 个确定性诊断样本的 comparison/matches，不纳入 Git。
+
+Test report 的 scope 必须声明完整 Test、参数从 freeze 加载、未调参、未重新冻结。Val-vs-Test comparison 的 policy 必须声明：未执行参数/阈值选择、Test 未用于 tuning、未应用自动 acceptance gate、未开始下一步。
+
+本次外部 Test 结果为：400/400 Homography 均成功估计并通过几何验收；399 个样本为 already-aligned，1 个样本 `0153_b1_test` 超过 near-identity 角点位移阈值并生成候选 Warp，但 SSIM 下降 0.00277、互信息下降 0.1100，因此保留 original；没有任何 warped candidate 被选择。相对 Validation，already-aligned 比例由 99.5% 变为 99.75%，original-retained 由 0.5% 变为 0.25%，差异仅作描述，不用于修改冻结参数。
+
+## 完整性与泄漏保护
+
+Step 3.2-D 只打开 `samples.jsonl`、`splits/test.txt`、split manifest/summary 和 Step 2 index manifest。它不会打开 `train.txt` 或 `val.txt`，也不会重新加载 Validation 图像。运行会验证：
+
+- 400 个唯一 Test IDs 和 40 个 Test groups；
+- train/val/test group sets 两两不重叠；
+- 每个 Test ID 属于 Test group，且所有 Test groups 均被覆盖；
+- Step 1/Step 2 samples 和 Test split hashes 一致；
+- 所有源路径位于 dataset root；
+- Test 输出根不会覆盖 Step 3.2-C artifacts；
+- 运行前后 dataset snapshot 完全相同；
+- 诊断读取后再执行最终 snapshot；
+- C 三份冻结证据在 Test 运行前后 hashes 不变。
+
+任何结构、来源、冻结证据、只读或完整性错误都会 fail closed；单个样本的 Homography 拒绝属于合法评估结果。
+
+## Step 3.2-C 冻结摘要
+
+Validation 为 400 samples / 40 groups。最大内点重投影误差阈值基于 Validation 从 5.5 px 调整并冻结为 9.0 px；其余参数保持候选值。最终 Validation：400 个 Homography 全部几何通过，398 个 already-aligned，2 个候选 Warp 因 SSIM/MI 下降保留 original。
+
+冻结产物与 Validation 报告位于：
+
+- `artifacts/step3/alignment_report.json`
+- `artifacts/step3/alignment_parameters_frozen.json`
+- `artifacts/step3/run_manifest.json`
+
+Step 3.2-D 绝不写入这些路径。
+
+## 测试
+
+```bash
+python -m pytest tests/step3 -q
+python -m pytest tests/step1 tests/step2 tests/step3 -q
+```
+
+测试覆盖 Validation freeze 回归、Test-only contract、算法参数覆盖拒绝、冻结证据完整性、CRLF/LF digest、Test 固定顺序、无 train/val split 访问、group/hash/path 安全和严格 JSON。
+
+Step 3.2-D 完成后停止，不修改冻结参数，不开始 Step 3.3-A。
 
 Step 3.2-C 使用 Step 1 生成的外部分组 split，只运行完整 Validation 集，对 Step 3.2-B 的 SIFT/RANSAC、Homography 几何验收、near-identity 和质量选择参数进行最终审查并冻结。Step 3.2-D 才会使用冻结参数运行 Test；本步骤不读取、不评估 Test，也不能根据 Test 调参。
 
