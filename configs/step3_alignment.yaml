@@ -1,10 +1,22 @@
-# Step 3.2-B: Homography geometry and quality acceptance
+schema_version: step3-alignment-config-v1
+roadmap_step: 3.2-C
 inputs:
   step1_root: artifacts/step1
   step2_root: artifacts/step2
   dataset_root: "D:/WuDJ/Desktop/工作室文档/project/数据集/VOCdevkit/VOC2007"
+  samples: samples.jsonl
+  splits_dir: splits
+  split_manifest: split_manifest.json
+  split_summary: split_summary.json
+  step2_index_manifest: index_manifest.json
 output:
   root: artifacts/step3
+run:
+  purpose: validation_freeze
+  split: val
+  selection: full_split
+  expected_sample_count: 400
+  expected_group_count: 40
 sift:
   nfeatures: 2000
   n_octave_layers: 3
@@ -20,7 +32,7 @@ ransac:
   confidence: 0.995
   min_inliers: 10
   min_inlier_ratio: 0.50
-  max_inlier_reprojection_error: 5.5
+  max_inlier_reprojection_error: 9.0
 geometry:
   normalization_epsilon: 1.0e-8
   max_condition_number: 10000.0
@@ -47,6 +59,7 @@ quality:
   min_mutual_info_improvement: 0.01
   max_ssim_regression: 0.0005
   max_mutual_info_regression: 0.01
-validation:
-  sample_count: 10
-  seed: 20260717
+diagnostics:
+  max_samples: 20
+  render_comparison: true
+  render_matches: true

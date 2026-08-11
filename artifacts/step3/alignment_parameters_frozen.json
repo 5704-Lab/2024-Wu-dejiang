@@ -1,0 +1,80 @@
+{
+  "derived_from": {
+    "group_count": 40,
+    "sample_count": 400,
+    "source_snapshot_digest": "1e8c83146414f501caa05e2f4a6b719732523d6a196859370abda43add40fd13",
+    "split": "val",
+    "step1_samples_sha256": "ac2f64d39fdff5adba0f432e8ef9c4734dcdeb0102bc3de784e4b82388a6b66b",
+    "step1_val_split_sha256": "f28f38eed9e7895f3dc758c71f12be76cf073c843522dc189b85d215142ce3bf",
+    "validation_report_sha256": "810699c9d3fb0ce28aec04a2580d8d0c3e48e5c2e8bf66310ec215ebeeab027b"
+  },
+  "frozen_at_utc": "2026-08-11T02:18:31.544634+00:00",
+  "intended_next_use": "Step 3.2-D Test alignment evaluation",
+  "parameters": {
+    "geometry": {
+      "max_abs_rotation_degrees": 30.0,
+      "max_anisotropy_ratio": 2.0,
+      "max_condition_number": 10000.0,
+      "max_perspective_strength": 0.25,
+      "max_projected_area_ratio": 2.0,
+      "max_scale": 2.0,
+      "min_overlap_ratio": 0.7,
+      "min_projected_area_ratio": 0.5,
+      "min_scale": 0.5,
+      "normalization_epsilon": 1e-08
+    },
+    "matcher": {
+      "backend": "bf",
+      "lowe_ratio": 0.7
+    },
+    "near_identity": {
+      "enabled": true,
+      "max_abs_rotation_degrees": 0.1,
+      "max_corner_displacement_pixels": 1.0,
+      "max_perspective_strength": 0.002,
+      "max_scale_deviation": 0.005
+    },
+    "quality": {
+      "erode_ssim_mask": true,
+      "max_mutual_info_regression": 0.01,
+      "max_ssim_regression": 0.0005,
+      "min_mutual_info_improvement": 0.01,
+      "min_ssim_improvement": 0.001,
+      "min_valid_pixels": 1024,
+      "mutual_info_bins": 64,
+      "ssim_window": 11
+    },
+    "ransac": {
+      "confidence": 0.995,
+      "max_inlier_reprojection_error": 9.0,
+      "max_iterations": 2000,
+      "min_inlier_ratio": 0.5,
+      "min_inliers": 10,
+      "reprojection_threshold": 5.0
+    },
+    "sift": {
+      "contrast_threshold": 0.04,
+      "edge_threshold": 10,
+      "n_octave_layers": 3,
+      "nfeatures": 2000,
+      "sigma": 1.6
+    }
+  },
+  "parameters_sha256": "2262bcc10235465a2138e602de584eff5ea976289b67ea920b96e694051efe8c",
+  "roadmap_step": "3.2-C",
+  "schema_version": "step3-alignment-freeze-v1",
+  "selection": {
+    "rationale": [
+      {
+        "frozen_value": 9.0,
+        "parameter": "ransac.max_inlier_reprojection_error",
+        "previous_value": 5.5,
+        "safety_intent": "Accept globally stable near-identity homographies while retaining a finite maximum-error guard above the observed Validation maximum.",
+        "validation_evidence": "Three Validation samples exceeded 5.5 px only because of isolated RANSAC inliers (6.66-8.40 px), while their mean errors were 0.049-0.087 px, inlier ratios were 0.953-0.977, condition numbers were 1.0001-1.0014, and projected overlap was at least 0.99927."
+      }
+    ],
+    "test_used_for_tuning": false,
+    "workflow": "validation_only"
+  },
+  "status": "frozen"
+}

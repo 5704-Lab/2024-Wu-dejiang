@@ -1,121 +1,164 @@
 import json
-from collections import defaultdict
 from pathlib import Path
 
 import pytest
 
 from step1_audit.paths import validate_roots
 from step3_model.alignment import AlignmentResult
-from step3_model.run_alignment import _allocate_split_counts, _resolve, _summarize
+from step3_model.run_alignment import (
+    _canonical_digest,
+    _distribution,
+    _effective_parameters,
+    _load_full_validation_split,
+    _resolve,
+    _validate_run_contract,
+    _validation_report,
+)
 
 
-def test_allocate_split_counts_uses_total_requested_count():
-    split_ids = {
-        "train": [f"train-{index}" for index in range(80)],
-        "val": [f"val-{index}" for index in range(10)],
-        "test": [f"test-{index}" for index in range(10)],
-    }
-    quotas = _allocate_split_counts(split_ids, 10)
-    assert quotas == {"train": 8, "val": 1, "test": 1}
-    assert sum(quotas.values()) == 10
-
-
-def test_summary_with_no_results_is_strict_json():
-    summary = _summarize([], defaultdict(list), [])
-    assert summary["schema_version"] == "step3-alignment-v4"
-    assert summary["total_samples"] == 0
-    assert summary["overall"]["mean_inlier_reprojection_error_mean"] is None
-    assert summary["stages"]["quality_improved_rate"] is None
-    encoded = json.dumps(summary, allow_nan=False)
-    assert "NaN" not in encoded
-
-
-def test_summary_contains_auditable_sample_records():
-    result = AlignmentResult(
-        sample_id="sample-1",
-        success=True,
-        homography_estimated=True,
-        geometry_accepted=True,
-        quality_improved=True,
-        warp_applied=True,
-        quality_evaluated=True,
-        selected_variant="warped",
-        status="warped_selected",
-        reasons=["warped_candidate_selected"],
-        criteria={"minimum_inlier_ratio": {
-            "applicable": True, "passed": True, "value": 10 / 12,
-            "operator": ">=", "threshold": 0.5,
-        }},
-        num_keypoints_query=20,
-        num_keypoints_template=22,
-        num_raw_matches=12,
-        num_inlier_matches=10,
-        inlier_ratio=10 / 12,
-        ransac_reprojection_error=0.4,
-        max_inlier_reprojection_error=0.8,
-        projected_overlap_ratio=0.9,
-        valid_pixel_count=900,
-        valid_pixel_ratio=0.9,
-        ssim_valid_pixel_count=800,
-        ssim_valid_pixel_ratio=0.8,
-        metrics_valid=True,
-        ssim_original=0.8,
-        ssim_warped=0.85,
-        ssim_selected=0.85,
-        mutual_info_original=1.2,
-        mutual_info_warped=1.3,
-        mutual_info_selected=1.3,
-    )
-    summary = _summarize(
-        [result], defaultdict(list),
-        [{"sample_id": "sample-1", "split": "val"}],
-    )
-    sample = summary["samples"][0]
-    assert sample["split"] == "val"
-    assert sample["geometry_accepted"] is True
-    assert sample["quality_improved"] is True
-    assert sample["ssim_candidate_delta"] == pytest.approx(0.05)
-    assert summary["stages"]["quality_improved_rate"] == pytest.approx(1.0)
-    assert summary["decisions"]["selected_warped_count"] == 1
-    assert summary["by_split"]["val"]["stages"]["geometry_accepted_count"] == 1
-
-
-def test_already_aligned_is_not_a_failure():
-    result = AlignmentResult(
-        sample_id="aligned",
-        success=True,
-        homography_estimated=True,
-        geometry_accepted=True,
-        already_aligned=True,
-        status="already_aligned",
-        reasons=["near_identity_transform"],
-        ssim_original=1.0,
-        ssim_selected=1.0,
-        mutual_info_original=2.0,
-        mutual_info_selected=2.0,
-    )
-    summary = _summarize([result], defaultdict(list), [])
-    assert summary["failure_count"] == 0
-    assert summary["stages"]["already_aligned_count"] == 1
-    assert summary["stages"]["quality_evaluated_count"] == 0
-    assert summary["stages"]["quality_improved_rate"] is None
-
-
-def test_rejection_reasons_and_criteria_are_counted():
-    result = AlignmentResult(
-        sample_id="bad",
-        homography_estimated=True,
-        status="geometry_rejected",
-        reasons=["minimum_inlier_ratio", "overlap_above_minimum"],
-        criteria={
-            "minimum_inlier_ratio": {"passed": False},
-            "overlap_above_minimum": {"passed": False},
+def _config(tmp_path: Path, expected_count: int = 2, expected_groups: int = 1):
+    step1 = tmp_path / "step1"
+    step2 = tmp_path / "step2"
+    dataset = tmp_path / "dataset"
+    output = tmp_path / "output"
+    (step1 / "splits").mkdir(parents=True)
+    step2.mkdir()
+    (dataset / "query").mkdir(parents=True)
+    (dataset / "template").mkdir(parents=True)
+    return {
+        "roadmap_step": "3.2-C",
+        "inputs": {
+            "samples": "samples.jsonl",
+            "splits_dir": "splits",
+            "split_manifest": "split_manifest.json",
+            "split_summary": "split_summary.json",
+            "step2_index_manifest": "index_manifest.json",
         },
+        "run": {
+            "purpose": "validation_freeze",
+            "split": "val",
+            "selection": "full_split",
+            "expected_sample_count": expected_count,
+            "expected_group_count": expected_groups,
+        },
+        "_step1_root": str(step1),
+        "_step2_root": str(step2),
+        "_dataset_root": str(dataset),
+        "_output_root": str(output),
+        "sift": {}, "matcher": {}, "ransac": {}, "geometry": {},
+        "near_identity": {}, "quality": {}, "diagnostics": {},
+    }
+
+
+def _write_fixture(config):
+    from step1_audit.hashing import sha256_file
+    step1 = Path(config["_step1_root"])
+    step2 = Path(config["_step2_root"])
+    dataset = Path(config["_dataset_root"])
+    records = []
+    for sample_id in ("0001_a", "0001_b"):
+        query = dataset / "query" / f"{sample_id}.png"
+        template = dataset / "template" / f"{sample_id}.png"
+        query.write_bytes(b"query")
+        template.write_bytes(b"template")
+        records.append({
+            "sample_id": sample_id,
+            "source_id": "0001",
+            "query_path": f"query/{sample_id}.png",
+            "template_path": f"template/{sample_id}.png",
+        })
+    samples_path = step1 / "samples.jsonl"
+    samples_path.write_text("".join(json.dumps(r, sort_keys=True) + "\n" for r in records), encoding="utf-8")
+    val_path = step1 / "splits" / "val.txt"
+    val_path.write_text("0001_a\n0001_b\n", encoding="utf-8")
+    samples_hash, val_hash = sha256_file(samples_path), sha256_file(val_path)
+    (step1 / "split_manifest.json").write_text(json.dumps({
+        "groups": {"val": ["0001"]}, "samples_digest": samples_hash,
+    }), encoding="utf-8")
+    (step1 / "split_summary.json").write_text(json.dumps({
+        "val": {"sample_count": 2, "group_count": 1},
+    }), encoding="utf-8")
+    (step2 / "index_manifest.json").write_text(json.dumps({
+        "step1_samples_sha256": samples_hash,
+        "split_sha256": {"val": val_hash},
+    }), encoding="utf-8")
+
+
+def test_run_contract_rejects_test_or_sampling(tmp_path: Path):
+    config = _config(tmp_path)
+    _validate_run_contract(config)
+    config["run"]["split"] = "test"
+    with pytest.raises(ValueError, match="run contract"):
+        _validate_run_contract(config)
+    config["run"]["split"] = "val"
+    config["run"]["selection"] = "sample"
+    with pytest.raises(ValueError, match="run contract"):
+        _validate_run_contract(config)
+
+
+def test_full_validation_loader_preserves_order_and_reads_only_val(tmp_path: Path, monkeypatch):
+    config = _config(tmp_path)
+    _write_fixture(config)
+    original = Path.read_text
+
+    def guarded(path, *args, **kwargs):
+        if path.name == "test.txt":
+            raise AssertionError("Test split must not be read")
+        return original(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", guarded)
+    entries, provenance = _load_full_validation_split(config)
+    assert [entry["sample_id"] for entry in entries] == ["0001_a", "0001_b"]
+    assert {entry["split"] for entry in entries} == {"val"}
+    assert provenance["validation_sample_count"] == 2
+    assert "test" not in json.dumps(provenance).lower()
+
+
+def test_full_validation_loader_rejects_duplicates(tmp_path: Path):
+    config = _config(tmp_path)
+    _write_fixture(config)
+    val_path = Path(config["_step1_root"]) / "splits" / "val.txt"
+    val_path.write_text("0001_a\n0001_a\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="duplicate"):
+        _load_full_validation_split(config)
+
+
+def test_distribution_handles_missing_values_and_is_strict_json():
+    distribution = _distribution([1.0, 2.0, None, float("nan")])
+    assert distribution["count"] == 2
+    assert distribution["missing_count"] == 2
+    assert distribution["quantiles"]["p50"] == pytest.approx(1.5)
+    json.dumps(distribution, allow_nan=False)
+
+
+def test_parameter_digest_ignores_diagnostics_and_changes_with_algorithm():
+    first = {section: {} for section in ("sift", "matcher", "ransac", "geometry", "near_identity", "quality")}
+    first["diagnostics"] = {"max_samples": 1}
+    second = dict(reversed(list(first.items())))
+    second["diagnostics"] = {"max_samples": 20}
+    assert _canonical_digest(_effective_parameters(first)) == _canonical_digest(_effective_parameters(second))
+    second["ransac"] = {"min_inlier_ratio": 0.6}
+    assert _canonical_digest(_effective_parameters(first)) != _canonical_digest(_effective_parameters(second))
+
+
+def test_validation_report_is_validation_only_and_complete():
+    result = AlignmentResult(
+        sample_id="sample-1", success=True, homography_estimated=True,
+        geometry_accepted=True, already_aligned=True, status="already_aligned",
+        reasons=["near_identity_transform"], ssim_original=1.0, ssim_selected=1.0,
+        mutual_info_original=2.0, mutual_info_selected=2.0,
     )
-    summary = _summarize([result], defaultdict(list), [])
-    assert summary["failure_count"] == 1
-    assert summary["reason_counts"]["minimum_inlier_ratio"] == 1
-    assert summary["criterion_failure_counts"]["overlap_above_minimum"] == 1
+    config = {
+        "run": {"expected_sample_count": 1, "expected_group_count": 1},
+        **{section: {} for section in ("sift", "matcher", "ransac", "geometry", "near_identity", "quality")},
+    }
+    report = _validation_report([result], config, {}, "digest", [])
+    assert report["schema_version"] == "step3-alignment-validation-v1"
+    assert report["scope"]["split"] == "val"
+    assert report["scope"]["complete"] is True
+    assert report["scope"]["test_accessed"] is False
+    assert len(report["samples"]) == 1
+    json.dumps(report, allow_nan=False)
 
 
 def test_output_root_cannot_be_inside_dataset(tmp_path: Path):

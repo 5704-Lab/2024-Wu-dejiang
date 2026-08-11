@@ -1,0 +1,37 @@
+{
+  "artifacts": {
+    "alignment_parameters_frozen.json": "0d04510fae052089f6a28593b81f3ed82322c28fed9faae71233ce0dc159cf21",
+    "alignment_report.json": "810699c9d3fb0ce28aec04a2580d8d0c3e48e5c2e8bf66310ec215ebeeab027b"
+  },
+  "command": "validate-freeze",
+  "generated_at_utc": "2026-08-11T02:18:31.544634+00:00",
+  "inputs": {
+    "config_sha256": "9f1d731b8786c02ab6ac83b750fac1957ee33553b26a7a90b87e9c78c396cf63",
+    "ordered_validation_ids_sha256": "f28f38eed9e7895f3dc758c71f12be76cf073c843522dc189b85d215142ce3bf",
+    "parameters_sha256": "2262bcc10235465a2138e602de584eff5ea976289b67ea920b96e694051efe8c",
+    "source_snapshot_digest": "1e8c83146414f501caa05e2f4a6b719732523d6a196859370abda43add40fd13",
+    "step1_samples_sha256": "ac2f64d39fdff5adba0f432e8ef9c4734dcdeb0102bc3de784e4b82388a6b66b",
+    "step1_split_manifest_sha256": "e70836308a12277896f5dad390dcbe4bd8a2ef73440a9cc669999cad31a61c45",
+    "step1_val_split_sha256": "f28f38eed9e7895f3dc758c71f12be76cf073c843522dc189b85d215142ce3bf",
+    "step2_validation_split_sha256": "f28f38eed9e7895f3dc758c71f12be76cf073c843522dc189b85d215142ce3bf",
+    "validation_group_count": 40,
+    "validation_sample_count": 400
+  },
+  "roadmap_step": "3.2-C",
+  "schema_version": "step3-run-manifest-v1",
+  "scope": {
+    "complete": true,
+    "group_count": 40,
+    "sample_count": 400,
+    "split": "val",
+    "test_accessed": false
+  },
+  "software": {
+    "numpy": "2.3.5",
+    "opencv": "4.10.0",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.6",
+    "pyyaml": "6.0.2"
+  },
+  "source_read_only_verified": true
+}

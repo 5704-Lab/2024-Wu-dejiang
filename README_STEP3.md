@@ -1,75 +1,120 @@
-# Step 3.2-B：Homography 合法性与质量验收
+# Step 3.2-C：完整 Validation 与配准参数冻结
 
-Step 3 读取 Step 1 的只读样本索引和无泄漏 split，使用 SIFT、Lowe ratio 与 RANSAC 估计 Query→Template Homography。Step 3.2-B 在 Step 3.2-A masked 指标基础上增加几何合法性验收、near-identity 跳过和 original/warped 质量选择。当前范围仍是宏观配准验证，不包含 Siamese、DCN、注意力候选区域或 RT-DETR；Step 3.3 尚未开始。
+Step 3.2-C 使用 Step 1 生成的外部分组 split，只运行完整 Validation 集，对 Step 3.2-B 的 SIFT/RANSAC、Homography 几何验收、near-identity 和质量选择参数进行最终审查并冻结。Step 3.2-D 才会使用冻结参数运行 Test；本步骤不读取、不评估 Test，也不能根据 Test 调参。
 
-## 环境与运行
+## 正式运行范围
+
+- split：仅 `val`
+- 样本数：400
+- source groups：40
+- 选择方式：`val.txt` 固定顺序的完整 split，不抽样
+- Test 访问：禁止
+- 原始数据集：严格只读
+
+历史 Step 3.2-B 的 10 个跨 split 样本仅为功能 smoke probe，不是参数冻结依据。
+
+## 运行
 
 ```bash
 python -m pip install -r requirements-step2.txt
-python scripts/run_step3.py align --config configs/step3_alignment.yaml
-```
-
-`validation.sample_count` 是 train/val/test 合计验证样本数，`validation.seed` 固定确定性抽样。程序只向 `artifacts/step3/` 写入报告和可视化。
-
-## 三阶段语义
-
-schema v4 明确区分：
-
-- `homography_estimated`：OpenCV 返回了 Homography 和 RANSAC mask；不代表矩阵合法。
-- `geometry_accepted`：RANSAC 证据、矩阵数值、投影四边形、变换强度和重叠比例全部通过。
-- `quality_improved`：仅对实际生成的非 near-identity Warp 候选评估；nullable，未评估时为 `null`。
-
-兼容字段 `success` 等同于 `geometry_accepted`。终态包括：
-
-- `homography_not_estimated`
-- `geometry_rejected`
-- `already_aligned`
-- `warped_selected`
-- `original_retained`
-
-返回图像始终是 `selected_variant`。几何拒绝和 near-identity 都保留 original，不执行 Warp。
-
-## Homography 验收
-
-配置位于 `configs/step3_alignment.yaml`：
-
-1. 最小 RANSAC 内点数和内点比例；
-2. 最大内点重投影误差，同时保留平均误差用于诊断；
-3. H 必须是有限 3×3 矩阵，并可通过 `H[2,2]` 归一化；
-4. 在中心化、尺度归一坐标中计算条件数；
-5. Query 四角的齐次分母和投影坐标必须有限；
-6. 投影四边形面积比例处于范围内、保持方向且不自交；
-7. 中心 Jacobian 的尺度、各向异性、旋转，以及归一化 H 的透视强度必须在阈值内；
-8. 投影四边形与 Template 矩形的连续面积重叠比例达到下限。
-
-危险或被拒绝的 H 不会传给 `cv2.warpPerspective`。逐样本 `criteria` 记录每项判据的适用性、值、运算符、阈值和通过状态，`reasons` 记录全部拒绝或选择原因。
-
-## near-identity 与质量选择
-
-当四角最大位移、尺度偏差、绝对旋转和透视强度同时低于 near-identity 阈值时，样本标记为 `already_aligned`，直接使用原 Query，避免插值造成微小退化。
-
-对非 near-identity 且几何通过的 H：
-
-1. 生成 warped candidate 和有效 footprint；
-2. original 与 candidate 在完全相同的 footprint 上计算 SSIM/互信息，SSIM mask 可腐蚀边界；
-3. 至少一个指标达到最小改善，并且两个指标都没有超过允许回退时，才选择 warped；否则状态为 `original_retained`。
-
-报告分别记录 original、warped candidate 和 selected 指标。`quality_improved_rate` 以实际完成质量评估的候选数为分母；没有候选时为 `null`。
-
-## 输出
-
-- `artifacts/step3/alignment_report.json`：`step3-alignment-v4`，包含阈值快照、阶段/决策统计、拒绝原因、判据失败计数、逐 split 和逐样本诊断，纳入 Git。
-- `artifacts/step3/alignment/<split>/*.png`：选择结果对比图、差异热图和 RANSAC 内点图，可重复生成，不纳入 Git。
-
-报告不记录机器相关的绝对数据集路径。不可用数值写为 `null`，并通过严格 JSON 序列化，禁止 NaN/Infinity。
-
-## 只读保证
-
-运行前验证输出目录不等于、也不位于原始数据集目录内；每个输入路径必须解析在数据集根目录内。真实运行前后可执行 Step 1 verify，对比已记录的 source digest：
-
-```bash
+python scripts/run_step1.py verify --config configs/step1_dataset.yaml
+python scripts/run_step3.py validate-freeze --config configs/step3_alignment.yaml
 python scripts/run_step1.py verify --config configs/step1_dataset.yaml
 ```
+
+`validate-freeze` 没有 split、limit、include-test 或阈值覆盖参数。配置必须声明：
+
+```yaml
+roadmap_step: 3.2-C
+run:
+  purpose: validation_freeze
+  split: val
+  selection: full_split
+  expected_sample_count: 400
+  expected_group_count: 40
+```
+
+Runner 只打开 `samples.jsonl` 和 `splits/val.txt`，不会构造或读取 `test.txt`。它会交叉验证 Step 1 split manifest、split summary 和 Step 2 index manifest 中的 Validation hashes。
+
+## 参数审查与冻结原则
+
+完整 Validation 报告用于检查：
+
+- Homography 估计、几何接受/拒绝和 near-identity 比例；
+- 内点数、内点比例、平均/最大内点重投影误差；
+- 条件数、投影面积与重叠比例；
+- 尺度、各向异性、旋转、透视强度和角点位移；
+- original/warped/selected SSIM、互信息和 candidate delta；
+- 所有 criterion failure 和拒绝原因。
+
+只有 Validation 数值分布和诊断图能够支持参数调整。不得为了提高接受率自动放宽安全阈值。若调整任一参数，必须重新运行全部 400 个 Validation 样本，再生成冻结产物。Test 阶段不得重新冻结参数。
+
+## 产物
+
+### `artifacts/step3/alignment_report.json`
+
+schema：`step3-alignment-validation-v1`。
+
+包含：
+
+- Validation-only scope；
+- processed/unique sample count、group count、complete 状态；
+- `test_accessed: false`；
+- 输入 provenance 和 effective parameters；
+- stages、decisions、status/reason/criterion failure counts；
+- 每个样本的完整判据和 Homography 诊断；
+- 数值分布的 count、missing count、min/max/mean/std；
+- p01/p05/p25/p50/p75/p95/p99，使用 NumPy `quantile(method="linear")`；
+- 按终态分组的分布。
+
+不可用或非有限数值写为 `null`，严格禁止 NaN/Infinity。
+
+### `artifacts/step3/alignment_parameters_frozen.json`
+
+schema：`step3-alignment-freeze-v1`。
+
+包含所有会影响配准结果的：
+
+- SIFT 参数；
+- matcher 与 Lowe ratio；
+- RANSAC 参数；
+- Homography geometry 阈值；
+- near-identity 阈值；
+- masked SSIM/MI 和质量选择阈值。
+
+这些参数以排序、紧凑 JSON 规范化后生成 `parameters_sha256`。诊断图片限制和输出路径不进入 digest。Step 3.2-D 必须读取该冻结产物或校验相同 digest。
+
+本次完整 Validation 将 `ransac.max_inlier_reprojection_error` 从 Step 3.2-B 候选值 5.5 px 调整并冻结为 9.0 px。Validation 中 3 个超过 5.5 px 的样本仅存在孤立最大误差（6.66–8.40 px），其平均内点误差仅 0.049–0.087 px、内点比例为 0.953–0.977、条件数为 1.0001–1.0014、投影重叠至少 0.99927，因此整体 Homography 稳定且接近单位阵。9.0 px 仍保留高于 Validation 最大值的有限保护。最终 400 个 Validation Homography 全部通过几何验收；398 个判定为 already-aligned，另外 2 个候选 Warp 均因 SSIM 和互信息显著下降而保留 original。
+
+### `artifacts/step3/run_manifest.json`
+
+记录软件版本、Validation-only scope、source snapshot digest、Step 1/Step 2 Validation hashes、ordered Validation IDs digest、配置 hash，以及 report/freeze artifact hashes。追踪产物中不记录绝对数据集路径，也不记录 Test hash。
+
+## 诊断图片
+
+完整 Validation 默认不会为 400 个普通样本生成全部图片。程序按确定性优先级选择有限样本：
+
+1. Homography 未估计；
+2. 几何拒绝；
+3. Warp 后保留 original；
+4. Warp 被选择；
+5. 最大内点误差较高的 near-identity 样本。
+
+默认最多 20 个样本，只生成 comparison 和 RANSAC matches。图片位于 `artifacts/step3/alignment/val/`，不纳入 Git；JSON 证据纳入 Git。
+
+## 只读与完整性保证
+
+运行前后对原始数据集执行完整 tree snapshot；任何文件增删、大小或 hash 变化都会阻止冻结。以下情况也会 fail closed：
+
+- Validation 样本不是恰好 400 个唯一 ID；
+- Validation group 不是恰好 40 个；
+- ID 不存在或属于非 Validation group；
+- Step 1/Step 2 Validation hash 不一致；
+- 输入路径逃逸数据集根目录；
+- 输出目录位于数据集内；
+- runner 异常或处理不完整。
+
+单个样本的 Homography 估计失败属于有效评估结果，不会使完整 Validation 失效。
 
 ## 测试
 
@@ -78,4 +123,6 @@ python -m pytest tests/step3 -q
 python -m pytest tests/step1 tests/step2 tests/step3 -q
 ```
 
-合成测试覆盖有限性/归一化、条件与投影几何、面积/方向/自交、尺度/旋转/透视、重叠、near-identity、质量选择、已知平移和相同图像跳过 Warp；报告测试覆盖 schema v4、严格 JSON、阶段分母、拒绝原因和 already-aligned 非失败语义。
+测试覆盖 Validation-only 契约、禁止 Test 访问、固定顺序、重复/未知 ID、group/count 完整性、上游 hashes、参数 digest、分布统计、严格 JSON 和路径安全。
+
+本步骤完成后停止，不运行 Test，不自动开始 Step 3.2-D。
