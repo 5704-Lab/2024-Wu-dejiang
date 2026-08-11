@@ -2,71 +2,381 @@
   "by_split": {
     "test": {
       "count": 1,
-      "mean_inliers": 1652.0,
-      "mean_reprojection_error": 0.04717354103922844,
-      "metrics_valid_count": 1,
-      "mi_after_mean": 3.0393732582985624,
-      "mi_before_mean": 3.0397511714856913,
-      "mi_delta_mean": -0.00037791318712887545,
-      "ssim_after_mean": 0.9828512668609619,
-      "ssim_before_mean": 0.9828524788220724,
-      "ssim_delta_mean": -1.2119611104699501e-06,
-      "ssim_valid_pixel_ratio_mean": 0.995715625,
-      "valid_pixel_ratio_mean": 0.99929375,
-      "valid_pixel_ratio_min": 0.99929375
+      "overall": {
+        "abs_rotation_degrees_mean": 0.00022961952768487003,
+        "condition_number_mean": 1.0000495004703809,
+        "inlier_ratio_mean": 0.986268656716418,
+        "local_scale_mean": 0.9999992365536431,
+        "max_corner_displacement_pixels_mean": 0.024456062966164288,
+        "max_inlier_reprojection_error_mean": 3.3152589797973633,
+        "mean_inlier_reprojection_error_mean": 0.04717354103922844,
+        "mean_inliers": 1652.0,
+        "metrics_valid_count": 0,
+        "mi_candidate_delta_mean": null,
+        "mi_original_mean": 3.0402252795512514,
+        "mi_selected_mean": 3.0402252795512514,
+        "mi_warped_mean": null,
+        "perspective_strength_mean": 2.1058828526794427e-05,
+        "projected_area_ratio_mean": 0.9999984739926004,
+        "projected_overlap_ratio_mean": 0.9999762100936559,
+        "projected_overlap_ratio_min": 0.9999762100936559,
+        "ssim_candidate_delta_mean": null,
+        "ssim_original_mean": 0.9829158186912537,
+        "ssim_selected_mean": 0.9829158186912537,
+        "ssim_warped_mean": null,
+        "valid_pixel_ratio_mean": null
+      },
+      "stages": {
+        "already_aligned_count": 1,
+        "already_aligned_rate": 1.0,
+        "geometry_accepted_count": 1,
+        "geometry_accepted_rate": 1.0,
+        "geometry_rejected_count": 0,
+        "geometry_rejected_rate": 0.0,
+        "homography_estimated_count": 1,
+        "homography_estimated_rate": 1.0,
+        "quality_evaluated_count": 0,
+        "quality_evaluated_rate": 0.0,
+        "quality_improved_count": 0,
+        "quality_improved_rate": null,
+        "warp_applied_count": 0,
+        "warp_applied_rate": 0.0
+      }
     },
     "train": {
       "count": 8,
-      "mean_inliers": 1099.625,
-      "mean_reprojection_error": 0.04666722076945007,
-      "metrics_valid_count": 8,
-      "mi_after_mean": 2.5370389071797996,
-      "mi_before_mean": 2.5385183836105245,
-      "mi_delta_mean": -0.0014794764307247132,
-      "ssim_after_mean": 0.9788011536002159,
-      "ssim_before_mean": 0.9788030410806339,
-      "ssim_delta_mean": -1.887480417878118e-06,
-      "ssim_valid_pixel_ratio_mean": 0.9923640625000001,
-      "valid_pixel_ratio_mean": 0.998729296875,
-      "valid_pixel_ratio_min": 0.99723125
+      "overall": {
+        "abs_rotation_degrees_mean": 0.00045477520289250806,
+        "condition_number_mean": 1.000076971772735,
+        "inlier_ratio_mean": 0.9578974651132827,
+        "local_scale_mean": 0.9999965239134715,
+        "max_corner_displacement_pixels_mean": 0.05567448759482628,
+        "max_inlier_reprojection_error_mean": 2.0969665870070457,
+        "mean_inlier_reprojection_error_mean": 0.04666722076945007,
+        "mean_inliers": 1099.625,
+        "metrics_valid_count": 0,
+        "mi_candidate_delta_mean": null,
+        "mi_original_mean": 2.5377126714525002,
+        "mi_selected_mean": 2.5377126714525002,
+        "mi_warped_mean": null,
+        "perspective_strength_mean": 5.7596996116673456e-05,
+        "projected_area_ratio_mean": 0.9999930583612862,
+        "projected_overlap_ratio_mean": 0.9999528117907084,
+        "projected_overlap_ratio_min": 0.999894267082915,
+        "ssim_candidate_delta_mean": null,
+        "ssim_original_mean": 0.9789662609497706,
+        "ssim_selected_mean": 0.9789662609497706,
+        "ssim_warped_mean": null,
+        "valid_pixel_ratio_mean": null
+      },
+      "stages": {
+        "already_aligned_count": 8,
+        "already_aligned_rate": 1.0,
+        "geometry_accepted_count": 8,
+        "geometry_accepted_rate": 1.0,
+        "geometry_rejected_count": 0,
+        "geometry_rejected_rate": 0.0,
+        "homography_estimated_count": 8,
+        "homography_estimated_rate": 1.0,
+        "quality_evaluated_count": 0,
+        "quality_evaluated_rate": 0.0,
+        "quality_improved_count": 0,
+        "quality_improved_rate": null,
+        "warp_applied_count": 0,
+        "warp_applied_rate": 0.0
+      }
     },
     "val": {
       "count": 1,
-      "mean_inliers": 1395.0,
-      "mean_reprojection_error": 0.045360952615737915,
-      "metrics_valid_count": 1,
-      "mi_after_mean": 3.2122781687339157,
-      "mi_before_mean": 3.2318723094876947,
-      "mi_delta_mean": -0.019594140753778966,
-      "ssim_after_mean": 0.9898166457811991,
-      "ssim_before_mean": 0.9898491104443868,
-      "ssim_delta_mean": -3.2464663187736775e-05,
-      "ssim_valid_pixel_ratio_mean": 0.985440625,
-      "valid_pixel_ratio_mean": 0.9975890625,
-      "valid_pixel_ratio_min": 0.9975890625
+      "overall": {
+        "abs_rotation_degrees_mean": 0.0008469076046291139,
+        "condition_number_mean": 1.0001040562509056,
+        "inlier_ratio_mean": 0.9893617021276596,
+        "local_scale_mean": 0.9999627368541614,
+        "max_corner_displacement_pixels_mean": 0.06261640796195964,
+        "max_inlier_reprojection_error_mean": 5.016207695007324,
+        "mean_inlier_reprojection_error_mean": 0.045360952615737915,
+        "mean_inliers": 1395.0,
+        "metrics_valid_count": 0,
+        "mi_candidate_delta_mean": null,
+        "mi_original_mean": 3.2265242199629647,
+        "mi_selected_mean": 3.2265242199629647,
+        "mi_warped_mean": null,
+        "perspective_strength_mean": 5.612637228508166e-05,
+        "projected_area_ratio_mean": 0.9999254813809939,
+        "projected_overlap_ratio_mean": 0.9999236373376608,
+        "projected_overlap_ratio_min": 0.9999236373376608,
+        "ssim_candidate_delta_mean": null,
+        "ssim_original_mean": 0.9899969299634298,
+        "ssim_selected_mean": 0.9899969299634298,
+        "ssim_warped_mean": null,
+        "valid_pixel_ratio_mean": null
+      },
+      "stages": {
+        "already_aligned_count": 1,
+        "already_aligned_rate": 1.0,
+        "geometry_accepted_count": 1,
+        "geometry_accepted_rate": 1.0,
+        "geometry_rejected_count": 0,
+        "geometry_rejected_rate": 0.0,
+        "homography_estimated_count": 1,
+        "homography_estimated_rate": 1.0,
+        "quality_evaluated_count": 0,
+        "quality_evaluated_rate": 0.0,
+        "quality_improved_count": 0,
+        "quality_improved_rate": null,
+        "warp_applied_count": 0,
+        "warp_applied_rate": 0.0
+      }
+    }
+  },
+  "configuration": {
+    "geometry": {
+      "max_abs_rotation_degrees": 30.0,
+      "max_anisotropy_ratio": 2.0,
+      "max_condition_number": 10000.0,
+      "max_perspective_strength": 0.25,
+      "max_projected_area_ratio": 2.0,
+      "max_scale": 2.0,
+      "min_overlap_ratio": 0.7,
+      "min_projected_area_ratio": 0.5,
+      "min_scale": 0.5,
+      "normalization_epsilon": 1e-08
+    },
+    "near_identity": {
+      "enabled": true,
+      "max_abs_rotation_degrees": 0.1,
+      "max_corner_displacement_pixels": 1.0,
+      "max_perspective_strength": 0.002,
+      "max_scale_deviation": 0.005
+    },
+    "quality": {
+      "erode_ssim_mask": true,
+      "max_mutual_info_regression": 0.01,
+      "max_ssim_regression": 0.0005,
+      "min_mutual_info_improvement": 0.01,
+      "min_ssim_improvement": 0.001,
+      "min_valid_pixels": 1024,
+      "mutual_info_bins": 64,
+      "ssim_window": 11
+    },
+    "ransac": {
+      "confidence": 0.995,
+      "max_inlier_reprojection_error": 5.5,
+      "max_iterations": 2000,
+      "min_inlier_ratio": 0.5,
+      "min_inliers": 10,
+      "reprojection_threshold": 5.0
+    }
+  },
+  "criterion_failure_counts": {},
+  "decisions": {
+    "selected_original_count": 10,
+    "selected_warped_count": 0,
+    "status_counts": {
+      "already_aligned": 10
     }
   },
   "failure_count": 0,
   "failures": [],
-  "generated_at_utc": "2026-08-10T09:43:04.797868+00:00",
+  "generated_at_utc": "2026-08-11T01:22:55.193273+00:00",
   "overall": {
+    "abs_rotation_degrees_mean": 0.00047147287554540486,
+    "condition_number_mean": 1.0000769330903165,
+    "inlier_ratio_mean": 0.9638810079750337,
+    "local_scale_mean": 0.9999934164715576,
+    "max_corner_displacement_pixels_mean": 0.05324683716867342,
+    "max_inlier_reprojection_error_mean": 2.5107199370861055,
+    "mean_inlier_reprojection_error_mean": 0.04658722598105669,
     "mean_inliers": 1184.4,
-    "mean_reprojection_error": 0.04658722598105669,
-    "metrics_valid_count": 10,
-    "mi_after_mean": 2.6547962684470874,
-    "mi_before_mean": 2.657977054985758,
-    "mi_delta_mean": -0.003180786538670555,
-    "ssim_after_mean": 0.9803077141443888,
-    "ssim_before_mean": 0.9803125917911532,
-    "ssim_delta_mean": -4.8776467641231666e-06,
-    "ssim_valid_pixel_ratio_mean": 0.9920068750000002,
-    "valid_pixel_ratio_mean": 0.99867171875,
-    "valid_pixel_ratio_min": 0.99723125
+    "metrics_valid_count": 0,
+    "mi_candidate_delta_mean": null,
+    "mi_original_mean": 2.656845087113422,
+    "mi_selected_mean": 2.656845087113422,
+    "mi_warped_mean": null,
+    "perspective_strength_mean": 5.3796116974526377e-05,
+    "projected_area_ratio_mean": 0.9999868422263883,
+    "projected_overlap_ratio_mean": 0.9999522341756985,
+    "projected_overlap_ratio_min": 0.999894267082915,
+    "ssim_candidate_delta_mean": null,
+    "ssim_original_mean": 0.9804642836252848,
+    "ssim_selected_mean": 0.9804642836252848,
+    "ssim_warped_mean": null,
+    "valid_pixel_ratio_mean": null
   },
   "python": "3.12.6",
+  "reason_counts": {
+    "near_identity_transform": 10
+  },
   "samples": [
     {
+      "already_aligned": true,
+      "anisotropy_ratio": 1.0000340001333226,
+      "criteria": {
+        "anisotropy_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 1.0000340001333226
+        },
+        "condition_number_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 10000.0,
+          "value": 1.0000682594262476
+        },
+        "homography_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_normalizable": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_shape_valid": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": [
+            3,
+            3
+          ],
+          "value": [
+            3,
+            3
+          ]
+        },
+        "maximum_inlier_reprojection_error": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 5.5,
+          "value": 4.882152557373047
+        },
+        "minimum_inlier_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 10,
+          "value": 1064
+        },
+        "minimum_inlier_ratio": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.9156626506024096
+        },
+        "minimum_ratio_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 4,
+          "value": 1162
+        },
+        "near_identity_corner_displacement": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 0.04036350525346947
+        },
+        "near_identity_perspective": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.002,
+          "value": 3.8953828533142306e-05
+        },
+        "near_identity_rotation": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 7.972174814811145e-05
+        },
+        "near_identity_scale": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.005,
+          "value": 3.134934267057243e-05
+        },
+        "orientation_preserved": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "overlap_above_minimum": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.7,
+          "value": 0.999928238677571
+        },
+        "perspective_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 3.8953828533142306e-05
+        },
+        "projected_area_ratio_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 0.9999373053244697
+        },
+        "projected_corners_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "projected_quadrilateral_non_self_intersecting": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": false,
+          "value": false
+        },
+        "rotation_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 30.0,
+          "value": 7.972174814811145e-05
+        },
+        "scale_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 0.9999686506573294
+        }
+      },
       "error": null,
+      "geometry_accepted": true,
+      "homography_condition_number": 1.0000682594262476,
+      "homography_estimated": true,
       "homography_matrix": [
         [
           0.9999522234392634,
@@ -84,28 +394,235 @@
           1.0
         ]
       ],
-      "metrics_valid": true,
-      "mutual_info_after": 2.942901744538355,
-      "mutual_info_before": 2.9421481356119408,
-      "mutual_info_delta": 0.0007536089264141843,
+      "homography_normalized": true,
+      "inlier_ratio": 0.9156626506024096,
+      "local_scale": 0.9999686506573294,
+      "local_scale_x": 0.9999856500465556,
+      "local_scale_y": 0.9999516515570867,
+      "max_corner_displacement_pixels": 0.04036350525346947,
+      "max_inlier_reprojection_error": 4.882152557373047,
+      "metrics_valid": false,
+      "mutual_info_candidate_delta": null,
+      "mutual_info_original": 2.941262799549351,
+      "mutual_info_selected": 2.941262799549351,
+      "mutual_info_warped": null,
       "num_inlier_matches": 1064,
       "num_keypoints_query": 2000,
       "num_keypoints_template": 1674,
       "num_ratio_matches": 1162,
+      "orientation_preserved": true,
+      "perspective_strength": 3.8953828533142306e-05,
+      "projected_area_ratio": 0.9999373053244697,
+      "projected_overlap_ratio": 0.999928238677571,
+      "projected_query_corners": [
+        [
+          0.012836908510571433,
+          0.028716741727766847
+        ],
+        [
+          799.0199756141743,
+          -0.003152694646764466
+        ],
+        [
+          798.9917003832169,
+          798.9835537663299
+        ],
+        [
+          0.02712963895356139,
+          798.9701136277445
+        ]
+      ],
+      "quality_evaluated": false,
+      "quality_improved": null,
       "ransac_reprojection_error": 0.08738336712121964,
+      "reasons": [
+        "near_identity_transform"
+      ],
+      "rotation_degrees": -7.972174814811145e-05,
       "sample_id": "0038_s_test",
+      "selected_variant": "original",
+      "self_intersects": false,
       "split": "train",
-      "ssim_after": 0.9391434987386068,
-      "ssim_before": 0.9391377766927084,
-      "ssim_delta": 5.7220458984375e-06,
-      "ssim_valid_pixel_count": 629338,
-      "ssim_valid_pixel_ratio": 0.983340625,
+      "ssim_candidate_delta": null,
+      "ssim_original": 0.9401226043701172,
+      "ssim_selected": 0.9401226043701172,
+      "ssim_valid_pixel_count": 0,
+      "ssim_valid_pixel_ratio": 0.0,
+      "ssim_warped": null,
+      "status": "already_aligned",
       "success": true,
-      "valid_pixel_count": 638228,
-      "valid_pixel_ratio": 0.99723125
+      "valid_pixel_count": 0,
+      "valid_pixel_ratio": 0.0,
+      "warp_applied": false
     },
     {
+      "already_aligned": true,
+      "anisotropy_ratio": 1.0000360146197496,
+      "criteria": {
+        "anisotropy_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 1.0000360146197496
+        },
+        "condition_number_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 10000.0,
+          "value": 1.0001043567182542
+        },
+        "homography_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_normalizable": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_shape_valid": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": [
+            3,
+            3
+          ],
+          "value": [
+            3,
+            3
+          ]
+        },
+        "maximum_inlier_reprojection_error": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 5.5,
+          "value": 1.9111791849136353
+        },
+        "minimum_inlier_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 10,
+          "value": 813
+        },
+        "minimum_inlier_ratio": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.9902557856272838
+        },
+        "minimum_ratio_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 4,
+          "value": 821
+        },
+        "near_identity_corner_displacement": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 0.09259691583259025
+        },
+        "near_identity_perspective": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.002,
+          "value": 8.888163887108192e-05
+        },
+        "near_identity_rotation": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 0.0005234493503640502
+        },
+        "near_identity_scale": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.005,
+          "value": 3.972537204188775e-05
+        },
+        "orientation_preserved": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "overlap_above_minimum": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.7,
+          "value": 0.9999702381418576
+        },
+        "perspective_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 8.888163887108192e-05
+        },
+        "projected_area_ratio_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 1.0000794680838603
+        },
+        "projected_corners_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "projected_quadrilateral_non_self_intersecting": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": false,
+          "value": false
+        },
+        "rotation_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 30.0,
+          "value": 0.0005234493503640502
+        },
+        "scale_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 1.0000397253720419
+        }
+      },
       "error": null,
+      "geometry_accepted": true,
+      "homography_condition_number": 1.0001043567182542,
+      "homography_estimated": true,
       "homography_matrix": [
         [
           1.0002069888097103,
@@ -123,28 +640,235 @@
           1.0
         ]
       ],
-      "metrics_valid": true,
-      "mutual_info_after": 2.140044554907889,
-      "mutual_info_before": 2.140726824219285,
-      "mutual_info_delta": -0.0006822693113961442,
+      "homography_normalized": true,
+      "inlier_ratio": 0.9902557856272838,
+      "local_scale": 1.0000397253720419,
+      "local_scale_x": 1.0000577332351286,
+      "local_scale_y": 1.0000217178332196,
+      "max_corner_displacement_pixels": 0.09259691583259025,
+      "max_inlier_reprojection_error": 1.9111791849136353,
+      "metrics_valid": false,
+      "mutual_info_candidate_delta": null,
+      "mutual_info_original": 2.140287652418329,
+      "mutual_info_selected": 2.140287652418329,
+      "mutual_info_warped": null,
       "num_inlier_matches": 813,
       "num_keypoints_query": 876,
       "num_keypoints_template": 889,
       "num_ratio_matches": 821,
+      "orientation_preserved": true,
+      "perspective_strength": 8.888163887108192e-05,
+      "projected_area_ratio": 1.0000794680838603,
+      "projected_overlap_ratio": 0.9999702381418576,
+      "projected_query_corners": [
+        [
+          -0.04577842332993535,
+          -0.02707386144205533
+        ],
+        [
+          798.9802164772943,
+          0.022998950024323735
+        ],
+        [
+          798.9883813851533,
+          798.9776180140999
+        ],
+        [
+          -0.06398580561530906,
+          799.0669328432197
+        ]
+      ],
+      "quality_evaluated": false,
+      "quality_improved": null,
       "ransac_reprojection_error": 0.0329812616109848,
+      "reasons": [
+        "near_identity_transform"
+      ],
+      "rotation_degrees": -0.0005234493503640502,
       "sample_id": "0176_s_test",
+      "selected_variant": "original",
+      "self_intersects": false,
       "split": "train",
-      "ssim_after": 0.9938257336616516,
-      "ssim_before": 0.9938280781110128,
-      "ssim_delta": -2.344449361202372e-06,
-      "ssim_valid_pixel_count": 636424,
-      "ssim_valid_pixel_ratio": 0.9944125,
+      "ssim_candidate_delta": null,
+      "ssim_original": 0.9938624501228333,
+      "ssim_selected": 0.9938624501228333,
+      "ssim_valid_pixel_count": 0,
+      "ssim_valid_pixel_ratio": 0.0,
+      "ssim_warped": null,
+      "status": "already_aligned",
       "success": true,
-      "valid_pixel_count": 639414,
-      "valid_pixel_ratio": 0.999084375
+      "valid_pixel_count": 0,
+      "valid_pixel_ratio": 0.0,
+      "warp_applied": false
     },
     {
+      "already_aligned": true,
+      "anisotropy_ratio": 1.0000120083535193,
+      "criteria": {
+        "anisotropy_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 1.0000120083535193
+        },
+        "condition_number_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 10000.0,
+          "value": 1.0000154759209878
+        },
+        "homography_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_normalizable": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_shape_valid": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": [
+            3,
+            3
+          ],
+          "value": [
+            3,
+            3
+          ]
+        },
+        "maximum_inlier_reprojection_error": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 5.5,
+          "value": 0.5009918808937073
+        },
+        "minimum_inlier_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 10,
+          "value": 1533
+        },
+        "minimum_inlier_ratio": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.948051948051948
+        },
+        "minimum_ratio_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 4,
+          "value": 1617
+        },
+        "near_identity_corner_displacement": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 0.010286692011721842
+        },
+        "near_identity_perspective": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.002,
+          "value": 9.88492767201372e-06
+        },
+        "near_identity_rotation": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 0.00037930715576939126
+        },
+        "near_identity_scale": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.005,
+          "value": 2.75411263095382e-06
+        },
+        "orientation_preserved": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "overlap_above_minimum": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.7,
+          "value": 0.9999910910227271
+        },
+        "perspective_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 9.88492767201372e-06
+        },
+        "projected_area_ratio_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 0.9999944919772574
+        },
+        "projected_corners_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "projected_quadrilateral_non_self_intersecting": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": false,
+          "value": false
+        },
+        "rotation_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 30.0,
+          "value": 0.00037930715576939126
+        },
+        "scale_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 0.999997245887369
+        }
+      },
       "error": null,
+      "geometry_accepted": true,
+      "homography_condition_number": 1.0000154759209878,
+      "homography_estimated": true,
       "homography_matrix": [
         [
           0.999972928225593,
@@ -162,28 +886,235 @@
           1.0
         ]
       ],
-      "metrics_valid": true,
-      "mutual_info_after": 2.662959455896885,
-      "mutual_info_before": 2.662959455896885,
-      "mutual_info_delta": 0.0,
+      "homography_normalized": true,
+      "inlier_ratio": 0.948051948051948,
+      "local_scale": 0.999997245887369,
+      "local_scale_x": 1.0000032500295675,
+      "local_scale_y": 0.99999124178122,
+      "max_corner_displacement_pixels": 0.010286692011721842,
+      "max_inlier_reprojection_error": 0.5009918808937073,
+      "metrics_valid": false,
+      "mutual_info_candidate_delta": null,
+      "mutual_info_original": 2.662959455896888,
+      "mutual_info_selected": 2.662959455896888,
+      "mutual_info_warped": null,
       "num_inlier_matches": 1533,
       "num_keypoints_query": 2000,
       "num_keypoints_template": 2000,
       "num_ratio_matches": 1617,
+      "orientation_preserved": true,
+      "perspective_strength": 9.88492767201372e-06,
+      "projected_area_ratio": 0.9999944919772574,
+      "projected_overlap_ratio": 0.9999910910227271,
+      "projected_query_corners": [
+        [
+          0.004403973478881409,
+          0.005172390975873055
+        ],
+        [
+          798.9985083745478,
+          -0.010177970625538192
+        ],
+        [
+          799.0010331053229,
+          798.9997555712902
+        ],
+        [
+          0.008071461846314796,
+          798.9993709596248
+        ]
+      ],
+      "quality_evaluated": false,
+      "quality_improved": null,
       "ransac_reprojection_error": 0.028636367991566658,
+      "reasons": [
+        "near_identity_transform"
+      ],
+      "rotation_degrees": -0.00037930715576939126,
       "sample_id": "0066_b_test",
+      "selected_variant": "original",
+      "self_intersects": false,
       "split": "train",
-      "ssim_after": 0.9783196647961935,
-      "ssim_before": 0.9783196647961935,
-      "ssim_delta": 0.0,
-      "ssim_valid_pixel_count": 640000,
-      "ssim_valid_pixel_ratio": 1.0,
+      "ssim_candidate_delta": null,
+      "ssim_original": 0.9783196647961935,
+      "ssim_selected": 0.9783196647961935,
+      "ssim_valid_pixel_count": 0,
+      "ssim_valid_pixel_ratio": 0.0,
+      "ssim_warped": null,
+      "status": "already_aligned",
       "success": true,
-      "valid_pixel_count": 640000,
-      "valid_pixel_ratio": 1.0
+      "valid_pixel_count": 0,
+      "valid_pixel_ratio": 0.0,
+      "warp_applied": false
     },
     {
+      "already_aligned": true,
+      "anisotropy_ratio": 1.00001671863978,
+      "criteria": {
+        "anisotropy_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 1.00001671863978
+        },
+        "condition_number_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 10000.0,
+          "value": 1.000040423883113
+        },
+        "homography_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_normalizable": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_shape_valid": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": [
+            3,
+            3
+          ],
+          "value": [
+            3,
+            3
+          ]
+        },
+        "maximum_inlier_reprojection_error": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 5.5,
+          "value": 1.4068461656570435
+        },
+        "minimum_inlier_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 10,
+          "value": 1345
+        },
+        "minimum_inlier_ratio": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.9725234996384671
+        },
+        "minimum_ratio_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 4,
+          "value": 1383
+        },
+        "near_identity_corner_displacement": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 0.03202436777353327
+        },
+        "near_identity_perspective": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.002,
+          "value": 2.709089788975575e-05
+        },
+        "near_identity_rotation": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 7.300099877212977e-05
+        },
+        "near_identity_scale": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.005,
+          "value": 1.4385984119291706e-05
+        },
+        "orientation_preserved": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "overlap_above_minimum": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.7,
+          "value": 0.9999928532380118
+        },
+        "perspective_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 2.709089788975575e-05
+        },
+        "projected_area_ratio_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 1.0000287736394031
+        },
+        "projected_corners_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "projected_quadrilateral_non_self_intersecting": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": false,
+          "value": false
+        },
+        "rotation_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 30.0,
+          "value": 7.300099877212977e-05
+        },
+        "scale_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 1.0000143859841193
+        }
+      },
       "error": null,
+      "geometry_accepted": true,
+      "homography_condition_number": 1.000040423883113,
+      "homography_estimated": true,
       "homography_matrix": [
         [
           0.9999519702870014,
@@ -201,67 +1132,481 @@
           1.0
         ]
       ],
-      "metrics_valid": true,
-      "mutual_info_after": 2.229387094294621,
-      "mutual_info_before": 2.229387094294621,
-      "mutual_info_delta": 0.0,
+      "homography_normalized": true,
+      "inlier_ratio": 0.9725234996384671,
+      "local_scale": 1.0000143859841193,
+      "local_scale_x": 1.0000227453893271,
+      "local_scale_y": 1.0000060266487898,
+      "max_corner_displacement_pixels": 0.03202436777353327,
+      "max_inlier_reprojection_error": 1.4068461656570435,
+      "metrics_valid": false,
+      "mutual_info_candidate_delta": null,
+      "mutual_info_original": 2.22938709429462,
+      "mutual_info_selected": 2.22938709429462,
+      "mutual_info_warped": null,
       "num_inlier_matches": 1345,
       "num_keypoints_query": 1693,
       "num_keypoints_template": 1616,
       "num_ratio_matches": 1383,
-      "ransac_reprojection_error": 0.052250247448682785,
-      "sample_id": "0000_rc_test",
-      "split": "train",
-      "ssim_after": 0.9851810534795126,
-      "ssim_before": 0.9851812521616617,
-      "ssim_delta": -1.9868214917728722e-07,
-      "ssim_valid_pixel_count": 640000,
-      "ssim_valid_pixel_ratio": 1.0,
-      "success": true,
-      "valid_pixel_count": 640000,
-      "valid_pixel_ratio": 1.0
-    },
-    {
-      "error": null,
-      "homography_matrix": [
+      "orientation_preserved": true,
+      "perspective_strength": 2.709089788975575e-05,
+      "projected_area_ratio": 1.0000287736394031,
+      "projected_overlap_ratio": 0.9999928532380118,
+      "projected_query_corners": [
         [
-          0.9999553939712391,
-          -1.4776853442430284e-05,
-          0.012770489792025878
+          0.009257658362313466,
+          0.0009177239724027685
         ],
         [
-          -1.0511316936033287e-05,
-          0.9999386528587185,
-          0.012594965019299437
+          799.0035996449849,
+          -0.010502172217253157
         ],
         [
-          -3.386501728361492e-08,
-          -4.465980829870742e-08,
-          0.9999999999999999
+          799.0247085548481,
+          799.0203727133346
+        ],
+        [
+          0.002100660824019953,
+          798.9990730118784
         ]
       ],
-      "metrics_valid": true,
-      "mutual_info_after": 3.096030840440209,
-      "mutual_info_before": 3.096030840440209,
-      "mutual_info_delta": 0.0,
+      "quality_evaluated": false,
+      "quality_improved": null,
+      "ransac_reprojection_error": 0.052250247448682785,
+      "reasons": [
+        "near_identity_transform"
+      ],
+      "rotation_degrees": -7.300099877212977e-05,
+      "sample_id": "0000_rc_test",
+      "selected_variant": "original",
+      "self_intersects": false,
+      "split": "train",
+      "ssim_candidate_delta": null,
+      "ssim_original": 0.9851812521616617,
+      "ssim_selected": 0.9851812521616617,
+      "ssim_valid_pixel_count": 0,
+      "ssim_valid_pixel_ratio": 0.0,
+      "ssim_warped": null,
+      "status": "already_aligned",
+      "success": true,
+      "valid_pixel_count": 0,
+      "valid_pixel_ratio": 0.0,
+      "warp_applied": false
+    },
+    {
+      "already_aligned": true,
+      "anisotropy_ratio": 1.000013837930848,
+      "criteria": {
+        "anisotropy_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 1.000013837930848
+        },
+        "condition_number_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 10000.0,
+          "value": 1.0000323064812187
+        },
+        "homography_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_normalizable": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_shape_valid": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": [
+            3,
+            3
+          ],
+          "value": [
+            3,
+            3
+          ]
+        },
+        "maximum_inlier_reprojection_error": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 5.5,
+          "value": 2.042475938796997
+        },
+        "minimum_inlier_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 10,
+          "value": 1530
+        },
+        "minimum_inlier_ratio": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.9845559845559846
+        },
+        "minimum_ratio_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 4,
+          "value": 1554
+        },
+        "near_identity_corner_displacement": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 0.017936514526674732
+        },
+        "near_identity_perspective": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.002,
+          "value": 2.2419759929496676e-05
+        },
+        "near_identity_rotation": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 1.3514942256862418e-06
+        },
+        "near_identity_scale": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.005,
+          "value": 5.9208461603565965e-06
+        },
+        "orientation_preserved": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "overlap_above_minimum": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.7,
+          "value": 0.9999809093344152
+        },
+        "perspective_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 2.2419759929496676e-05
+        },
+        "projected_area_ratio_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 0.9999881593455037
+        },
+        "projected_corners_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "projected_quadrilateral_non_self_intersecting": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": false,
+          "value": false
+        },
+        "rotation_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 30.0,
+          "value": 1.3514942256862418e-06
+        },
+        "scale_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 0.9999940791538396
+        }
+      },
+      "error": null,
+      "geometry_accepted": true,
+      "homography_condition_number": 1.0000323064812187,
+      "homography_estimated": true,
+      "homography_matrix": [
+        [
+          0.9999553939712392,
+          -1.4776853442430286e-05,
+          0.01277048979202588
+        ],
+        [
+          -1.0511316936033288e-05,
+          0.9999386528587186,
+          0.012594965019299438
+        ],
+        [
+          -3.386501728361493e-08,
+          -4.465980829870743e-08,
+          1.0
+        ]
+      ],
+      "homography_normalized": true,
+      "inlier_ratio": 0.9845559845559846,
+      "local_scale": 0.9999940791538396,
+      "local_scale_x": 1.0000009980543618,
+      "local_scale_y": 0.9999871603011886,
+      "max_corner_displacement_pixels": 0.017936514526674732,
+      "max_inlier_reprojection_error": 2.042475938796997,
+      "metrics_valid": false,
+      "mutual_info_candidate_delta": null,
+      "mutual_info_original": 3.0960308404402106,
+      "mutual_info_selected": 3.0960308404402106,
+      "mutual_info_warped": null,
       "num_inlier_matches": 1530,
       "num_keypoints_query": 2000,
       "num_keypoints_template": 2000,
       "num_ratio_matches": 1554,
+      "orientation_preserved": true,
+      "perspective_strength": 2.2419759929496676e-05,
+      "projected_area_ratio": 0.9999881593455037,
+      "projected_overlap_ratio": 0.9999809093344152,
+      "projected_query_corners": [
+        [
+          0.01277048979202588,
+          0.012594965019299438
+        ],
+        [
+          798.9987496998802,
+          0.004196536337913557
+        ],
+        [
+          799.015454863747,
+          799.0053107172818
+        ],
+        [
+          0.000963818283631967,
+          798.99208918313
+        ]
+      ],
+      "quality_evaluated": false,
+      "quality_improved": null,
       "ransac_reprojection_error": 0.029788941144943237,
+      "reasons": [
+        "near_identity_transform"
+      ],
+      "rotation_degrees": -1.3514942256862418e-06,
       "sample_id": "0027_rc1_test",
+      "selected_variant": "original",
+      "self_intersects": false,
       "split": "train",
-      "ssim_after": 0.9597118099530538,
-      "ssim_before": 0.9597118099530538,
-      "ssim_delta": 0.0,
-      "ssim_valid_pixel_count": 640000,
-      "ssim_valid_pixel_ratio": 1.0,
+      "ssim_candidate_delta": null,
+      "ssim_original": 0.9597118099530538,
+      "ssim_selected": 0.9597118099530538,
+      "ssim_valid_pixel_count": 0,
+      "ssim_valid_pixel_ratio": 0.0,
+      "ssim_warped": null,
+      "status": "already_aligned",
       "success": true,
-      "valid_pixel_count": 640000,
-      "valid_pixel_ratio": 1.0
+      "valid_pixel_count": 0,
+      "valid_pixel_ratio": 0.0,
+      "warp_applied": false
     },
     {
+      "already_aligned": true,
+      "anisotropy_ratio": 1.0000648674816766,
+      "criteria": {
+        "anisotropy_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 1.0000648674816766
+        },
+        "condition_number_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 10000.0,
+          "value": 1.00017240598273
+        },
+        "homography_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_normalizable": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_shape_valid": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": [
+            3,
+            3
+          ],
+          "value": [
+            3,
+            3
+          ]
+        },
+        "maximum_inlier_reprojection_error": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 5.5,
+          "value": 0.5626518130302429
+        },
+        "minimum_inlier_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 10,
+          "value": 320
+        },
+        "minimum_inlier_ratio": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.8672086720867209
+        },
+        "minimum_ratio_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 4,
+          "value": 369
+        },
+        "near_identity_corner_displacement": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 0.11510332133138718
+        },
+        "near_identity_perspective": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.002,
+          "value": 0.0001453775067427289
+        },
+        "near_identity_rotation": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 0.0006397182626748294
+        },
+        "near_identity_scale": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.005,
+          "value": 8.34029099250344e-06
+        },
+        "orientation_preserved": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "overlap_above_minimum": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.7,
+          "value": 0.999894267082915
+        },
+        "perspective_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 0.0001453775067427289
+        },
+        "projected_area_ratio_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 0.9999833616505264
+        },
+        "projected_corners_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "projected_quadrilateral_non_self_intersecting": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": false,
+          "value": false
+        },
+        "rotation_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 30.0,
+          "value": 0.0006397182626748294
+        },
+        "scale_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 0.9999916597090075
+        }
+      },
       "error": null,
+      "geometry_accepted": true,
+      "homography_condition_number": 1.00017240598273,
+      "homography_estimated": true,
       "homography_matrix": [
         [
           1.0003218875278672,
@@ -279,28 +1624,235 @@
           1.0
         ]
       ],
-      "metrics_valid": true,
-      "mutual_info_after": 2.238038373989885,
-      "mutual_info_before": 2.241556146821909,
-      "mutual_info_delta": -0.0035177728320241464,
+      "homography_normalized": true,
+      "inlier_ratio": 0.8672086720867209,
+      "local_scale": 0.9999916597090075,
+      "local_scale_x": 1.0000240926533865,
+      "local_scale_y": 0.9999592278164989,
+      "max_corner_displacement_pixels": 0.11510332133138718,
+      "max_inlier_reprojection_error": 0.5626518130302429,
+      "metrics_valid": false,
+      "mutual_info_candidate_delta": null,
+      "mutual_info_original": 2.241333953363953,
+      "mutual_info_selected": 2.241333953363953,
+      "mutual_info_warped": null,
       "num_inlier_matches": 320,
       "num_keypoints_query": 467,
       "num_keypoints_template": 434,
       "num_ratio_matches": 369,
+      "orientation_preserved": true,
+      "perspective_strength": 0.0001453775067427289,
+      "projected_area_ratio": 0.9999833616505264,
+      "projected_overlap_ratio": 0.999894267082915,
+      "projected_query_corners": [
+        [
+          -0.07983648243837921,
+          -0.08291508097676162
+        ],
+        [
+          798.9762368361169,
+          0.052020067640140014
+        ],
+        [
+          798.9349051419376,
+          798.939995398476
+        ],
+        [
+          -0.005401154644146156,
+          799.006143263534
+        ]
+      ],
+      "quality_evaluated": false,
+      "quality_improved": null,
       "ransac_reprojection_error": 0.043509237468242645,
+      "reasons": [
+        "near_identity_transform"
+      ],
+      "rotation_degrees": 0.0006397182626748294,
       "sample_id": "0054_s_test",
+      "selected_variant": "original",
+      "self_intersects": false,
       "split": "train",
-      "ssim_after": 0.987428883711497,
-      "ssim_before": 0.9874294201532999,
-      "ssim_delta": -5.364418029785156e-07,
-      "ssim_valid_pixel_count": 630694,
-      "ssim_valid_pixel_ratio": 0.985459375,
+      "ssim_candidate_delta": null,
+      "ssim_original": 0.9875848690668741,
+      "ssim_selected": 0.9875848690668741,
+      "ssim_valid_pixel_count": 0,
+      "ssim_valid_pixel_ratio": 0.0,
+      "ssim_warped": null,
+      "status": "already_aligned",
       "success": true,
-      "valid_pixel_count": 638449,
-      "valid_pixel_ratio": 0.9975765625
+      "valid_pixel_count": 0,
+      "valid_pixel_ratio": 0.0,
+      "warp_applied": false
     },
     {
+      "already_aligned": true,
+      "anisotropy_ratio": 1.0000690916018184,
+      "criteria": {
+        "anisotropy_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 1.0000690916018184
+        },
+        "condition_number_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 10000.0,
+          "value": 1.0000887523690267
+        },
+        "homography_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_normalizable": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_shape_valid": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": [
+            3,
+            3
+          ],
+          "value": [
+            3,
+            3
+          ]
+        },
+        "maximum_inlier_reprojection_error": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 5.5,
+          "value": 0.687738835811615
+        },
+        "minimum_inlier_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 10,
+          "value": 574
+        },
+        "minimum_inlier_ratio": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.9965277777777778
+        },
+        "minimum_ratio_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 4,
+          "value": 576
+        },
+        "near_identity_corner_displacement": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 0.05502467145521063
+        },
+        "near_identity_perspective": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.002,
+          "value": 5.760789696086345e-05
+        },
+        "near_identity_rotation": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 0.00018862986653092714
+        },
+        "near_identity_scale": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.005,
+          "value": 1.4659703722053052e-06
+        },
+        "orientation_preserved": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "overlap_above_minimum": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.7,
+          "value": 0.9999559446178813
+        },
+        "perspective_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 5.760789696086345e-05
+        },
+        "projected_area_ratio_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 1.0000029385636684
+        },
+        "projected_corners_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "projected_quadrilateral_non_self_intersecting": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": false,
+          "value": false
+        },
+        "rotation_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 30.0,
+          "value": 0.00018862986653092714
+        },
+        "scale_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 1.0000014659703722
+        }
+      },
       "error": null,
+      "geometry_accepted": true,
+      "homography_condition_number": 1.0000887523690267,
+      "homography_estimated": true,
       "homography_matrix": [
         [
           0.9998568406351054,
@@ -318,28 +1870,235 @@
           1.0
         ]
       ],
-      "metrics_valid": true,
-      "mutual_info_after": 2.692219563472997,
-      "mutual_info_before": 2.6940443056208268,
-      "mutual_info_delta": -0.0018247421478299053,
+      "homography_normalized": true,
+      "inlier_ratio": 0.9965277777777778,
+      "local_scale": 1.0000014659703722,
+      "local_scale_x": 1.0000360112252378,
+      "local_scale_y": 0.9999669219088377,
+      "max_corner_displacement_pixels": 0.05502467145521063,
+      "max_inlier_reprojection_error": 0.687738835811615,
+      "metrics_valid": false,
+      "mutual_info_candidate_delta": null,
+      "mutual_info_original": 2.692776499974663,
+      "mutual_info_selected": 2.692776499974663,
+      "mutual_info_warped": null,
       "num_inlier_matches": 574,
       "num_keypoints_query": 702,
       "num_keypoints_template": 639,
       "num_ratio_matches": 576,
+      "orientation_preserved": true,
+      "perspective_strength": 5.760789696086345e-05,
+      "projected_area_ratio": 1.0000029385636684,
+      "projected_overlap_ratio": 0.9999559446178813,
+      "projected_query_corners": [
+        [
+          0.025534155007458932,
+          0.005526569213663617
+        ],
+        [
+          799.002276622863,
+          -0.01678522792560312
+        ],
+        [
+          799.0263606498339,
+          799.0482993851833
+        ],
+        [
+          0.037439620416606596,
+          798.9794761698198
+        ]
+      ],
+      "quality_evaluated": false,
+      "quality_improved": null,
       "ransac_reprojection_error": 0.04649360477924347,
+      "reasons": [
+        "near_identity_transform"
+      ],
+      "rotation_degrees": 0.00018862986653092714,
       "sample_id": "0179_b1_test",
+      "selected_variant": "original",
+      "self_intersects": false,
       "split": "train",
-      "ssim_after": 0.9908724625905355,
-      "ssim_before": 0.9908698797225952,
-      "ssim_delta": 2.5828679403039345e-06,
-      "ssim_valid_pixel_count": 634864,
-      "ssim_valid_pixel_ratio": 0.991975,
+      "ssim_candidate_delta": null,
+      "ssim_original": 0.9909431139628092,
+      "ssim_selected": 0.9909431139628092,
+      "ssim_valid_pixel_count": 0,
+      "ssim_valid_pixel_ratio": 0.0,
+      "ssim_warped": null,
+      "status": "already_aligned",
       "success": true,
-      "valid_pixel_count": 639144,
-      "valid_pixel_ratio": 0.9986625
+      "valid_pixel_count": 0,
+      "valid_pixel_ratio": 0.0,
+      "warp_applied": false
     },
     {
+      "already_aligned": true,
+      "anisotropy_ratio": 1.0000429271168958,
+      "criteria": {
+        "anisotropy_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 1.0000429271168958
+        },
+        "condition_number_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 10000.0,
+          "value": 1.000093793400301
+        },
+        "homography_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_normalizable": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_shape_valid": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": [
+            3,
+            3
+          ],
+          "value": [
+            3,
+            3
+          ]
+        },
+        "maximum_inlier_reprojection_error": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 5.5,
+          "value": 4.781696319580078
+        },
+        "minimum_inlier_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 10,
+          "value": 1618
+        },
+        "minimum_inlier_ratio": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.9883934025656689
+        },
+        "minimum_ratio_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 4,
+          "value": 1637
+        },
+        "near_identity_corner_displacement": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 0.08205991257402288
+        },
+        "near_identity_perspective": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.002,
+          "value": 7.05595123343049e-05
+        },
+        "near_identity_rotation": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 0.0017530227466549394
+        },
+        "near_identity_scale": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.005,
+          "value": 3.5021426306847125e-05
+        },
+        "orientation_preserved": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "overlap_above_minimum": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.7,
+          "value": 0.9999089522102879
+        },
+        "perspective_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 7.05595123343049e-05
+        },
+        "projected_area_ratio_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 0.9999299683056004
+        },
+        "projected_corners_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "projected_quadrilateral_non_self_intersecting": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": false,
+          "value": false
+        },
+        "rotation_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 30.0,
+          "value": 0.0017530227466549394
+        },
+        "scale_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 0.9999649785736932
+        }
+      },
       "error": null,
+      "geometry_accepted": true,
+      "homography_condition_number": 1.000093793400301,
+      "homography_estimated": true,
       "homography_matrix": [
         [
           0.9998045256079913,
@@ -357,28 +2116,235 @@
           1.0
         ]
       ],
-      "metrics_valid": true,
-      "mutual_info_after": 2.2947296298975584,
-      "mutual_info_before": 2.30129426597852,
-      "mutual_info_delta": -0.006564636080961694,
+      "homography_normalized": true,
+      "inlier_ratio": 0.9883934025656689,
+      "local_scale": 0.9999649785736932,
+      "local_scale_x": 0.9999864411501274,
+      "local_scale_y": 0.9999435164579071,
+      "max_corner_displacement_pixels": 0.08205991257402288,
+      "max_inlier_reprojection_error": 4.781696319580078,
+      "metrics_valid": false,
+      "mutual_info_candidate_delta": null,
+      "mutual_info_original": 2.297663075681988,
+      "mutual_info_selected": 2.297663075681988,
+      "mutual_info_warped": null,
       "num_inlier_matches": 1618,
       "num_keypoints_query": 1825,
       "num_keypoints_template": 1824,
       "num_ratio_matches": 1637,
+      "orientation_preserved": true,
+      "perspective_strength": 7.05595123343049e-05,
+      "projected_area_ratio": 0.9999299683056004,
+      "projected_overlap_ratio": 0.9999089522102879,
+      "projected_query_corners": [
+        [
+          0.07994267806621277,
+          0.018520191015703433
+        ],
+        [
+          798.9908640356008,
+          0.015863337326511653
+        ],
+        [
+          799.0180858766549,
+          799.0373311372834
+        ],
+        [
+          0.016740939057527018,
+          798.972872729262
+        ]
+      ],
+      "quality_evaluated": false,
+      "quality_improved": null,
       "ransac_reprojection_error": 0.052294738590717316,
+      "reasons": [
+        "near_identity_transform"
+      ],
+      "rotation_degrees": 0.0017530227466549394,
       "sample_id": "0211_rc1_test",
+      "selected_variant": "original",
+      "self_intersects": false,
       "split": "train",
-      "ssim_after": 0.9959261218706766,
-      "ssim_before": 0.995946447054545,
-      "ssim_delta": -2.0325183868408203e-05,
-      "ssim_valid_pixel_count": 629584,
-      "ssim_valid_pixel_ratio": 0.983725,
+      "ssim_candidate_delta": null,
+      "ssim_original": 0.996004323164622,
+      "ssim_selected": 0.996004323164622,
+      "ssim_valid_pixel_count": 0,
+      "ssim_valid_pixel_ratio": 0.0,
+      "ssim_warped": null,
+      "status": "already_aligned",
       "success": true,
-      "valid_pixel_count": 638259,
-      "valid_pixel_ratio": 0.9972796875
+      "valid_pixel_count": 0,
+      "valid_pixel_ratio": 0.0,
+      "warp_applied": false
     },
     {
+      "already_aligned": true,
+      "anisotropy_ratio": 1.0000310832639507,
+      "criteria": {
+        "anisotropy_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 1.0000310832639507
+        },
+        "condition_number_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 10000.0,
+          "value": 1.0001040562509056
+        },
+        "homography_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_normalizable": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_shape_valid": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": [
+            3,
+            3
+          ],
+          "value": [
+            3,
+            3
+          ]
+        },
+        "maximum_inlier_reprojection_error": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 5.5,
+          "value": 5.016207695007324
+        },
+        "minimum_inlier_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 10,
+          "value": 1395
+        },
+        "minimum_inlier_ratio": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.9893617021276596
+        },
+        "minimum_ratio_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 4,
+          "value": 1410
+        },
+        "near_identity_corner_displacement": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 0.06261640796195964
+        },
+        "near_identity_perspective": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.002,
+          "value": 5.612637228508166e-05
+        },
+        "near_identity_rotation": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 0.0008469076046291139
+        },
+        "near_identity_scale": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.005,
+          "value": 3.726314583862855e-05
+        },
+        "orientation_preserved": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "overlap_above_minimum": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.7,
+          "value": 0.9999236373376608
+        },
+        "perspective_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 5.612637228508166e-05
+        },
+        "projected_area_ratio_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 0.9999254813809939
+        },
+        "projected_corners_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "projected_quadrilateral_non_self_intersecting": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": false,
+          "value": false
+        },
+        "rotation_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 30.0,
+          "value": 0.0008469076046291139
+        },
+        "scale_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 0.9999627368541614
+        }
+      },
       "error": null,
+      "geometry_accepted": true,
+      "homography_condition_number": 1.0001040562509056,
+      "homography_estimated": true,
       "homography_matrix": [
         [
           0.9998718307048362,
@@ -396,67 +2362,331 @@
           1.0
         ]
       ],
-      "metrics_valid": true,
-      "mutual_info_after": 3.2122781687339157,
-      "mutual_info_before": 3.2318723094876947,
-      "mutual_info_delta": -0.019594140753778966,
+      "homography_normalized": true,
+      "inlier_ratio": 0.9893617021276596,
+      "local_scale": 0.9999627368541614,
+      "local_scale_x": 0.9999782777862419,
+      "local_scale_y": 0.9999471961636068,
+      "max_corner_displacement_pixels": 0.06261640796195964,
+      "max_inlier_reprojection_error": 5.016207695007324,
+      "metrics_valid": false,
+      "mutual_info_candidate_delta": null,
+      "mutual_info_original": 3.2265242199629647,
+      "mutual_info_selected": 3.2265242199629647,
+      "mutual_info_warped": null,
       "num_inlier_matches": 1395,
       "num_keypoints_query": 1676,
       "num_keypoints_template": 1582,
       "num_ratio_matches": 1410,
-      "ransac_reprojection_error": 0.045360952615737915,
-      "sample_id": "0095_f_test",
-      "split": "val",
-      "ssim_after": 0.9898166457811991,
-      "ssim_before": 0.9898491104443868,
-      "ssim_delta": -3.2464663187736775e-05,
-      "ssim_valid_pixel_count": 630682,
-      "ssim_valid_pixel_ratio": 0.985440625,
-      "success": true,
-      "valid_pixel_count": 638457,
-      "valid_pixel_ratio": 0.9975890625
-    },
-    {
-      "error": null,
-      "homography_matrix": [
+      "orientation_preserved": true,
+      "perspective_strength": 5.612637228508166e-05,
+      "projected_area_ratio": 0.9999254813809939,
+      "projected_overlap_ratio": 0.9999236373376608,
+      "projected_query_corners": [
         [
-          1.0000661613166235,
-          2.513712506023932e-05,
-          -0.023707279002733644
+          0.05317414021673439,
+          0.03306547078554353
         ],
         [
-          1.884256984012506e-05,
-          1.000021398743452,
-          -0.006005325810606499
+          798.9902175443451,
+          0.014910862722922951
         ],
         [
-          3.93198015468563e-08,
-          3.501188580998976e-08,
-          0.9999999999999999
+          799.0083783635115,
+          798.9978433395887
+        ],
+        [
+          -0.009082798441252064,
+          798.9765454928771
         ]
       ],
-      "metrics_valid": true,
-      "mutual_info_after": 3.0393732582985624,
-      "mutual_info_before": 3.0397511714856913,
-      "mutual_info_delta": -0.00037791318712887545,
+      "quality_evaluated": false,
+      "quality_improved": null,
+      "ransac_reprojection_error": 0.045360952615737915,
+      "reasons": [
+        "near_identity_transform"
+      ],
+      "rotation_degrees": 0.0008469076046291139,
+      "sample_id": "0095_f_test",
+      "selected_variant": "original",
+      "self_intersects": false,
+      "split": "val",
+      "ssim_candidate_delta": null,
+      "ssim_original": 0.9899969299634298,
+      "ssim_selected": 0.9899969299634298,
+      "ssim_valid_pixel_count": 0,
+      "ssim_valid_pixel_ratio": 0.0,
+      "ssim_warped": null,
+      "status": "already_aligned",
+      "success": true,
+      "valid_pixel_count": 0,
+      "valid_pixel_ratio": 0.0,
+      "warp_applied": false
+    },
+    {
+      "already_aligned": true,
+      "anisotropy_ratio": 1.0000453495406483,
+      "criteria": {
+        "anisotropy_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 2.0,
+          "value": 1.0000453495406483
+        },
+        "condition_number_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 10000.0,
+          "value": 1.0000495004703809
+        },
+        "homography_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_normalizable": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "homography_shape_valid": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": [
+            3,
+            3
+          ],
+          "value": [
+            3,
+            3
+          ]
+        },
+        "maximum_inlier_reprojection_error": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 5.5,
+          "value": 3.3152589797973633
+        },
+        "minimum_inlier_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 10,
+          "value": 1652
+        },
+        "minimum_inlier_ratio": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.5,
+          "value": 0.986268656716418
+        },
+        "minimum_ratio_matches": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 4,
+          "value": 1675
+        },
+        "near_identity_corner_displacement": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 1.0,
+          "value": 0.024456062966164288
+        },
+        "near_identity_perspective": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.002,
+          "value": 2.1058828526794427e-05
+        },
+        "near_identity_rotation": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.1,
+          "value": 0.00022961952768487003
+        },
+        "near_identity_scale": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.005,
+          "value": 7.634463569106131e-07
+        },
+        "orientation_preserved": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "overlap_above_minimum": {
+          "applicable": true,
+          "operator": ">=",
+          "passed": true,
+          "threshold": 0.7,
+          "value": 0.9999762100936559
+        },
+        "perspective_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 0.25,
+          "value": 2.1058828526794427e-05
+        },
+        "projected_area_ratio_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 0.9999984739926004
+        },
+        "projected_corners_finite": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": true,
+          "value": true
+        },
+        "projected_quadrilateral_non_self_intersecting": {
+          "applicable": true,
+          "operator": "==",
+          "passed": true,
+          "threshold": false,
+          "value": false
+        },
+        "rotation_within_limit": {
+          "applicable": true,
+          "operator": "<=",
+          "passed": true,
+          "threshold": 30.0,
+          "value": 0.00022961952768487003
+        },
+        "scale_within_range": {
+          "applicable": true,
+          "operator": "between",
+          "passed": true,
+          "threshold": [
+            0.5,
+            2.0
+          ],
+          "value": 0.9999992365536431
+        }
+      },
+      "error": null,
+      "geometry_accepted": true,
+      "homography_condition_number": 1.0000495004703809,
+      "homography_estimated": true,
+      "homography_matrix": [
+        [
+          1.0000661613166237,
+          2.5137125060239325e-05,
+          -0.023707279002733648
+        ],
+        [
+          1.8842569840125065e-05,
+          1.0000213987434523,
+          -0.0060053258106065
+        ],
+        [
+          3.9319801546856306e-08,
+          3.5011885809989764e-08,
+          1.0
+        ]
+      ],
+      "homography_normalized": true,
+      "inlier_ratio": 0.986268656716418,
+      "local_scale": 0.9999992365536431,
+      "local_scale_x": 1.0000219110495896,
+      "local_scale_y": 0.999976562571818,
+      "max_corner_displacement_pixels": 0.024456062966164288,
+      "max_inlier_reprojection_error": 3.3152589797973633,
+      "metrics_valid": false,
+      "mutual_info_candidate_delta": null,
+      "mutual_info_original": 3.0402252795512514,
+      "mutual_info_selected": 3.0402252795512514,
+      "mutual_info_warped": null,
       "num_inlier_matches": 1652,
       "num_keypoints_query": 2000,
       "num_keypoints_template": 2000,
       "num_ratio_matches": 1675,
+      "orientation_preserved": true,
+      "perspective_strength": 2.1058828526794427e-05,
+      "projected_area_ratio": 0.9999984739926004,
+      "projected_overlap_ratio": 0.9999762100936559,
+      "projected_query_corners": [
+        [
+          -0.023707279002733648,
+          -0.0060053258106065
+        ],
+        [
+          799.0040536849997,
+          0.00904960318460099
+        ],
+        [
+          799.0017866462518,
+          798.9786953252761
+        ],
+        [
+          -0.0036226147387781464,
+          798.9887409622607
+        ]
+      ],
+      "quality_evaluated": false,
+      "quality_improved": null,
       "ransac_reprojection_error": 0.04717354103922844,
+      "reasons": [
+        "near_identity_transform"
+      ],
+      "rotation_degrees": -0.00022961952768487003,
       "sample_id": "0135_rc_test",
+      "selected_variant": "original",
+      "self_intersects": false,
       "split": "test",
-      "ssim_after": 0.9828512668609619,
-      "ssim_before": 0.9828524788220724,
-      "ssim_delta": -1.2119611104699501e-06,
-      "ssim_valid_pixel_count": 637258,
-      "ssim_valid_pixel_ratio": 0.995715625,
+      "ssim_candidate_delta": null,
+      "ssim_original": 0.9829158186912537,
+      "ssim_selected": 0.9829158186912537,
+      "ssim_valid_pixel_count": 0,
+      "ssim_valid_pixel_ratio": 0.0,
+      "ssim_warped": null,
+      "status": "already_aligned",
       "success": true,
-      "valid_pixel_count": 639548,
-      "valid_pixel_ratio": 0.99929375
+      "valid_pixel_count": 0,
+      "valid_pixel_ratio": 0.0,
+      "warp_applied": false
     }
   ],
-  "schema_version": "step3-alignment-v3",
+  "schema_version": "step3-alignment-v4",
+  "stages": {
+    "already_aligned_count": 10,
+    "already_aligned_rate": 1.0,
+    "geometry_accepted_count": 10,
+    "geometry_accepted_rate": 1.0,
+    "geometry_rejected_count": 0,
+    "geometry_rejected_rate": 0.0,
+    "homography_estimated_count": 10,
+    "homography_estimated_rate": 1.0,
+    "quality_evaluated_count": 0,
+    "quality_evaluated_rate": 0.0,
+    "quality_improved_count": 0,
+    "quality_improved_rate": null,
+    "warp_applied_count": 0,
+    "warp_applied_rate": 0.0
+  },
   "success_count": 10,
   "success_rate": 1.0,
   "total_samples": 10

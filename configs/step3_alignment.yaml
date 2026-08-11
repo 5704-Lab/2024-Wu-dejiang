@@ -1,4 +1,4 @@
-# Step 3.1: SIFT + RANSAC macro-geometric alignment configuration
+# Step 3.2-B: Homography geometry and quality acceptance
 inputs:
   step1_root: artifacts/step1
   step2_root: artifacts/step2
@@ -19,11 +19,34 @@ ransac:
   max_iterations: 2000
   confidence: 0.995
   min_inliers: 10
+  min_inlier_ratio: 0.50
+  max_inlier_reprojection_error: 5.5
+geometry:
+  normalization_epsilon: 1.0e-8
+  max_condition_number: 10000.0
+  min_projected_area_ratio: 0.50
+  max_projected_area_ratio: 2.00
+  min_overlap_ratio: 0.70
+  min_scale: 0.50
+  max_scale: 2.00
+  max_anisotropy_ratio: 2.00
+  max_abs_rotation_degrees: 30.0
+  max_perspective_strength: 0.25
+near_identity:
+  enabled: true
+  max_corner_displacement_pixels: 1.0
+  max_scale_deviation: 0.005
+  max_abs_rotation_degrees: 0.10
+  max_perspective_strength: 0.002
 quality:
   ssim_window: 11
   mutual_info_bins: 64
   erode_ssim_mask: true
   min_valid_pixels: 1024
+  min_ssim_improvement: 0.001
+  min_mutual_info_improvement: 0.01
+  max_ssim_regression: 0.0005
+  max_mutual_info_regression: 0.01
 validation:
   sample_count: 10
   seed: 20260717
