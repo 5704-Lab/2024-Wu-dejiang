@@ -1,0 +1,39 @@
+schema_version: step3-crop-config-v1
+roadmap_step: 4-A
+inputs:
+  step2_config: configs/step2_dataset.yaml
+  step1_root: artifacts/step1
+  step2_root: artifacts/step2
+  dataset_root: "D:/WuDJ/Desktop/工作室文档/project/数据集/VOCdevkit/VOC2007"
+  alignment_validation_report: artifacts/step3/alignment_report.json
+  alignment_frozen_parameters: artifacts/step3/alignment_parameters_frozen.json
+  alignment_validation_manifest: artifacts/step3/run_manifest.json
+  alignment_test_report: artifacts/step3/test/alignment_report.json
+  alignment_test_manifest: artifacts/step3/test/run_manifest.json
+output:
+  root: artifacts/step3/crop
+model:
+  kernel_size: 3
+  hidden_ratio: 4
+  zero_init: true
+fusion:
+  hidden: 128
+  reduction: 16
+proposals:
+  min_area: 64
+  max_aspect_ratio: 5.0
+  adaptive_block: 51
+  adaptive_c: -5
+  morph_kernel: 5
+crop:
+  expand_k: 1.8
+  merge_iou_threshold: 0.3
+run:
+  purpose: crop_smoke
+  split: val
+  selection: ordered_prefix
+  sample_count: 40
+  batch_size: 1
+  num_workers: 0
+  device: auto
+  inference_dtype: float32

@@ -8,6 +8,7 @@ from pathlib import Path
 
 from .run_alignment import load_config, run_validation_freeze
 from .run_backbone import load_backbone_config, run_backbone_smoke
+from .run_crop import load_crop_config, run_crop_smoke
 from .run_feature_warp import load_feature_warp_config, run_feature_warp_smoke
 from .run_fusion import load_fusion_config, run_fusion_smoke
 from .run_heatmap import load_heatmap_config, run_heatmap_smoke
@@ -19,7 +20,7 @@ from .test_evaluation import load_test_config, run_test_evaluation
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Step 3 alignment and model evaluation")
-    parser.add_argument("command", choices=("validate-freeze", "test-evaluate", "backbone-smoke", "offset-smoke", "feature-warp-smoke", "train-alignment", "heatmap-smoke", "fusion-smoke", "proposals-smoke"))
+    parser.add_argument("command", choices=("validate-freeze", "test-evaluate", "backbone-smoke", "offset-smoke", "feature-warp-smoke", "train-alignment", "heatmap-smoke", "fusion-smoke", "proposals-smoke", "crop-smoke"))
     parser.add_argument("--config", type=Path)
     args = parser.parse_args()
     if args.command == "validate-freeze":
@@ -86,7 +87,7 @@ def main() -> int:
             "trainable_parameter_count": result["trainable_parameter_count"],
             "png_count": result["png_count"],
         }
-    else:
+    elif args.command == "proposals-smoke":
         result = run_proposals_smoke(load_proposals_config(args.config or Path("configs/step3_proposals.yaml")))
         recall = result["recall_statistics"]
         summary = {
@@ -98,6 +99,18 @@ def main() -> int:
             "recall@0.7": recall.get("recall@0.7"),
             "total_gt_boxes": recall.get("total_gt_boxes"),
             "total_candidate_boxes": recall.get("total_candidate_boxes"),
+        }
+    else:
+        result = run_crop_smoke(load_crop_config(args.config or Path("configs/step3_crop.yaml")))
+        stats = result["crop_statistics"]
+        summary = {
+            "schema_version": result["schema_version"], "verified": result["verified"],
+            "selected_device": result["selected_device"],
+            "processed_sample_count": result["processed_sample_count"],
+            "total_crops": stats.get("total_crops"),
+            "crops_with_gt": stats.get("crops_with_gt_boxes"),
+            "gt_coverage": stats.get("gt_coverage"),
+            "crop_area_mean": stats.get("crop_area_mean"),
         }
     print(json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True))
     return 0

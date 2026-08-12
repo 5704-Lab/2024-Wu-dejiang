@@ -1,0 +1,19 @@
+{
+  "crop_statistics": {
+    "covered_gt_boxes": 13,
+    "crop_area_max": 141453,
+    "crop_area_mean": 1395.550686250903,
+    "crop_area_min": 162,
+    "crops_with_gt_boxes": 13,
+    "empty_crops": 12446,
+    "gt_coverage": 0.325,
+    "total_crops": 12459,
+    "total_gt_boxes": 40
+  },
+  "expected_sample_count": 40,
+  "processed_sample_count": 40,
+  "roadmap_step": "4-A",
+  "schema_version": "step3-crop-smoke-v1",
+  "selected_device": "cuda",
+  "verified": true
+}

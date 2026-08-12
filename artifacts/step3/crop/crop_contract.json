@@ -1,0 +1,9 @@
+{
+  "method": "center_expand + clip",
+  "parameters": {
+    "expand_k": 1.8,
+    "merge_iou_threshold": 0.3
+  },
+  "roadmap_step": "4-A",
+  "schema_version": "step3-crop-contract-v1"
+}
