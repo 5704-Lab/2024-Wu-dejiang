@@ -1,0 +1,298 @@
+{
+  "expected_sample_count": 40,
+  "per_sample": [
+    {
+      "candidate_box_count": 224,
+      "enhanced_max": 0.11519420146942139,
+      "enhanced_min": -0.1406039595603943,
+      "gt_box_count": 1,
+      "sample_id": "0008_b1_test"
+    },
+    {
+      "candidate_box_count": 274,
+      "enhanced_max": 0.14263811707496643,
+      "enhanced_min": -0.08786969631910324,
+      "gt_box_count": 1,
+      "sample_id": "0008_b_test"
+    },
+    {
+      "candidate_box_count": 274,
+      "enhanced_max": 0.13620257377624512,
+      "enhanced_min": -0.08821304887533188,
+      "gt_box_count": 1,
+      "sample_id": "0008_c_test"
+    },
+    {
+      "candidate_box_count": 259,
+      "enhanced_max": 0.13247248530387878,
+      "enhanced_min": -0.09564842283725739,
+      "gt_box_count": 1,
+      "sample_id": "0008_f_test"
+    },
+    {
+      "candidate_box_count": 313,
+      "enhanced_max": 0.11226958781480789,
+      "enhanced_min": -0.08352385461330414,
+      "gt_box_count": 1,
+      "sample_id": "0008_h_test"
+    },
+    {
+      "candidate_box_count": 192,
+      "enhanced_max": 0.12115868926048279,
+      "enhanced_min": -0.10616534948348999,
+      "gt_box_count": 1,
+      "sample_id": "0008_rc1_test"
+    },
+    {
+      "candidate_box_count": 257,
+      "enhanced_max": 0.1293943077325821,
+      "enhanced_min": -0.09341241419315338,
+      "gt_box_count": 1,
+      "sample_id": "0008_rc_test"
+    },
+    {
+      "candidate_box_count": 282,
+      "enhanced_max": 0.13631901144981384,
+      "enhanced_min": -0.08768470585346222,
+      "gt_box_count": 1,
+      "sample_id": "0008_s1_test"
+    },
+    {
+      "candidate_box_count": 268,
+      "enhanced_max": 0.13508614897727966,
+      "enhanced_min": -0.0875038281083107,
+      "gt_box_count": 1,
+      "sample_id": "0008_s_test"
+    },
+    {
+      "candidate_box_count": 55,
+      "enhanced_max": 0.1376083791255951,
+      "enhanced_min": -0.08891662955284119,
+      "gt_box_count": 1,
+      "sample_id": "0008_test"
+    },
+    {
+      "candidate_box_count": 386,
+      "enhanced_max": 0.11087294667959213,
+      "enhanced_min": -0.09473896771669388,
+      "gt_box_count": 1,
+      "sample_id": "0009_b1_test"
+    },
+    {
+      "candidate_box_count": 414,
+      "enhanced_max": 0.08076895773410797,
+      "enhanced_min": -0.08553612232208252,
+      "gt_box_count": 1,
+      "sample_id": "0009_b_test"
+    },
+    {
+      "candidate_box_count": 410,
+      "enhanced_max": 0.1113492026925087,
+      "enhanced_min": -0.09660761058330536,
+      "gt_box_count": 1,
+      "sample_id": "0009_c_test"
+    },
+    {
+      "candidate_box_count": 408,
+      "enhanced_max": 0.11388102173805237,
+      "enhanced_min": -0.08322523534297943,
+      "gt_box_count": 1,
+      "sample_id": "0009_f_test"
+    },
+    {
+      "candidate_box_count": 404,
+      "enhanced_max": 0.10943970829248428,
+      "enhanced_min": -0.0972519963979721,
+      "gt_box_count": 1,
+      "sample_id": "0009_h_test"
+    },
+    {
+      "candidate_box_count": 20,
+      "enhanced_max": 0.13268476724624634,
+      "enhanced_min": -0.11013210564851761,
+      "gt_box_count": 1,
+      "sample_id": "0009_rc1_test"
+    },
+    {
+      "candidate_box_count": 353,
+      "enhanced_max": 0.06764835119247437,
+      "enhanced_min": -0.09689454734325409,
+      "gt_box_count": 1,
+      "sample_id": "0009_rc_test"
+    },
+    {
+      "candidate_box_count": 417,
+      "enhanced_max": 0.07637052237987518,
+      "enhanced_min": -0.11608817428350449,
+      "gt_box_count": 1,
+      "sample_id": "0009_s1_test"
+    },
+    {
+      "candidate_box_count": 413,
+      "enhanced_max": 0.08635462820529938,
+      "enhanced_min": -0.11299154162406921,
+      "gt_box_count": 1,
+      "sample_id": "0009_s_test"
+    },
+    {
+      "candidate_box_count": 161,
+      "enhanced_max": 0.09625005722045898,
+      "enhanced_min": -0.09904592484235764,
+      "gt_box_count": 1,
+      "sample_id": "0009_test"
+    },
+    {
+      "candidate_box_count": 276,
+      "enhanced_max": 0.19724981486797333,
+      "enhanced_min": -0.09424585103988647,
+      "gt_box_count": 1,
+      "sample_id": "0022_b1_test"
+    },
+    {
+      "candidate_box_count": 389,
+      "enhanced_max": 0.1190079003572464,
+      "enhanced_min": -0.08562707901000977,
+      "gt_box_count": 1,
+      "sample_id": "0022_b_test"
+    },
+    {
+      "candidate_box_count": 273,
+      "enhanced_max": 0.1329360008239746,
+      "enhanced_min": -0.11573771387338638,
+      "gt_box_count": 1,
+      "sample_id": "0022_c_test"
+    },
+    {
+      "candidate_box_count": 304,
+      "enhanced_max": 0.1098417416214943,
+      "enhanced_min": -0.11585527658462524,
+      "gt_box_count": 1,
+      "sample_id": "0022_f_test"
+    },
+    {
+      "candidate_box_count": 289,
+      "enhanced_max": 0.12702108919620514,
+      "enhanced_min": -0.10566122084856033,
+      "gt_box_count": 1,
+      "sample_id": "0022_h_test"
+    },
+    {
+      "candidate_box_count": 200,
+      "enhanced_max": 0.1564156860113144,
+      "enhanced_min": -0.1279035210609436,
+      "gt_box_count": 1,
+      "sample_id": "0022_rc1_test"
+    },
+    {
+      "candidate_box_count": 343,
+      "enhanced_max": 0.13303042948246002,
+      "enhanced_min": -0.08699341118335724,
+      "gt_box_count": 1,
+      "sample_id": "0022_rc_test"
+    },
+    {
+      "candidate_box_count": 443,
+      "enhanced_max": 0.1150050088763237,
+      "enhanced_min": -0.09325969219207764,
+      "gt_box_count": 1,
+      "sample_id": "0022_s1_test"
+    },
+    {
+      "candidate_box_count": 310,
+      "enhanced_max": 0.13989019393920898,
+      "enhanced_min": -0.10200206935405731,
+      "gt_box_count": 1,
+      "sample_id": "0022_s_test"
+    },
+    {
+      "candidate_box_count": 141,
+      "enhanced_max": 0.1475268006324768,
+      "enhanced_min": -0.10321090370416641,
+      "gt_box_count": 1,
+      "sample_id": "0022_test"
+    },
+    {
+      "candidate_box_count": 212,
+      "enhanced_max": 0.1440248191356659,
+      "enhanced_min": -0.17038950324058533,
+      "gt_box_count": 1,
+      "sample_id": "0036_b1_test"
+    },
+    {
+      "candidate_box_count": 200,
+      "enhanced_max": 0.10982515662908554,
+      "enhanced_min": -0.13197946548461914,
+      "gt_box_count": 1,
+      "sample_id": "0036_b_test"
+    },
+    {
+      "candidate_box_count": 197,
+      "enhanced_max": 0.11917982995510101,
+      "enhanced_min": -0.14978791773319244,
+      "gt_box_count": 1,
+      "sample_id": "0036_c_test"
+    },
+    {
+      "candidate_box_count": 169,
+      "enhanced_max": 0.13715170323848724,
+      "enhanced_min": -0.160636305809021,
+      "gt_box_count": 1,
+      "sample_id": "0036_f_test"
+    },
+    {
+      "candidate_box_count": 169,
+      "enhanced_max": 0.11412662267684937,
+      "enhanced_min": -0.16936175525188446,
+      "gt_box_count": 1,
+      "sample_id": "0036_h_test"
+    },
+    {
+      "candidate_box_count": 129,
+      "enhanced_max": 0.14779041707515717,
+      "enhanced_min": -0.1653948724269867,
+      "gt_box_count": 1,
+      "sample_id": "0036_rc1_test"
+    },
+    {
+      "candidate_box_count": 252,
+      "enhanced_max": 0.11568774282932281,
+      "enhanced_min": -0.1666812151670456,
+      "gt_box_count": 1,
+      "sample_id": "0036_rc_test"
+    },
+    {
+      "candidate_box_count": 196,
+      "enhanced_max": 0.1303289383649826,
+      "enhanced_min": -0.1682845950126648,
+      "gt_box_count": 1,
+      "sample_id": "0036_s1_test"
+    },
+    {
+      "candidate_box_count": 172,
+      "enhanced_max": 0.12621888518333435,
+      "enhanced_min": -0.16033707559108734,
+      "gt_box_count": 1,
+      "sample_id": "0036_s_test"
+    },
+    {
+      "candidate_box_count": 54,
+      "enhanced_max": 0.13581667840480804,
+      "enhanced_min": -0.15183915197849274,
+      "gt_box_count": 1,
+      "sample_id": "0036_test"
+    }
+  ],
+  "processed_sample_count": 40,
+  "recall_statistics": {
+    "candidates_per_gt": 262.55,
+    "recall@0.3": 0.525,
+    "recall@0.5": 0.15,
+    "recall@0.7": 0.0,
+    "total_candidate_boxes": 10502,
+    "total_gt_boxes": 40
+  },
+  "roadmap_step": "3.5-C",
+  "schema_version": "step3-proposals-smoke-v1",
+  "selected_device": "cuda",
+  "verified": true
+}

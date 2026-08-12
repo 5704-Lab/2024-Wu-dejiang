@@ -1,0 +1,21 @@
+{
+  "evaluation": {
+    "iou_thresholds": [
+      0.3,
+      0.5,
+      0.7
+    ],
+    "metric": "recall@IoU"
+  },
+  "parameters": {
+    "adaptive_block": 51,
+    "adaptive_c": -5,
+    "max_area_ratio": 0.8,
+    "max_aspect_ratio": 5.0,
+    "min_area": 64.0,
+    "morph_kernel": 5
+  },
+  "postprocessing": "adaptive_threshold + morph_close + findContours + boundingRect",
+  "roadmap_step": "3.5-C",
+  "schema_version": "step3-proposals-contract-v1"
+}

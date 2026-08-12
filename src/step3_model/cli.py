@@ -12,13 +12,14 @@ from .run_feature_warp import load_feature_warp_config, run_feature_warp_smoke
 from .run_fusion import load_fusion_config, run_fusion_smoke
 from .run_heatmap import load_heatmap_config, run_heatmap_smoke
 from .run_offset import load_offset_config, run_offset_smoke
+from .run_proposals import load_proposals_config, run_proposals_smoke
 from .run_train_alignment import load_train_config, run_train_alignment
 from .test_evaluation import load_test_config, run_test_evaluation
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Step 3 alignment and model evaluation")
-    parser.add_argument("command", choices=("validate-freeze", "test-evaluate", "backbone-smoke", "offset-smoke", "feature-warp-smoke", "train-alignment", "heatmap-smoke", "fusion-smoke"))
+    parser.add_argument("command", choices=("validate-freeze", "test-evaluate", "backbone-smoke", "offset-smoke", "feature-warp-smoke", "train-alignment", "heatmap-smoke", "fusion-smoke", "proposals-smoke"))
     parser.add_argument("--config", type=Path)
     args = parser.parse_args()
     if args.command == "validate-freeze":
@@ -75,7 +76,7 @@ def main() -> int:
             "ordered_validation_sample_ids": result["ordered_validation_sample_ids"],
             "png_count": result["png_count"],
         }
-    else:
+    elif args.command == "fusion-smoke":
         result = run_fusion_smoke(load_fusion_config(args.config or Path("configs/step3_fusion.yaml")))
         summary = {
             "schema_version": result["schema_version"], "verified": result["verified"],
@@ -84,6 +85,19 @@ def main() -> int:
             "ordered_validation_sample_ids": result["ordered_validation_sample_ids"],
             "trainable_parameter_count": result["trainable_parameter_count"],
             "png_count": result["png_count"],
+        }
+    else:
+        result = run_proposals_smoke(load_proposals_config(args.config or Path("configs/step3_proposals.yaml")))
+        recall = result["recall_statistics"]
+        summary = {
+            "schema_version": result["schema_version"], "verified": result["verified"],
+            "selected_device": result["selected_device"],
+            "processed_sample_count": result["processed_sample_count"],
+            "recall@0.3": recall.get("recall@0.3"),
+            "recall@0.5": recall.get("recall@0.5"),
+            "recall@0.7": recall.get("recall@0.7"),
+            "total_gt_boxes": recall.get("total_gt_boxes"),
+            "total_candidate_boxes": recall.get("total_candidate_boxes"),
         }
     print(json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True))
     return 0

@@ -1,6 +1,6 @@
-# Step 3.2-C / 3.2-D / 3.3-A / 3.3-B / 3.4-A / 3.4-B / 3.4-C / 3.5-A / 3.5-B：配准冻结、Test 评估、共享多尺度 Backbone、Offset Predictor、DCN Feature Warp、微对齐训练、特征差异热力图与多尺度融合注意力
+# Step 3.2-C / 3.2-D / 3.3-A / 3.3-B / 3.4-A / 3.4-B / 3.4-C / 3.5-A / 3.5-B / 3.5-C：配准冻结、Test 评估、共享多尺度 Backbone、Offset Predictor、DCN Feature Warp、微对齐训练、特征差异热力图、多尺度融合注意力与候选框后处理
 
-Step 3.5-B 已实现 CBAM per-scale + 学习加权融合：通道注意力（全局 SE）建模上下文抑制背景纹理，空间注意力（7×7）聚焦微小缺陷区域，三尺度差异特征通过可学习 softmax 权重融合为统一 [800,800] 增强热力图。参数仅 ~460K。
+Step 3.5-C 已实现候选框后处理与召回评估：自适应阈值二值化 + 形态学闭运算 + findContours + boundingRect 生成候选框，用 box_iou 与 GT 计算 recall@IoU。首次端到端量化 CBAM 融合热力图的召回性能。
 
 ## Step 3.3-B 多尺度 Backbone
 
@@ -209,6 +209,42 @@ python scripts/run_step3.py fusion-smoke --config configs/step3_fusion.yaml
 - `artifacts/step3/fusion/panels/*.png`（不被 Git 追踪）
 
 Step 3.5-B 不实现候选框生成（属于 3.5-C）、不修改 Step 3.2/3.3/3.4/3.5-A 证据。
+
+## Step 3.5-C：候选框后处理与召回评估
+
+Step 3.5-C 将 Step 3.5-B 的增强热力图转换为离散候选框，并与 GT boxes 对比评估 recall 性能。
+
+正式命令：
+
+```bash
+python scripts/run_step3.py proposals-smoke --config configs/step3_proposals.yaml
+```
+
+### 设计
+
+- **后处理 pipeline**：归一化 → 自适应阈值（Gaussian block=51,C=-5） → 形态学闭运算（5×5） → findContours → boundingRect → 面积/长宽比过滤
+- **召回评估**：用 `torchvision.ops.box_iou` 计算每个 GT box 的最佳匹配 IoU，统计 recall@0.3/0.5/0.7
+- **不需要 NMS**：轮廓外接矩形天然不重叠，无冗余框需要抑制
+
+### 真实 Smoke 结果（40 个 Val 样本，zero-init predictor）
+
+| 指标 | 值 |
+|------|-----|
+| GT boxes | 40 |
+| 候选框总数 | 10,502 |
+| recall@0.3 | **52.5%** |
+| recall@0.5 | 15.0% |
+| recall@0.7 | 0.0% |
+
+**分析**：零偏移预测器（未训练）下，CBAM 融合热力图已经捕获了一些缺陷区域（recall@0.3 过半数），但定位精度不足（recall@0.5 仅 15%，recall@0.7 为 0）。候选框倾向于较大且边界松散，符合 "高 recall 低 precision" 的候选阶段设计意图。训练 OffsetPredictor 后 DCN 对齐改善有望显著提升定位精度。
+
+### 产物
+
+- `artifacts/step3/proposals/proposals_contract.json`
+- `artifacts/step3/proposals/smoke_report.json`
+- `artifacts/step3/proposals/run_manifest.json`
+
+Step 3.5-C 不进行 detector 训练（属于 Step 5）、不修改 Step 3.2 证据。
 
 ## Step 3.3-A 历史记录
 
