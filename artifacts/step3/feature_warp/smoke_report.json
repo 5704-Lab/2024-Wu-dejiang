@@ -1,0 +1,180 @@
+{
+  "batches": [
+    {
+      "device": "cuda:0",
+      "dtype": "torch.float32",
+      "finite": true,
+      "input_shape": [
+        1,
+        3,
+        800,
+        800
+      ],
+      "max_abs_diff_per_scale": {
+        "C3": 0.0,
+        "C4": 0.0,
+        "C5": 0.0
+      },
+      "non_zero_offset_differs_template": true,
+      "non_zero_offset_finite": true,
+      "offset_shapes": {
+        "C3": [
+          1,
+          18,
+          100,
+          100
+        ],
+        "C4": [
+          1,
+          18,
+          50,
+          50
+        ],
+        "C5": [
+          1,
+          18,
+          25,
+          25
+        ]
+      },
+      "sample_ids": [
+        "0008_b1_test"
+      ],
+      "template_feature_shapes": {
+        "C3": [
+          1,
+          512,
+          100,
+          100
+        ],
+        "C4": [
+          1,
+          1024,
+          50,
+          50
+        ],
+        "C5": [
+          1,
+          2048,
+          25,
+          25
+        ]
+      },
+      "warped_feature_shapes": {
+        "C3": [
+          1,
+          512,
+          100,
+          100
+        ],
+        "C4": [
+          1,
+          1024,
+          50,
+          50
+        ],
+        "C5": [
+          1,
+          2048,
+          25,
+          25
+        ]
+      },
+      "zero_offset_identity_verified": true
+    },
+    {
+      "device": "cuda:0",
+      "dtype": "torch.float32",
+      "finite": true,
+      "input_shape": [
+        1,
+        3,
+        800,
+        800
+      ],
+      "max_abs_diff_per_scale": {
+        "C3": 0.0,
+        "C4": 0.0,
+        "C5": 0.0
+      },
+      "non_zero_offset_differs_template": true,
+      "non_zero_offset_finite": true,
+      "offset_shapes": {
+        "C3": [
+          1,
+          18,
+          100,
+          100
+        ],
+        "C4": [
+          1,
+          18,
+          50,
+          50
+        ],
+        "C5": [
+          1,
+          18,
+          25,
+          25
+        ]
+      },
+      "sample_ids": [
+        "0008_b_test"
+      ],
+      "template_feature_shapes": {
+        "C3": [
+          1,
+          512,
+          100,
+          100
+        ],
+        "C4": [
+          1,
+          1024,
+          50,
+          50
+        ],
+        "C5": [
+          1,
+          2048,
+          25,
+          25
+        ]
+      },
+      "warped_feature_shapes": {
+        "C3": [
+          1,
+          512,
+          100,
+          100
+        ],
+        "C4": [
+          1,
+          1024,
+          50,
+          50
+        ],
+        "C5": [
+          1,
+          2048,
+          25,
+          25
+        ]
+      },
+      "zero_offset_identity_verified": true
+    }
+  ],
+  "dcn_warp_started": true,
+  "expected_sample_count": 2,
+  "ordered_validation_sample_ids": [
+    "0008_b1_test",
+    "0008_b_test"
+  ],
+  "processed_sample_count": 2,
+  "roadmap_step": "3.4-B",
+  "schema_version": "step3-feature-warp-smoke-v1",
+  "selected_device": "cuda",
+  "train_started": false,
+  "verified": true
+}

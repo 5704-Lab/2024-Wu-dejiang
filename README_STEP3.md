@@ -1,6 +1,6 @@
-# Step 3.2-C / 3.2-D / 3.3-A / 3.3-B：配准冻结、Test 评估与共享多尺度 Backbone
+# Step 3.2-C / 3.2-D / 3.3-A / 3.3-B / 3.4-A / 3.4-B：配准冻结、Test 评估、共享多尺度 Backbone、Offset Predictor 与 DCN Feature Warp
 
-Step 3.3-B 已将共享 Backbone 公开为有序多尺度输出。模型仍是 Step 3.3-A 的单实例、共享权重 Siamese ResNet-50，直接消费 Step 2 的 raw paired tensors，不在线重算配准；Step 3.2 Validation/Test 的 800 个样本最终均选择 original，且当前没有训练集 aligned-image 索引。Step 3.4-A 尚未开始。
+Step 3.4-B 已在 Step 3.4-A 的 Offset Predictor 之上实现 DCN Feature Warp（identity kernel + deform_conv2d），对模板多尺度特征进行形变采样对齐。端到端 pipeline：Backbone → OffsetPredictor → FeatureWarp，zero-offset 时 warped 逐 bit 等于 template。Backbone 全部冻结、Predictor trainable、Warp 无 trainable 参数。Step 3.4-C（偏移预测训练）尚未开始。
 
 ## Step 3.3-B 多尺度 Backbone
 
@@ -73,6 +73,44 @@ python scripts/run_step3.py offset-smoke --config configs/step3_offset.yaml
 - `artifacts/step3/offset_predictor/run_manifest.json`
 
 Step 3.4-A 不实现 DCN warp（属于 3.4-B）、不训练（属于 3.4-C）、不修改 Step 3.2/3.3 证据。
+
+## Step 3.4-B：DCN / Feature Warp
+
+Step 3.4-B 在 Step 3.4-A 的 Offset Predictor 之上实现 DCN Feature Warp：使用逐尺度 identity kernel + deformable convolution 对模板多尺度特征进行形变采样，使其在特征空间向 Query 对齐。本步骤只建立 warp 模块、契约、测试与真实 smoke，不做偏移训练（3.4-C）。
+
+正式命令：
+
+```bash
+python scripts/run_step3.py feature-warp-smoke --config configs/step3_feature_warp.yaml
+```
+
+### 设计
+
+- **identity kernel**：逐尺度注册 `[C, C, 3, 3]` 恒等卷积核为 buffer（`weight[c, c, 1, 1] = 1.0`），stride=1, padding=1。零偏移时 `deform_conv2d` 等价于 identity：`warped[c, h, w] = template[c, h, w]`。
+- **逐尺度独立 DCN**：对 template feature 的每个尺度调用 `torchvision.ops.deform_conv2d`，使用对应尺度的 identity kernel 和 offsets。
+- **输入契约**：template_features 与 offsets 两个 dict，key 顺序固定 `["C3","C4","C5"]`，逐尺度验证 shape、finite、dtype/device 一致。
+- **zero-offset identity 保证**：OffsetPredictor 零初始化，offsets 全零 → warped features 逐 bit 等于 template features（经真实 smoke 验证）。
+
+### 参数
+
+- FeatureWarp 无 trainable 参数：identity kernel 注册为 buffer，不含 `nn.Parameter`。
+- 端到端 pipeline（Backbone + OffsetPredictor + FeatureWarp）总参数不变：24,918,710（backbone 23,508,032 + predictor 1,410,678）。
+
+### 真实 Smoke 结果
+
+- 2 对 ordered Validation pairs，CUDA 设备
+- 三尺度 warped 输出 shape 与 template feature 完全一致：C3 `[1,512,100,100]`、C4 `[1,1024,50,50]`、C5 `[1,2048,25,25]`
+- zero-offset identity 逐 bit 验证通过（所有尺度 max-abs-diff 均为 0）
+- 非零合成偏移产生不同于 template 的有限输出（确认 DCN 运行为非退化）
+- 数据集只读、Step 3.2 证据 hashes 不变
+
+### 产物
+
+- `artifacts/step3/feature_warp/feature_warp_contract.json`
+- `artifacts/step3/feature_warp/smoke_report.json`
+- `artifacts/step3/feature_warp/run_manifest.json`
+
+Step 3.4-B 不实现偏移预测训练（属于 3.4-C）、不修改 loss/optimizer、不保存 checkpoint、不修改 Step 3.2/3.3/3.4-A 证据。
 
 ## Step 3.3-A 历史记录
 
