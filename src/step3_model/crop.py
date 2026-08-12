@@ -111,6 +111,31 @@ def map_boxes_to_crop(
     return shifted
 
 
+def inverse_map_boxes(
+    boxes: torch.Tensor,
+    crop_rect: tuple[int, int, int, int],
+) -> torch.Tensor:
+    """Map boxes from crop-local coordinates back to image coordinates.
+
+    This is the exact inverse of map_boxes_to_crop: crop-relative
+    coordinates are shifted by the crop origin to recover image-space positions.
+
+    Args:
+        boxes: [N, 4] xyxy in crop-local space
+        crop_rect: (x, y, w, h) of crop window in image space
+
+    Returns:
+        [N, 4] xyxy in image space.
+    """
+    if boxes.numel() == 0:
+        return boxes.clone()
+    x0, y0, _w, _h = crop_rect
+    shifted = boxes.clone()
+    shifted[:, [0, 2]] += x0
+    shifted[:, [1, 3]] += y0
+    return shifted
+
+
 def crop_image_tensor(
     image: torch.Tensor,
     crop_rect: tuple[int, int, int, int],

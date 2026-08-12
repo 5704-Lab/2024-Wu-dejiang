@@ -6,6 +6,7 @@ from step3_model.crop import (
     build_crops,
     crop_image_tensor,
     expand_box,
+    inverse_map_boxes,
     map_boxes_to_crop,
     merge_overlapping_boxes,
 )
@@ -96,6 +97,48 @@ def test_map_boxes_to_crop_empty():
     boxes = torch.empty((0, 4), dtype=torch.float32)
     mapped = map_boxes_to_crop(boxes, (0, 0, 100, 100))
     assert mapped.shape[0] == 0
+
+
+# ---------------------------------------------------------------------------
+# inverse mapping tests
+# ---------------------------------------------------------------------------
+
+def test_inverse_map_boxes():
+    """Round-trip: map to crop, then inverse map back → original (for boxes fully inside)."""
+    crop_rect = (50, 50, 100, 100)
+    boxes = torch.tensor([[60, 60, 80, 80]], dtype=torch.float32)
+    mapped = map_boxes_to_crop(boxes, crop_rect)
+    restored = inverse_map_boxes(mapped, crop_rect)
+    assert torch.allclose(restored[0], boxes[0])
+
+
+def test_inverse_map_boxes_multiple():
+    crop_rect = (100, 50, 200, 150)
+    boxes = torch.tensor([[120, 70, 180, 130], [200, 100, 280, 160]], dtype=torch.float32)
+    mapped = map_boxes_to_crop(boxes, crop_rect)
+    restored = inverse_map_boxes(mapped, crop_rect)
+    assert torch.allclose(restored, boxes)
+
+
+def test_inverse_map_boxes_empty():
+    boxes = torch.empty((0, 4), dtype=torch.float32)
+    restored = inverse_map_boxes(boxes, (10, 20, 30, 40))
+    assert restored.shape[0] == 0
+
+
+def test_map_inverse_map_roundtrip_random():
+    """Random boxes fully inside a region → roundtrip preserves coordinates."""
+    crop_rect = (100, 100, 400, 300)
+    x0, y0, w, h = crop_rect
+    for _ in range(10):
+        x1 = x0 + torch.rand(1).item() * (w - 20)
+        y1 = y0 + torch.rand(1).item() * (h - 20)
+        x2 = x1 + 10 + torch.rand(1).item() * min(50, w - (x1 - x0) - 10)
+        y2 = y1 + 10 + torch.rand(1).item() * min(50, h - (y1 - y0) - 10)
+        boxes = torch.tensor([[x1, y1, x2, y2]], dtype=torch.float32)
+        mapped = map_boxes_to_crop(boxes, crop_rect)
+        restored = inverse_map_boxes(mapped, crop_rect)
+        assert torch.allclose(restored, boxes, atol=1e-4), f"Failed at box {boxes.tolist()}"
 
 
 # ---------------------------------------------------------------------------
