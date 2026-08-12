@@ -9,6 +9,7 @@ from pathlib import Path
 from .run_alignment import load_config, run_validation_freeze
 from .run_backbone import load_backbone_config, run_backbone_smoke
 from .run_crop import load_crop_config, run_crop_smoke
+from .run_detection import load_detection_config, run_coco_export, run_detection_smoke
 from .run_feature_warp import load_feature_warp_config, run_feature_warp_smoke
 from .run_fusion import load_fusion_config, run_fusion_smoke
 from .run_heatmap import load_heatmap_config, run_heatmap_smoke
@@ -20,7 +21,7 @@ from .test_evaluation import load_test_config, run_test_evaluation
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Step 3 alignment and model evaluation")
-    parser.add_argument("command", choices=("validate-freeze", "test-evaluate", "backbone-smoke", "offset-smoke", "feature-warp-smoke", "train-alignment", "heatmap-smoke", "fusion-smoke", "proposals-smoke", "crop-smoke"))
+    parser.add_argument("command", choices=("validate-freeze", "test-evaluate", "backbone-smoke", "offset-smoke", "feature-warp-smoke", "train-alignment", "heatmap-smoke", "fusion-smoke", "proposals-smoke", "crop-smoke", "export-coco", "detection-smoke"))
     parser.add_argument("--config", type=Path)
     args = parser.parse_args()
     if args.command == "validate-freeze":
@@ -100,7 +101,7 @@ def main() -> int:
             "total_gt_boxes": recall.get("total_gt_boxes"),
             "total_candidate_boxes": recall.get("total_candidate_boxes"),
         }
-    else:
+    elif args.command == "crop-smoke":
         result = run_crop_smoke(load_crop_config(args.config or Path("configs/step3_crop.yaml")))
         stats = result["crop_statistics"]
         summary = {
@@ -111,6 +112,24 @@ def main() -> int:
             "crops_with_gt": stats.get("crops_with_gt_boxes"),
             "gt_coverage": stats.get("gt_coverage"),
             "crop_area_mean": stats.get("crop_area_mean"),
+        }
+    elif args.command == "export-coco":
+        result = run_coco_export(load_detection_config(args.config or Path("configs/step3_detection.yaml")))
+        summaries = result.get("summaries", {})
+        summary = {
+            "schema_version": result["schema_version"],
+            "train_images": summaries.get("train", {}).get("image_count", 0),
+            "val_images": summaries.get("val", {}).get("image_count", 0),
+            "test_images": summaries.get("test", {}).get("image_count", 0),
+            "total_annotations": sum(s.get("annotation_count", 0) for s in summaries.values()),
+        }
+    else:
+        result = run_detection_smoke(load_detection_config(args.config or Path("configs/step3_detection.yaml")))
+        summary = {
+            "schema_version": result["schema_version"], "verified": result["verified"],
+            "selected_device": result["selected_device"],
+            "sample_count": result["sample_count"],
+            "results": result["results"],
         }
     print(json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True))
     return 0
