@@ -36,6 +36,44 @@ python scripts/run_step3.py backbone-smoke --config configs/step3_backbone.yaml
 
 Step 3.3-B 不实现 FPN/neck、channel projection、feature fusion、attention、DCN、loss、optimizer、训练或 RT-DETR。Offset Predictor 属于 Step 3.4-A，尚未开始。
 
+## Step 3.4-A：Offset Predictor
+
+Step 3.4-A 在 Step 3.3-B 的多尺度共享 Backbone 之上实现 Offset Predictor，为后续 Step 3.4-B 的 DCN/Feature Warp 预测逐尺度形变采样偏移。本步骤只建立预测器模块、契约、测试与真实 smoke，不做 DCN warp（3.4-B）、不做训练（3.4-C）。
+
+正式命令：
+
+```bash
+python scripts/run_step3.py offset-smoke --config configs/step3_offset.yaml
+```
+
+### 设计
+
+- **逐尺度独立 head**：`3×3 conv(2C→C/4) → GELU → 3×3 conv(C/4→18)`，C3/C4/C5 各一个 head，参数独立。
+- **输入 pairing**：每尺度拼接 `[query_feature, template_feature]`（2×C 通道）。
+- **零初始化**：最终 conv 权重和偏置为 0，初始偏移严格为 0，使后续 DCN 初始行为等价于普通卷积（安全 identity）。
+- **偏移限幅**：`tanh` × 对应 stride（C3≤8、C4≤16、C5≤32 像素），防止初始随机权重产生灾难性采样位置。
+- 输出形状：每尺度 `[B, 18, H, W]`，对应 `deform_conv2d` 的 offset 布局 `[B, 2×kH×kW, Hout, Wout]`（k=3）。
+
+### 参数
+
+- 总参数：24,918,710（backbone 23,508,032 + predictor 1,410,678）
+- 所有 Backbone 参数在 smoke 中冻结；predictor 保持 trainable（为 3.4-C 训练准备）
+
+### 真实 Smoke 结果
+
+- 2 对 ordered Validation pairs，CUDA 设备
+- 三尺度 offset shape 完全符合预期：C3 `[1,18,100,100]`、C4 `[1,18,50,50]`、C5 `[1,18,25,25]`
+- 所有 offset 严格为 0（zero-init 验证通过）
+- 数据集只读、Step 3.2 证据 hashes 不变
+
+### 产物
+
+- `artifacts/step3/offset_predictor/offset_contract.json`
+- `artifacts/step3/offset_predictor/smoke_report.json`
+- `artifacts/step3/offset_predictor/run_manifest.json`
+
+Step 3.4-A 不实现 DCN warp（属于 3.4-B）、不训练（属于 3.4-C）、不修改 Step 3.2/3.3 证据。
+
 ## Step 3.3-A 历史记录
 
 Step 3.3-A 建立了共享 ResNet-50 Backbone 基础与单尺度 layer4 契约（真实 smoke 已验证共享权重、CUDA 前向与源数据只读）；3.3-B 在其上公开了有序多尺度输出，A 的单尺度 API 已由 B 的多尺度契约替代，A 阶段的 artifacts 由 B 的 v2 artifacts 继承覆盖。

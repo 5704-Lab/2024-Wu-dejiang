@@ -1,0 +1,37 @@
+{
+  "artifacts": {
+    "offset_contract.json": "2c41d64c794effe207572a999cb16b0db03d7738b8f7982f8b4330857fe1ea09",
+    "smoke_report.json": "511ab125119250deba89f42b75659c22f156a4c1651097352089c0f7d4ee8599"
+  },
+  "command": "offset-smoke",
+  "controls": {
+    "alignment_evidence_integrity_verified": true,
+    "dcn_started": false,
+    "feature_warp_started": false,
+    "source_read_only_verified": true,
+    "step_3_4_b_started": false,
+    "train_started": false
+  },
+  "generated_at_utc": "2026-08-12T01:07:46.278330+00:00",
+  "inputs": {
+    "config_sha256": "601eb4bfcc941d9593198ff8da9cce8c2039ef5d84ed713340d5fd69c645176d",
+    "source_snapshot_digest": "1e8c83146414f501caa05e2f4a6b719732523d6a196859370abda43add40fd13",
+    "step2_config_sha256": "fda61db7c44b963bacf289fec10af34d391251eb7b6e823c739752d93c6b89b7",
+    "step3_2_evidence_sha256": {
+      "alignment_frozen_parameters": "0d04510fae052089f6a28593b81f3ed82322c28fed9faae71233ce0dc159cf21",
+      "alignment_test_manifest": "abf5f4bf88ac4d1631bfe8c87d2adfaedbc03c5be55764a0d4ddc0d3d68f287d",
+      "alignment_test_report": "39c8f575cb1a27621d73f988ebc4d28023345395ea64d162020c86f1fa54217d",
+      "alignment_validation_manifest": "5d6d9ea00d63c2bd16fbe9ae4e72b783a5c63fae31f93b7480b1cfebedce1c16",
+      "alignment_validation_report": "810699c9d3fb0ce28aec04a2580d8d0c3e48e5c2e8bf66310ec215ebeeab027b"
+    }
+  },
+  "roadmap_step": "3.4-A",
+  "schema_version": "step3-offset-run-manifest-v1",
+  "software": {
+    "cuda_available": true,
+    "python": "3.12.6",
+    "selected_device": "cuda",
+    "torch": "2.11.0+cu128",
+    "torchvision": "0.26.0+cu128"
+  }
+}

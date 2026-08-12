@@ -1,0 +1,120 @@
+{
+  "batches": [
+    {
+      "device": "cuda:0",
+      "dtype": "torch.float32",
+      "finite": true,
+      "input_shape": [
+        1,
+        3,
+        800,
+        800
+      ],
+      "offset_max_abs": {
+        "C3": 0.0,
+        "C4": 0.0,
+        "C5": 0.0
+      },
+      "offset_mean": {
+        "C3": 0.0,
+        "C4": 0.0,
+        "C5": 0.0
+      },
+      "offset_shapes": {
+        "C3": [
+          1,
+          18,
+          100,
+          100
+        ],
+        "C4": [
+          1,
+          18,
+          50,
+          50
+        ],
+        "C5": [
+          1,
+          18,
+          25,
+          25
+        ]
+      },
+      "offset_std": {
+        "C3": 0.0,
+        "C4": 0.0,
+        "C5": 0.0
+      },
+      "sample_ids": [
+        "0008_b1_test"
+      ]
+    },
+    {
+      "device": "cuda:0",
+      "dtype": "torch.float32",
+      "finite": true,
+      "input_shape": [
+        1,
+        3,
+        800,
+        800
+      ],
+      "offset_max_abs": {
+        "C3": 0.0,
+        "C4": 0.0,
+        "C5": 0.0
+      },
+      "offset_mean": {
+        "C3": 0.0,
+        "C4": 0.0,
+        "C5": 0.0
+      },
+      "offset_shapes": {
+        "C3": [
+          1,
+          18,
+          100,
+          100
+        ],
+        "C4": [
+          1,
+          18,
+          50,
+          50
+        ],
+        "C5": [
+          1,
+          18,
+          25,
+          25
+        ]
+      },
+      "offset_std": {
+        "C3": 0.0,
+        "C4": 0.0,
+        "C5": 0.0
+      },
+      "sample_ids": [
+        "0008_b_test"
+      ]
+    }
+  ],
+  "dcn_started": false,
+  "expected_sample_count": 2,
+  "offset_max_abs_per_scale": {
+    "C3": 0.0,
+    "C4": 0.0,
+    "C5": 0.0
+  },
+  "ordered_validation_sample_ids": [
+    "0008_b1_test",
+    "0008_b_test"
+  ],
+  "parameter_count": 24918710,
+  "processed_sample_count": 2,
+  "roadmap_step": "3.4-A",
+  "schema_version": "step3-offset-smoke-v1",
+  "selected_device": "cuda",
+  "train_started": false,
+  "verified": true
+}
