@@ -1,5 +1,9 @@
 """SimeseUltraMaxPlus+ 印刷缺陷检测流水线 Gradio 演示应用（Step 8）。
 
+完整推理流程:
+    SIFT+RANSAC 宏观配准 → Backbone 特征提取 → OffsetPredictor DCN偏移
+    → FeatureWarp 特征形变 → MultiScaleFusion + CBAM → 候选框后处理
+
 用法:
     python src/demo/app.py
     # 浏览器打开 http://127.0.0.1:7860
@@ -22,6 +26,7 @@ import numpy as np
 import torch
 from PIL import Image
 
+from step3_model.alignment import SIFTAligner
 from step3_model.backbone import SharedSiameseBackbone
 from step3_model.feature_warp import FeatureWarp
 from step3_model.fusion import MultiScaleFusion
@@ -34,7 +39,7 @@ from step2_dataset.transforms import pil_to_tensor
 # 常量定义
 # ============================================================================
 
-CLASS_NAMES = ("broke", "dirty", "double", "miss")
+CLASS_NAMES = ("破损", "脏污", "重影", "漏印")
 """缺陷类别名称"""
 
 CLASS_COLORS: dict[int, tuple[int, int, int]] = {
@@ -54,6 +59,10 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 # ============================================================================
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# SIFT 宏观配准器 —— 使用默认参数（nfeatures=2000, Lowe ratio=0.7, RANSAC threshold=5.0）
+_aligner = SIFTAligner()
+print("[demo] SIFT 配准器已初始化")
 
 # 骨干网络 —— 始终使用 ImageNet 预训练权重
 backbone = SharedSiameseBackbone("IMAGENET1K_V2").eval().to(DEVICE)
@@ -157,6 +166,59 @@ def draw_boxes_with_labels(
     return canvas
 
 
+def render_alignment_comparison(
+    original: np.ndarray,
+    aligned: np.ndarray,
+    template: np.ndarray,
+    report: dict,
+) -> np.ndarray:
+    """渲染 SIFT 配准对比面板：原始 Query | 配准后 Query | Template | 配准指标。
+
+    参数:
+        original:  原始 query 图像 [H, W, 3] uint8 RGB。
+        aligned:   配准后的 query 图像 [H, W, 3] uint8 RGB。
+        template:  模板图像 [H, W, 3] uint8 RGB。
+        report:    配准报告字典。
+
+    返回:
+        拼接后的面板图像 [panel_h, panel_w, 3] uint8 RGB。
+    """
+    h, w = template.shape[:2]
+    ncols = 3
+    gap = 4
+    info_h = 80  # 底部信息栏高度
+    title_h = 28  # 顶部标题栏高度
+    total_h = h + title_h + info_h
+    total_w = w * ncols + gap * (ncols - 1)
+    canvas = np.full((total_h, total_w, 3), 248, dtype=np.uint8)
+
+    # 三列图像
+    canvas[title_h:title_h + h, :w] = original
+    canvas[title_h:title_h + h, w + gap:2 * w + gap] = aligned
+    canvas[title_h:title_h + h, 2 * (w + gap):2 * (w + gap) + w] = template
+
+    # 标题
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    titles = ["原始 Query（待检测）", "SIFT 配准后 Query", "Template（模板）"]
+    for idx, label in enumerate(titles):
+        x = idx * (w + gap)
+        cv2.putText(canvas, label, (x + 4, title_h - 6), font, 0.45, (44, 44, 44), 1, cv2.LINE_AA)
+
+    # 底部信息
+    y0 = title_h + h + 6
+    lines = [
+        f"配准状态: {report.get('status', 'N/A')}",
+        f"特征点: Q={report.get('kp_q', 0)}  T={report.get('kp_t', 0)}",
+        f"匹配内点: {report.get('inliers', 0)}/{report.get('matches', 0)}  内点率: {report.get('inlier_ratio', 'N/A')}",
+        f"重投影误差: {report.get('reproj_error', 'N/A')}",
+    ]
+    for i, line in enumerate(lines):
+        y = y0 + i * 16
+        cv2.putText(canvas, line, (6, y), font, 0.38, (60, 60, 60), 1, cv2.LINE_AA)
+
+    return canvas
+
+
 # ============================================================================
 # 核心推理流水线
 # ============================================================================
@@ -172,6 +234,10 @@ def run_full_pipeline(
 ) -> dict:
     """执行完整的 Siamese 缺陷筛选流水线。
 
+    流程:
+        SIFT+RANSAC 宏观配准 → Backbone → OffsetPredictor → FeatureWarp
+        → MultiScaleFusion → 候选框后处理 → 可视化
+
     参数:
         query_pil:     待检测（缺陷）图像。
         template_pil:  参考（标准模板）图像。
@@ -186,35 +252,74 @@ def run_full_pipeline(
     if query_pil is None or template_pil is None:
         raise gr.Error("请同时上传待检测图像和模板图像后再运行检测。")
 
-    # ================ 第 1 步：图像预处理 ====================================
+    # ================ 第 0 步：图像预处理（PIL → numpy） ====================
     query_pil = query_pil.convert("RGB").resize((800, 800), Image.Resampling.BILINEAR)
     template_pil = template_pil.convert("RGB").resize((800, 800), Image.Resampling.BILINEAR)
     query_rgb = np.array(query_pil)        # [800, 800, 3] uint8 RGB
     template_rgb = np.array(template_pil)
 
-    q_tensor = pil_to_tensor(query_pil).unsqueeze(0).to(DEVICE)       # [1, 3, 800, 800]
+    # ================ 第 1 步：SIFT+RANSAC 宏观几何配准 =====================
+    # 将 query 透视变换对齐到 template，消除拍照位置偏差、旋转、缩放。
+    align_info: dict = {"status": "未执行"}
+    aligned_rgb = query_rgb  # 默认回退：不配准
+
+    try:
+        aligned_result, align_report = _aligner.align(query_rgb, template_rgb, sample_id="demo")
+        align_info["status"] = align_report.status or "unknown"
+        align_info["kp_q"] = align_report.num_keypoints_query
+        align_info["kp_t"] = align_report.num_keypoints_template
+        align_info["matches"] = align_report.num_raw_matches
+        align_info["inliers"] = align_report.num_inlier_matches
+        align_info["inlier_ratio"] = (
+            f"{align_report.inlier_ratio:.3f}" if align_report.inlier_ratio is not None else "N/A"
+        )
+        align_info["reproj_error"] = (
+            f"{align_report.ransac_reprojection_error:.2f} px"
+            if align_report.ransac_reprojection_error is not None
+            else "N/A"
+        )
+        align_info["success"] = align_report.success
+
+        if align_report.success and not align_report.already_aligned:
+            aligned_rgb = aligned_result
+            align_info["status"] = "配准成功 ✓"
+        elif align_report.already_aligned:
+            align_info["status"] = "已对齐（无需变换）"
+        else:
+            align_info["status"] = f"配准失败: {align_report.error or '几何验收未通过'}"
+    except Exception as exc:
+        align_info["status"] = f"配准异常: {str(exc)}"
+        align_info["success"] = False
+
+    # ================ 第 1.5 步：配准对比可视化 =============================
+    alignment_viz = render_alignment_comparison(
+        query_rgb, aligned_rgb, template_rgb, align_info,
+    )
+
+    # ================ 第 2 步：配准后图像 → Tensor ==========================
+    q_tensor = pil_to_tensor(Image.fromarray(aligned_rgb)).unsqueeze(0).to(DEVICE)  # [1,3,800,800]
     t_tensor = pil_to_tensor(template_pil).unsqueeze(0).to(DEVICE)
 
-    # ================ 第 2-6 步：模型推理 ====================================
+    # ================ 第 3-7 步：神经网络推理 ===============================
     with torch.inference_mode():
-        # 第 2 步：共享骨干网络提取多尺度特征
+        # 第 3 步：共享骨干网络提取多尺度特征
         qf, tf = backbone(q_tensor, t_tensor)
 
-        # 第 3 步：偏移量预测器 → DCN 采样偏移
+        # 第 4 步：偏移量预测器 → DCN 采样偏移
         offsets = predictor(qf, tf)
 
-        # 第 4 步：特征形变模块 → 对齐后的模板特征
+        # 第 5 步：特征形变模块 → 对齐后的模板特征（微观形变补偿）
         warped = warp(tf, offsets)
 
-        # 第 5 步：差异特征 → 多尺度融合 → CBAM 增强热力图
+        # 第 6 步：差异特征 → 多尺度融合 → CBAM 增强热力图
         diff_features = {k: warped[k] - qf[k] for k in ["C3", "C4", "C5"]}
         enhanced = fusion(diff_features)  # [1, 1, 800, 800]
 
-        # 第 6 步：各尺度标量差异图（用于面板可视化）
+        # 第 7 步：各尺度标量差异图（用于面板可视化）
         diff_maps = compute_diff_maps(warped, qf)
         diff_upsampled = upsample_diff_maps(diff_maps)
 
-    # ================ 第 7 步：候选框后处理 ==================================
+    # ================ 第 8 步：候选框后处理 =================================
     enhanced_np: np.ndarray = enhanced[0, 0].cpu().numpy()  # [800, 800] float32
     candidate_boxes = postprocess_heatmap(
         enhanced_np,
@@ -227,28 +332,28 @@ def run_full_pipeline(
 
     candidate_count = int(candidate_boxes.shape[0])
 
-    # ================ 第 8 步：渲染多尺度热力图面板 ===========================
+    # ================ 第 9 步：渲染多尺度热力图面板 ==========================
     panel_path = OUTPUT_DIR / "heatmap_panel.png"
-    render_heatmap_panel(query_rgb, template_rgb, diff_upsampled, panel_path)
-    # 使用 np.fromfile + imdecode 避免 Windows 中文路径问题
+    # 面板中使用配准后的 query，便于对比差异来源
+    render_heatmap_panel(aligned_rgb, template_rgb, diff_upsampled, panel_path)
     panel_data = np.fromfile(str(panel_path), dtype=np.uint8)
     heatmap_panel_img = cv2.cvtColor(cv2.imdecode(panel_data, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
 
-    # ================ 第 9 步：渲染 CBAM 增强热力图 ===========================
+    # ================ 第 10 步：渲染 CBAM 增强热力图 =========================
     enhanced_heatmap_rgb = render_single_heatmap(enhanced_np)
 
-    # ================ 第 10 步：候选框叠加可视化 ==============================
-    candidate_overlay = draw_boxes(query_rgb, candidate_boxes, color=(255, 60, 60), thickness=2)
+    # ================ 第 11 步：候选框叠加可视化（画在配准后 query 上）========
+    candidate_overlay = draw_boxes(aligned_rgb, candidate_boxes, color=(255, 60, 60), thickness=2)
 
-    # ================ 第 11 步：最终检测结果叠加图 ============================
+    # ================ 第 12 步：最终检测结果叠加图 ===========================
     # 注意：RT-DETR 分类权重尚未集成，当前统一标注为"候选"。
     # 后续接入 RT-DETR 后，用实际类别预测结果替换此处标签。
     labels = ["候选"] * max(candidate_count, 0)
     final_overlay = draw_boxes_with_labels(
-        query_rgb, candidate_boxes, labels, CLASS_COLORS, thickness=2,
+        aligned_rgb, candidate_boxes, labels, CLASS_COLORS, thickness=2,
     )
 
-    # ================ 第 12 步：生成结果 JSON ================================
+    # ================ 生成结果 JSON =========================================
     results_json = [
         {
             "框坐标": [float(x1), float(y1), float(x2), float(y2)],
@@ -258,12 +363,25 @@ def run_full_pipeline(
         for x1, y1, x2, y2 in candidate_boxes
     ]
 
+    # 配准信息也写入 JSON（方便查看）
+    alignment_json = {
+        "SIFT配准状态": align_info["status"],
+        "Query特征点数": align_info.get("kp_q", 0),
+        "Template特征点数": align_info.get("kp_t", 0),
+        "匹配点对数": align_info.get("matches", 0),
+        "RANSAC内点数": align_info.get("inliers", 0),
+        "内点率": align_info.get("inlier_ratio", "N/A"),
+        "重投影误差均值": align_info.get("reproj_error", "N/A"),
+    }
+
     return {
         "heatmap_panel": heatmap_panel_img,
         "enhanced_heatmap": enhanced_heatmap_rgb,
+        "alignment_viz": alignment_viz,
         "candidate_overlay": candidate_overlay,
         "final_overlay": final_overlay,
         "candidate_count": candidate_count,
+        "alignment_info": alignment_json,
         "results_json": results_json,
     }
 
@@ -278,13 +396,21 @@ def run_pipeline_wrapper(query_img, template_img, min_area, expand_k, adaptive_b
             adaptive_block=int(adaptive_block),
             adaptive_c=int(adaptive_c),
         )
+
+        align_status = result["alignment_info"]["SIFT配准状态"]
+        detect_msg = f"✅ 检测完成 —— 共检出 {result['candidate_count']} 个候选区域。"
+        align_msg = f"SIFT配准: {align_status}"
+        status_text = f"{detect_msg}\n{align_msg}"
+
         return (
-            result["heatmap_panel"],                                              # 标签页 1a
-            result["enhanced_heatmap"],                                           # 标签页 1b
-            result["candidate_overlay"],                                          # 标签页 2
-            result["final_overlay"],                                              # 标签页 3a
-            json.dumps(result["results_json"], indent=2, ensure_ascii=False),      # 标签页 3b
-            f"✅ 检测完成 —— 共检出 {result['candidate_count']} 个候选区域。",
+            result["heatmap_panel"],                                             # 标签页 1a
+            result["enhanced_heatmap"],                                          # 标签页 1b
+            result["alignment_viz"],                                             # 标签页 1c
+            json.dumps(result["alignment_info"], indent=2, ensure_ascii=False),  # 标签页 1d
+            result["candidate_overlay"],                                         # 标签页 2
+            result["final_overlay"],                                             # 标签页 3a
+            json.dumps(result["results_json"], indent=2, ensure_ascii=False),    # 标签页 3b
+            status_text,
         )
     except Exception as exc:
         raise gr.Error(str(exc))
@@ -294,7 +420,6 @@ def run_pipeline_wrapper(query_img, template_img, min_area, expand_k, adaptive_b
 # Gradio 用户界面
 # ============================================================================
 
-# 自定义样式
 CSS = """
 footer {visibility: hidden}
 .status-box textarea {
@@ -305,7 +430,6 @@ footer {visibility: hidden}
 .gr-markdown h5 { font-weight: 600; }
 """
 
-# 主题配色方案 —— 采用中国风稳重色调
 THEME = gr.themes.Soft(
     primary_hue=gr.themes.colors.indigo,
     secondary_hue=gr.themes.colors.slate,
@@ -348,7 +472,7 @@ def build_ui() -> gr.Blocks:
             ### 📋 操作说明
 
             1. 在下方左侧上传 **待检测图像**（Query），右侧上传 **标准模板图像**（Template）
-            2. 点击 **开始检测** 按钮，系统将自动执行完整的孪生网络筛选流水线
+            2. 点击 **开始检测** 按钮，系统将自动执行 SIFT+RANSAC 宏观配准 → 孪生网络筛选流水线
             3. 在结果区域切换标签页，查看各阶段的可视化输出
             """
         )
@@ -403,6 +527,7 @@ def build_ui() -> gr.Blocks:
             value="就绪 —— 请上传待检测图像和模板图像，然后点击「开始检测」。",
             interactive=False,
             elem_classes=["status-box"],
+            lines=2,
         )
 
         # ================ 结果展示（标签页） ================================
@@ -413,8 +538,8 @@ def build_ui() -> gr.Blocks:
             with gr.TabItem("🔥 热力图分析"):
                 gr.Markdown(
                     """
-                    左图为五列对比面板（待检测图 / 模板图 / C3 差异 / C4 差异 / C5 差异），
-                    右图为经 CBAM 注意力增强后的多尺度融合热力图。
+                    **热力图面板** 展示五列对比（待检测图 / 模板图 / C3 差异 / C4 差异 / C5 差异），
+                    **增强热力图** 为经 CBAM 注意力增强后的多尺度融合结果。
                     """
                 )
                 with gr.Row():
@@ -431,8 +556,30 @@ def build_ui() -> gr.Blocks:
                             format="png",
                         )
 
+                gr.Markdown("---")
+                gr.Markdown("##### 📐 SIFT 宏观配准结果")
+                gr.Markdown(
+                    """
+                    展示原始 Query → SIFT+RANSAC 透视变换 → 配准后 Query 的对比，
+                    以及配准指标（特征点数、内点率、重投影误差）。
+                    """
+                )
+                with gr.Row():
+                    with gr.Column(scale=3):
+                        alignment_viz_output = gr.Image(
+                            label="SIFT 配准对比面板",
+                            type="numpy",
+                            format="png",
+                        )
+                    with gr.Column(scale=2):
+                        alignment_json_output = gr.Code(
+                            label="配准指标",
+                            language="json",
+                            lines=10,
+                        )
+
             with gr.TabItem("📦 候选区域"):
-                gr.Markdown("自适应阈值二值化 + 形态学闭运算 + 连通域分析得到的候选框，叠加在待检测图像上。")
+                gr.Markdown("自适应阈值二值化 + 形态学闭运算 + 连通域分析得到的候选框，叠加在配准后的待检测图像上。")
                 candidate_output = gr.Image(
                     label="候选框可视化",
                     type="numpy",
@@ -440,7 +587,7 @@ def build_ui() -> gr.Blocks:
                 )
 
             with gr.TabItem("🏷️ 检测结果"):
-                gr.Markdown("左侧为最终检测结果叠加图，右侧为结构化的 JSON 检测数据。")
+                gr.Markdown("左侧为最终检测结果叠加图（画在配准后图像上），右侧为结构化的 JSON 检测数据。")
                 with gr.Row():
                     with gr.Column(scale=3):
                         final_output = gr.Image(
@@ -459,7 +606,12 @@ def build_ui() -> gr.Blocks:
         run_btn.click(
             fn=run_pipeline_wrapper,
             inputs=[query_input, template_input, min_area, expand_k, adaptive_block, adaptive_c],
-            outputs=[panel_output, enhanced_output, candidate_output, final_output, json_output, status],
+            outputs=[
+                panel_output, enhanced_output,
+                alignment_viz_output, alignment_json_output,
+                candidate_output, final_output, json_output,
+                status,
+            ],
         )
 
         # ================ 页脚 =============================================
@@ -467,7 +619,7 @@ def build_ui() -> gr.Blocks:
             """
             ---
             <div style="text-align: center; color: #999; font-size: 0.82em; padding: 8px 0;">
-                SimeseUltraMaxPlus+ · 基于并行孪生网络的印刷缺陷检测 · 演示系统 v1.0
+                SimeseUltraMaxPlus+ · 基于并行孪生网络的印刷缺陷检测 · 演示系统 v1.1
             </div>
             """
         )
