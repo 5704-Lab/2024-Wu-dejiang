@@ -33,6 +33,10 @@ artifacts/step1/run_manifest.json
 # Recreate with: python scripts/run_step3.py align --config configs/step3_alignment.yaml
 artifacts/step3/alignment/**/*.png
 
+# Regenerable Step 3.5-A heatmap panel PNGs
+# Recreate with: python scripts/run_step3.py heatmap-smoke --config configs/step3_heatmap.yaml
+artifacts/step3/heatmap/**/*.png
+
 # Model outputs and large generated data
 outputs/
 checkpoints/
