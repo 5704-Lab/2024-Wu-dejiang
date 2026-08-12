@@ -26,6 +26,7 @@ import numpy as np
 import torch
 from PIL import Image
 
+from step3_model.alignment import SIFTAligner
 from step3_model.backbone import SharedSiameseBackbone
 from step3_model.feature_warp import FeatureWarp
 from step3_model.fusion import MultiScaleFusion
@@ -54,88 +55,26 @@ OUTPUT_DIR = Path(__file__).resolve().parent.parent.parent / "artifacts" / "step
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # ============================================================================
-# SIFT+RANSAC 宏观配准函数（独立实现，不依赖 SIFTAligner 的严格几何验收）
+# SIFT+RANSAC 宏观配准器（使用项目冻结参数，禁用 near_identity 以适配 demo 场景）
 # ============================================================================
 
-
-def sift_align(query_rgb: np.ndarray, template_rgb: np.ndarray) -> tuple[np.ndarray, dict]:
-    """用 SIFT + BFMatcher + Lowe ratio + RANSAC 将 query 对齐到 template。
-
-    参考 No3.py 的简洁实现风格：不做额外的几何验收，只要 RANSAC 成功
-    就执行透视变换。适合两张不同印刷品之间的宏观配准。
-
-    参数:
-        query_rgb:    待对齐图像 [H, W, 3] uint8 RGB。
-        template_rgb: 参考模板图像 [H, W, 3] uint8 RGB。
-
-    返回:
-        (对齐后的 query, 配准信息字典)
-    """
-    info: dict = {"status": "未执行"}
-
-    gray_q = cv2.cvtColor(query_rgb, cv2.COLOR_RGB2GRAY)
-    gray_t = cv2.cvtColor(template_rgb, cv2.COLOR_RGB2GRAY)
-
-    sift = cv2.SIFT_create(nfeatures=2000)
-    kp_q, des_q = sift.detectAndCompute(gray_q, None)
-    kp_t, des_t = sift.detectAndCompute(gray_t, None)
-
-    info["kp_q"] = len(kp_q) if kp_q else 0
-    info["kp_t"] = len(kp_t) if kp_t else 0
-
-    if des_q is None or des_t is None or len(kp_q) < 4 or len(kp_t) < 4:
-        info["status"] = "配准失败: 特征点不足（需要至少 4 个）"
-        info["success"] = False
-        return query_rgb, info
-
-    # BFMatcher + knn + Lowe ratio test
-    bf = cv2.BFMatcher()
-    raw_matches = bf.knnMatch(des_q, des_t, k=2)
-    good = [m for m, n in raw_matches if m.distance < 0.7 * n.distance]
-
-    info["matches"] = len(raw_matches)
-    info["good_matches"] = len(good)
-
-    if len(good) < 4:
-        info["status"] = f"配准失败: 高质量匹配点太少 ({len(good)} < 4)"
-        info["success"] = False
-        return query_rgb, info
-
-    # 提取匹配点坐标，RANSAC 估计单应矩阵
-    src_pts = np.float32([kp_q[m.queryIdx].pt for m in good]).reshape(-1, 1, 2)
-    dst_pts = np.float32([kp_t[m.trainIdx].pt for m in good]).reshape(-1, 1, 2)
-
-    H, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, ransacReprojThreshold=5.0)
-
-    if H is None or mask is None:
-        info["status"] = "配准失败: RANSAC 无法估计单应矩阵"
-        info["success"] = False
-        return query_rgb, info
-
-    inliers = int(mask.sum())
-    info["inliers"] = inliers
-    info["inlier_ratio"] = f"{inliers / len(good):.3f}"
-
-    # 计算重投影误差
-    projected = cv2.perspectiveTransform(src_pts, H).reshape(-1, 2)
-    errors = np.linalg.norm(projected - dst_pts.reshape(-1, 2), axis=1)
-    info["reproj_error"] = f"{errors[mask.ravel() == 1].mean():.2f} px"
-
-    if inliers < 8:
-        info["status"] = f"配准失败: RANSAC 内点太少 ({inliers} < 8)"
-        info["success"] = False
-        return query_rgb, info
-
-    # 执行透视变换 —— 将 query 对齐到 template
-    h, w = template_rgb.shape[:2]
-    aligned = cv2.warpPerspective(query_rgb, H, (w, h), flags=cv2.INTER_LINEAR,
-                                   borderMode=cv2.BORDER_CONSTANT, borderValue=(0, 0, 0))
-
-    info["status"] = "配准成功 ✓"
-    info["inliers"] = inliers
-    info["success"] = True
-    return aligned, info
-
+_aligner = SIFTAligner({
+    "sift": {"nfeatures": 2000},
+    "matcher": {"lowe_ratio": 0.7},
+    "ransac": {
+        "reprojection_threshold": 5.0,
+        "min_inliers": 10,
+        "min_inlier_ratio": 0.3,
+        "max_inlier_reprojection_error": 9.0,   # 与 frozen config 一致
+    },
+    "geometry": {
+        "min_projected_area_ratio": 0.3,
+        "max_projected_area_ratio": 3.0,
+        "min_overlap_ratio": 0.5,
+    },
+    "near_identity": {"enabled": False},  # 禁用 near-identity，确保始终尝试 warp
+})
+print("[demo] SIFTAligner 配准器已初始化")
 
 # ============================================================================
 # 全局模型组件（应用启动时加载一次，避免每次推理重复初始化）
@@ -299,7 +238,36 @@ def run_full_pipeline(
 
     # ================ 第 1 步：SIFT+RANSAC 宏观几何配准 =====================
     # 将 query 透视变换对齐到 template，消除拍照位置偏差、旋转、缩放。
-    aligned_rgb, align_info = sift_align(query_rgb, template_rgb)
+    align_info: dict = {"status": "未执行"}
+    aligned_rgb = query_rgb  # 默认回退：不配准
+
+    try:
+        aligned_result, align_report = _aligner.align(query_rgb, template_rgb, sample_id="demo")
+        align_info["status"] = align_report.status or "unknown"
+        align_info["kp_q"] = align_report.num_keypoints_query
+        align_info["kp_t"] = align_report.num_keypoints_template
+        align_info["good_matches"] = align_report.num_raw_matches
+        align_info["inliers"] = align_report.num_inlier_matches
+        align_info["inlier_ratio"] = (
+            f"{align_report.inlier_ratio:.3f}" if align_report.inlier_ratio is not None else "N/A"
+        )
+        align_info["reproj_error"] = (
+            f"{align_report.ransac_reprojection_error:.2f} px"
+            if align_report.ransac_reprojection_error is not None
+            else "N/A"
+        )
+        align_info["success"] = align_report.success
+
+        if align_report.success and not align_report.already_aligned:
+            aligned_rgb = aligned_result
+            align_info["status"] = "配准成功 ✓"
+        elif align_report.already_aligned:
+            align_info["status"] = "已对齐（无需变换）"
+        else:
+            align_info["status"] = f"配准失败: {align_report.error or '几何验收未通过'}"
+    except Exception as exc:
+        align_info["status"] = f"配准异常: {str(exc)}"
+        align_info["success"] = False
 
     # ================ 第 1.5 步：配准对比可视化 =============================
     alignment_viz = render_alignment_comparison(query_rgb, aligned_rgb, template_rgb, align_info)
