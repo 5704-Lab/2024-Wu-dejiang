@@ -230,7 +230,9 @@ def run_full_pipeline(
     # ================ 第 8 步：渲染多尺度热力图面板 ===========================
     panel_path = OUTPUT_DIR / "heatmap_panel.png"
     render_heatmap_panel(query_rgb, template_rgb, diff_upsampled, panel_path)
-    heatmap_panel_img = cv2.cvtColor(cv2.imread(str(panel_path)), cv2.COLOR_BGR2RGB)
+    # 使用 np.fromfile + imdecode 避免 Windows 中文路径问题
+    panel_data = np.fromfile(str(panel_path), dtype=np.uint8)
+    heatmap_panel_img = cv2.cvtColor(cv2.imdecode(panel_data, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
 
     # ================ 第 9 步：渲染 CBAM 增强热力图 ===========================
     enhanced_heatmap_rgb = render_single_heatmap(enhanced_np)
