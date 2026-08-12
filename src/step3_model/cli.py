@@ -10,12 +10,13 @@ from .run_alignment import load_config, run_validation_freeze
 from .run_backbone import load_backbone_config, run_backbone_smoke
 from .run_feature_warp import load_feature_warp_config, run_feature_warp_smoke
 from .run_offset import load_offset_config, run_offset_smoke
+from .run_train_alignment import load_train_config, run_train_alignment
 from .test_evaluation import load_test_config, run_test_evaluation
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Step 3 alignment and model evaluation")
-    parser.add_argument("command", choices=("validate-freeze", "test-evaluate", "backbone-smoke", "offset-smoke", "feature-warp-smoke"))
+    parser.add_argument("command", choices=("validate-freeze", "test-evaluate", "backbone-smoke", "offset-smoke", "feature-warp-smoke", "train-alignment"))
     parser.add_argument("--config", type=Path)
     args = parser.parse_args()
     if args.command == "validate-freeze":
@@ -43,7 +44,7 @@ def main() -> int:
             "offset_max_abs_per_scale": result["offset_max_abs_per_scale"],
             "parameter_count": result["parameter_count"],
         }
-    else:
+    elif args.command == "feature-warp-smoke":
         result = run_feature_warp_smoke(load_feature_warp_config(args.config or Path("configs/step3_feature_warp.yaml")))
         summary = {
             "schema_version": result["schema_version"], "verified": result["verified"],
@@ -52,6 +53,16 @@ def main() -> int:
             "ordered_validation_sample_ids": result["ordered_validation_sample_ids"],
             "dcn_warp_started": result["dcn_warp_started"],
             "train_started": result.get("train_started", False),
+        }
+    else:
+        result = run_train_alignment(load_train_config(args.config or Path("configs/step3_train_alignment.yaml")))
+        summary = {
+            "schema_version": result["schema_version"], "processed": result["processed"],
+            "selected_device": result["selected_device"],
+            "epochs_completed": result["epochs_completed"],
+            "best_epoch": result["best_epoch"],
+            "best_val_loss": result["best_val_loss"],
+            "trainable_parameter_count": result["trainable_parameter_count"],
         }
     print(json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True))
     return 0

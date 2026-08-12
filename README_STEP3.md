@@ -1,6 +1,6 @@
-# Step 3.2-C / 3.2-D / 3.3-A / 3.3-B / 3.4-A / 3.4-B：配准冻结、Test 评估、共享多尺度 Backbone、Offset Predictor 与 DCN Feature Warp
+# Step 3.2-C / 3.2-D / 3.3-A / 3.3-B / 3.4-A / 3.4-B / 3.4-C：配准冻结、Test 评估、共享多尺度 Backbone、Offset Predictor、DCN Feature Warp 与微对齐训练
 
-Step 3.4-B 已在 Step 3.4-A 的 Offset Predictor 之上实现 DCN Feature Warp（identity kernel + deform_conv2d），对模板多尺度特征进行形变采样对齐。端到端 pipeline：Backbone → OffsetPredictor → FeatureWarp，zero-offset 时 warped 逐 bit 等于 template。Backbone 全部冻结、Predictor trainable、Warp 无 trainable 参数。Step 3.4-C（偏移预测训练）尚未开始。
+Step 3.4-C 已完成 OffsetPredictor 的微对齐训练：在 3200 对训练集上用逐尺度加权 MSE loss（warped template features vs query features）训练，Backbone 冻结、Warp 无参数，仅 Predictor 的 1,410,678 参数被优化。训练从 zero-init 安全起点开始，产物包括 best/final checkpoint 和 training report。
 
 ## Step 3.3-B 多尺度 Backbone
 
@@ -111,6 +111,40 @@ python scripts/run_step3.py feature-warp-smoke --config configs/step3_feature_wa
 - `artifacts/step3/feature_warp/run_manifest.json`
 
 Step 3.4-B 不实现偏移预测训练（属于 3.4-C）、不修改 loss/optimizer、不保存 checkpoint、不修改 Step 3.2/3.3/3.4-A 证据。
+
+## Step 3.4-C：微对齐训练
+
+Step 3.4-C 在 Step 3.4-A/B 的 offset predictor + feature warp 之上实现完整的训练循环：冻结 Backbone、冻结 Warp（无参数）、仅训练 OffsetPredictor 的 1,410,678 参数，使 warped template features 向 query features 对齐。
+
+正式命令：
+
+```bash
+python scripts/run_step3.py train-alignment --config configs/step3_train_alignment.yaml
+```
+
+### 设计
+
+- **损失函数**：`MicroAlignmentLoss` —— 逐尺度加权 MSE：`loss = Σ α_s * MSE(warped[s], query_features[s])`。每个尺度的 MSE 内部已按 C×H×W 归一化，`α_C3=α_C4=α_C5=1.0` 保证三尺度等权贡献。
+- **训练 pipeline**：Backbone(冻结) → Predictor(训练) → Warp(冻结) → loss(warped, qf) → backward → optimizer.step
+- **优化器**：Adam(lr=0.001, weight_decay=0)
+- **调度器**：CosineAnnealingLR(T_max=epochs)
+- **数据增强**：训练集用 `PairTransform(training=True)` 进行几何翻转/旋转 + 独立两路光度增强（亮度/对比度/饱和度/色相/模糊/噪声），验证集无增强。
+- **确定性训练**：`derive_seed` 保证给定 (global_seed, split, sample_id, epoch, view) 下每个 epoch 的增强结果可复现，epoch 参数推进随机种子。
+
+### 参数
+
+- Trainable：仅 OffsetPredictor 的 1,410,678 参数
+- Frozen：Backbone 23,508,032 + Warp 0 = 23,508,032
+- 总参数不变：24,918,710
+
+### 产物
+
+- `artifacts/step3/training/training_report.json`
+- `artifacts/step3/training/run_manifest.json`
+- `artifacts/step3/training/checkpoint_best.pt`
+- `artifacts/step3/training/checkpoint_final.pt`
+
+Step 3.4-C 不进行超参搜索、不实现 early stopping、不进行 mixed-precision training、不实现多 GPU 训练、不修改 Step 3.2/3.3/3.4-A/3.4-B 证据。
 
 ## Step 3.3-A 历史记录
 

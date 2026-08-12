@@ -1,0 +1,32 @@
+schema_version: step3-training-config-v1
+roadmap_step: 3.4-C
+inputs:
+  step2_config: configs/step2_dataset.yaml
+  step1_root: artifacts/step1
+  step2_root: artifacts/step2
+  dataset_root: "D:/WuDJ/Desktop/工作室文档/project/数据集/VOCdevkit/VOC2007"
+  alignment_validation_report: artifacts/step3/alignment_report.json
+  alignment_frozen_parameters: artifacts/step3/alignment_parameters_frozen.json
+  alignment_validation_manifest: artifacts/step3/run_manifest.json
+  alignment_test_report: artifacts/step3/test/alignment_report.json
+  alignment_test_manifest: artifacts/step3/test/run_manifest.json
+output:
+  root: artifacts/step3/training
+model:
+  kernel_size: 3
+  hidden_ratio: 4
+  zero_init: true
+training:
+  epochs: 20
+  batch_size: 8
+  num_workers: 4
+  device: auto
+  lr: 0.001
+  weight_decay: 0.0
+  scheduler: cosine
+  validation_interval: 1
+loss:
+  per_scale_weights:
+    C3: 1.0
+    C4: 1.0
+    C5: 1.0
