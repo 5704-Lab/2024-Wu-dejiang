@@ -9,6 +9,7 @@ from pathlib import Path
 from .run_alignment import load_config, run_validation_freeze
 from .run_backbone import load_backbone_config, run_backbone_smoke
 from .run_feature_warp import load_feature_warp_config, run_feature_warp_smoke
+from .run_heatmap import load_heatmap_config, run_heatmap_smoke
 from .run_offset import load_offset_config, run_offset_smoke
 from .run_train_alignment import load_train_config, run_train_alignment
 from .test_evaluation import load_test_config, run_test_evaluation
@@ -16,7 +17,7 @@ from .test_evaluation import load_test_config, run_test_evaluation
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Step 3 alignment and model evaluation")
-    parser.add_argument("command", choices=("validate-freeze", "test-evaluate", "backbone-smoke", "offset-smoke", "feature-warp-smoke", "train-alignment"))
+    parser.add_argument("command", choices=("validate-freeze", "test-evaluate", "backbone-smoke", "offset-smoke", "feature-warp-smoke", "train-alignment", "heatmap-smoke"))
     parser.add_argument("--config", type=Path)
     args = parser.parse_args()
     if args.command == "validate-freeze":
@@ -54,7 +55,7 @@ def main() -> int:
             "dcn_warp_started": result["dcn_warp_started"],
             "train_started": result.get("train_started", False),
         }
-    else:
+    elif args.command == "train-alignment":
         result = run_train_alignment(load_train_config(args.config or Path("configs/step3_train_alignment.yaml")))
         summary = {
             "schema_version": result["schema_version"], "processed": result["processed"],
@@ -63,6 +64,15 @@ def main() -> int:
             "best_epoch": result["best_epoch"],
             "best_val_loss": result["best_val_loss"],
             "trainable_parameter_count": result["trainable_parameter_count"],
+        }
+    else:
+        result = run_heatmap_smoke(load_heatmap_config(args.config or Path("configs/step3_heatmap.yaml")))
+        summary = {
+            "schema_version": result["schema_version"], "verified": result["verified"],
+            "selected_device": result["selected_device"],
+            "processed_sample_count": result["processed_sample_count"],
+            "ordered_validation_sample_ids": result["ordered_validation_sample_ids"],
+            "png_count": result["png_count"],
         }
     print(json.dumps(summary, ensure_ascii=False, indent=2, sort_keys=True))
     return 0

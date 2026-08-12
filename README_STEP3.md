@@ -1,6 +1,6 @@
-# Step 3.2-C / 3.2-D / 3.3-A / 3.3-B / 3.4-A / 3.4-B / 3.4-C：配准冻结、Test 评估、共享多尺度 Backbone、Offset Predictor、DCN Feature Warp 与微对齐训练
+# Step 3.2-C / 3.2-D / 3.3-A / 3.3-B / 3.4-A / 3.4-B / 3.4-C / 3.5-A：配准冻结、Test 评估、共享多尺度 Backbone、Offset Predictor、DCN Feature Warp、微对齐训练与特征差异热力图
 
-Step 3.4-C 已完成 OffsetPredictor 的微对齐训练：在 3200 对训练集上用逐尺度加权 MSE loss（warped template features vs query features）训练，Backbone 冻结、Warp 无参数，仅 Predictor 的 1,410,678 参数被优化。训练从 zero-init 安全起点开始，产物包括 best/final checkpoint 和 training report。
+Step 3.5-A 已实现多尺度特征差异热力图：逐尺度计算 warped template 与 query 特征的相对 L2 差异，双线性上采样到 800×800，渲染为 5 列面板（query / template / diff_C3 / diff_C4 / diff_C5），使用 INFERNO colormap 着色。使用 zero-init predictor 建立预训练基线。
 
 ## Step 3.3-B 多尺度 Backbone
 
@@ -145,6 +145,32 @@ python scripts/run_step3.py train-alignment --config configs/step3_train_alignme
 - `artifacts/step3/training/checkpoint_final.pt`
 
 Step 3.4-C 不进行超参搜索、不实现 early stopping、不进行 mixed-precision training、不实现多 GPU 训练、不修改 Step 3.2/3.3/3.4-A/3.4-B 证据。
+
+## Step 3.5-A：特征差异热力图
+
+Step 3.5-A 在 DCN 对齐 pipeline 之上输出多尺度特征差异的可视化热力图，为人类理解模型行为提供第一扇窗口。
+
+正式命令：
+
+```bash
+python scripts/run_step3.py heatmap-smoke --config configs/step3_heatmap.yaml
+```
+
+### 设计
+
+- **差异度量**：`diff[s] = ||warped[s] - query[s]||₂ / (||query[s]||₂ + ε)`，逐像素跨通道 L2 范数，除以 query 特征范数做相对归一化。
+- **上采样**：各尺度 diff map 通过 cv2.INTER_LINEAR 上采样到 800×800（C3: 8×, C4: 16×, C5: 32×）。
+- **可视化面板**：5 列水平拼接 —— query | template | diff_C3 | diff_C4 | diff_C5。Query/template 用原图 RGB，diff 列用 `cv2.COLORMAP_INFERNO` 着色（感知均匀，适合出版物）。
+- **预训练基线**：使用 zero-init OffsetPredictor，热力图反映训练前的特征差异分布。后续训练后重新运行可对比变化。
+
+### 产物
+
+- `artifacts/step3/heatmap/heatmap_contract.json`
+- `artifacts/step3/heatmap/smoke_report.json`
+- `artifacts/step3/heatmap/run_manifest.json`
+- `artifacts/step3/heatmap/panels/*.png`（不被 Git 追踪）
+
+Step 3.5-A 不实现注意力机制（属于 3.5-B）、不进行候选框生成（属于 3.5-C）、不修改 Step 3.2/3.3/3.4 证据。
 
 ## Step 3.3-A 历史记录
 

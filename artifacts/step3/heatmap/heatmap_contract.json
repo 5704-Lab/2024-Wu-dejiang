@@ -1,0 +1,23 @@
+{
+  "architecture": "feature_diff_heatmap",
+  "colormap": "inferno",
+  "diff_formula": "||warped - query||_2 / (||query||_2 + eps)",
+  "diff_metric": "relative_l2",
+  "key_order": [
+    "C3",
+    "C4",
+    "C5"
+  ],
+  "roadmap_step": "3.5-A",
+  "scales": [
+    "C3",
+    "C4",
+    "C5"
+  ],
+  "schema_version": "step3-heatmap-contract-v1",
+  "target_size": [
+    800,
+    800
+  ],
+  "upsampling": "bilinear"
+}
