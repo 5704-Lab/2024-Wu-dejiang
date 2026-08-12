@@ -1,0 +1,36 @@
+{
+  "artifacts": {
+    "fusion_contract.json": "58de6eca521fa07be67cd149f2f218ced4052da90af90f5a0ed4e5c4946501c7",
+    "smoke_report.json": "cfc1613e24cc3eb3a5d062f68e50721290bcdc2411d59aea16eeb80c8b0cd78e"
+  },
+  "command": "fusion-smoke",
+  "controls": {
+    "alignment_evidence_integrity_verified": true,
+    "fusion_attention_started": true,
+    "source_read_only_verified": true,
+    "step_3_5_b_started": true
+  },
+  "generated_at_utc": "2026-08-12T03:22:09.307151+00:00",
+  "inputs": {
+    "config_sha256": "b1ec3f7d5a7f2ce27df49bc5153eac5d25274a4812e85dedc07917ea8173e34b",
+    "source_snapshot_digest": "1e8c83146414f501caa05e2f4a6b719732523d6a196859370abda43add40fd13",
+    "step2_config_sha256": "fda61db7c44b963bacf289fec10af34d391251eb7b6e823c739752d93c6b89b7",
+    "step3_2_evidence_sha256": {
+      "alignment_frozen_parameters": "0d04510fae052089f6a28593b81f3ed82322c28fed9faae71233ce0dc159cf21",
+      "alignment_test_manifest": "abf5f4bf88ac4d1631bfe8c87d2adfaedbc03c5be55764a0d4ddc0d3d68f287d",
+      "alignment_test_report": "39c8f575cb1a27621d73f988ebc4d28023345395ea64d162020c86f1fa54217d",
+      "alignment_validation_manifest": "5d6d9ea00d63c2bd16fbe9ae4e72b783a5c63fae31f93b7480b1cfebedce1c16",
+      "alignment_validation_report": "810699c9d3fb0ce28aec04a2580d8d0c3e48e5c2e8bf66310ec215ebeeab027b"
+    }
+  },
+  "roadmap_step": "3.5-B",
+  "schema_version": "step3-fusion-run-manifest-v1",
+  "software": {
+    "cuda_available": true,
+    "cuda_device": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "python": "3.12.6",
+    "selected_device": "cuda",
+    "torch": "2.11.0+cu128",
+    "torchvision": "0.26.0+cu128"
+  }
+}

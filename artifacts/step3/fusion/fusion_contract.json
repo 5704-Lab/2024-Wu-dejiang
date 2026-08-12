@@ -1,0 +1,36 @@
+{
+  "architecture": "cbam_per_scale_fusion",
+  "components": {
+    "channel_attention": "SE",
+    "fusion": "learned_softmax_weighted_sum",
+    "per_scale": [
+      {
+        "hidden": 128,
+        "input_channels": 512,
+        "scale": "C3"
+      },
+      {
+        "hidden": 128,
+        "input_channels": 1024,
+        "scale": "C4"
+      },
+      {
+        "hidden": 128,
+        "input_channels": 2048,
+        "scale": "C5"
+      }
+    ],
+    "spatial_attention": {
+      "kernel": 7,
+      "method": "mean_max_concat"
+    }
+  },
+  "key_order": [
+    "C3",
+    "C4",
+    "C5"
+  ],
+  "roadmap_step": "3.5-B",
+  "schema_version": "step3-fusion-contract-v1",
+  "trainable_parameter_count": 465964
+}

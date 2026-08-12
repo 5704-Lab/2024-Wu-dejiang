@@ -1,6 +1,6 @@
-# Step 3.2-C / 3.2-D / 3.3-A / 3.3-B / 3.4-A / 3.4-B / 3.4-C / 3.5-A：配准冻结、Test 评估、共享多尺度 Backbone、Offset Predictor、DCN Feature Warp、微对齐训练与特征差异热力图
+# Step 3.2-C / 3.2-D / 3.3-A / 3.3-B / 3.4-A / 3.4-B / 3.4-C / 3.5-A / 3.5-B：配准冻结、Test 评估、共享多尺度 Backbone、Offset Predictor、DCN Feature Warp、微对齐训练、特征差异热力图与多尺度融合注意力
 
-Step 3.5-A 已实现多尺度特征差异热力图：逐尺度计算 warped template 与 query 特征的相对 L2 差异，双线性上采样到 800×800，渲染为 5 列面板（query / template / diff_C3 / diff_C4 / diff_C5），使用 INFERNO colormap 着色。使用 zero-init predictor 建立预训练基线。
+Step 3.5-B 已实现 CBAM per-scale + 学习加权融合：通道注意力（全局 SE）建模上下文抑制背景纹理，空间注意力（7×7）聚焦微小缺陷区域，三尺度差异特征通过可学习 softmax 权重融合为统一 [800,800] 增强热力图。参数仅 ~460K。
 
 ## Step 3.3-B 多尺度 Backbone
 
@@ -171,6 +171,44 @@ python scripts/run_step3.py heatmap-smoke --config configs/step3_heatmap.yaml
 - `artifacts/step3/heatmap/panels/*.png`（不被 Git 追踪）
 
 Step 3.5-A 不实现注意力机制（属于 3.5-B）、不进行候选框生成（属于 3.5-C）、不修改 Step 3.2/3.3/3.4 证据。
+
+## Step 3.5-B：注意力与多尺度融合
+
+Step 3.5-B 在 3.5-A 的差异图基础上引入通道注意力（全局上下文建模）与空间注意力（局部缺陷聚焦），并将三尺度差异特征通过可学习 softmax 权重融合为统一的增强热力图。
+
+正式命令：
+
+```bash
+python scripts/run_step3.py fusion-smoke --config configs/step3_fusion.yaml
+```
+
+### 设计
+
+- **输入**：raw 差异特征 `D_s = warped[s] - query[s]`（每尺度 C_s 通道），非标量——保留全通道信息供注意力学习。
+- **通道注意力 (SE)**：全局平均池化 → FC bottleneck (r=16) → sigmoid → per-channel 权重。捕捉"哪些通道携带缺陷信号而非背景纹理"。对应论文中"全局注意力抑制正常印刷纹理"。
+- **空间注意力 (7×7 conv)**：跨通道 mean+max 合并 → 7×7 conv → sigmoid → per-pixel 权重。聚焦"缺陷的精确空间位置"。对应论文中"局部注意力聚焦微小缺陷"。
+- **每尺度独立 CBAM**：Channel Attn → Spatial Attn 级联，三尺度各一套参数。
+- **融合**：每尺度经 1×1 conv 投影为单通道标量 → bilinear 上采样到 800×800 → `softmax(w) ⊙ stack` 加权求和。三个可学习标量初始化为 0（即均匀 1/3）。
+
+### 参数
+
+| 组件 | 参数量 |
+|------|--------|
+| ChannelProject (3 scales, C→128) | ~460K |
+| ChannelAttn (SE, r=16) | ~0.5K/scale |
+| SpatialAttn (7×7) | ~50/scale |
+| FuseConv (128→1) | ~130/scale |
+| Fusion weights | 3 |
+| **总计** | **~462K** |
+
+### 产物
+
+- `artifacts/step3/fusion/fusion_contract.json`
+- `artifacts/step3/fusion/smoke_report.json`
+- `artifacts/step3/fusion/run_manifest.json`
+- `artifacts/step3/fusion/panels/*.png`（不被 Git 追踪）
+
+Step 3.5-B 不实现候选框生成（属于 3.5-C）、不修改 Step 3.2/3.3/3.4/3.5-A 证据。
 
 ## Step 3.3-A 历史记录
 
