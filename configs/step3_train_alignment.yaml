@@ -16,6 +16,7 @@ model:
   kernel_size: 3
   hidden_ratio: 4
   zero_init: true
+  max_offset: 3.0
 training:
   epochs: 20
   batch_size: 8

@@ -13,6 +13,7 @@ def _heatmap_to_mask(
     adaptive_block: int = 51,
     adaptive_c: int = -5,
     morph_kernel: int = 5,
+    min_peak_sigma: float = 2.0,
 ) -> np.ndarray:
     """Convert a continuous heatmap to a binary mask via adaptive threshold + morph close.
 
@@ -21,12 +22,24 @@ def _heatmap_to_mask(
         adaptive_block: block size for adaptiveThreshold (must be odd).
         adaptive_c: constant subtracted from the mean.
         morph_kernel: kernel size for morphological close.
+        min_peak_sigma: minimum (max - mean) / std ratio to consider the
+            heatmap as containing real defect signals.  Values below this
+            threshold indicate uniform noise → empty mask.
 
     Returns:
         [H, W] uint8 binary mask (0 or 255).
     """
+    # Global activation check: if the heatmap has no statistically significant
+    # peaks (i.e. it is nearly uniform noise), adaptive thresholding would
+    # still fragment it into hundreds of noise blobs.
+    hmean = float(heatmap.mean())
+    hstd = float(heatmap.std())
+    hmax = float(heatmap.max())
+    if hstd > 1e-8 and (hmax - hmean) / hstd < min_peak_sigma:
+        return np.zeros_like(heatmap, dtype=np.uint8)
+
     # Normalize to [0, 255]
-    vmin, vmax = float(heatmap.min()), float(heatmap.max())
+    vmin, vmax = float(heatmap.min()), hmax
     if vmax - vmin < 1e-8:
         return np.zeros_like(heatmap, dtype=np.uint8)
     normalized = np.clip((heatmap - vmin) / (vmax - vmin) * 255, 0, 255).astype(np.uint8)
@@ -90,12 +103,14 @@ def postprocess_heatmap(
     adaptive_block: int = 51,
     adaptive_c: int = -5,
     morph_kernel: int = 5,
+    min_activation: float = 0.01,
 ) -> np.ndarray:
     """Convert a single heatmap [H, W] to candidate xyxy boxes [K, 4].
 
-    Pipeline: normalize → adaptive threshold → morph close → findContours → boundingRect → filter.
+    Pipeline: activation check → normalize → adaptive threshold → morph close →
+              findContours → boundingRect → filter.
     """
-    mask = _heatmap_to_mask(heatmap, adaptive_block, adaptive_c, morph_kernel)
+    mask = _heatmap_to_mask(heatmap, adaptive_block, adaptive_c, morph_kernel, min_activation)
     return _mask_to_boxes(mask, min_area, max_aspect_ratio)
 
 

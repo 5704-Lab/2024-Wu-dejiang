@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from typing import Any
 
 import torch
@@ -49,12 +50,14 @@ def _build_pipeline(
     kernel_size: int = 3,
     hidden_ratio: int = 4,
     zero_init: bool = True,
+    max_offset: float = 3.0,
 ) -> tuple[SharedSiameseBackbone, OffsetPredictor, FeatureWarp]:
     backbone = SharedSiameseBackbone("IMAGENET1K_V2").to(device).eval()
     for parameter in backbone.parameters():
         parameter.requires_grad_(False)
     predictor = OffsetPredictor(
         kernel_size=kernel_size, hidden_ratio=hidden_ratio, zero_init=zero_init,
+        max_offset=max_offset,
     ).to(device)
     warp = FeatureWarp(kernel_size=kernel_size).to(device).eval()
     return backbone, predictor, warp
@@ -68,12 +71,17 @@ def train_one_epoch(
     optimizer: torch.optim.Optimizer,
     criterion: MicroAlignmentLoss,
     device: torch.device,
+    epoch: int = 0,
+    total_epochs: int = 0,
 ) -> dict[str, float]:
     predictor.train()
     total_loss = 0.0
     per_scale_losses = {"C3": 0.0, "C4": 0.0, "C5": 0.0}
     count = 0
-    for batch in loader:
+    total_batches = len(loader)
+    t0 = time.time()
+    log_every = max(1, total_batches // 10)  # 每 10% 进度打印一次
+    for idx, batch in enumerate(loader, 1):
         query = batch["query"].to(device)
         template = batch["template"].to(device)
         with torch.no_grad():
@@ -88,6 +96,12 @@ def train_one_epoch(
         for key in _STAGE_NAMES:
             per_scale_losses[key] += stats[f"loss_{key}"]
         count += 1
+        if idx % log_every == 0 or idx == total_batches:
+            elapsed = time.time() - t0
+            avg_loss = total_loss / count
+            eta = elapsed / idx * (total_batches - idx) if idx > 0 else 0
+            print(f"  Train [{epoch:3d}/{total_epochs:3d}] batch {idx:4d}/{total_batches:4d} | "
+                  f"loss={avg_loss:.6f} | elapsed={elapsed:.0f}s | ETA={eta:.0f}s", flush=True)
     n = max(count, 1)
     return {"train_loss": total_loss / n, **{f"train_loss_{k}": v / n for k, v in per_scale_losses.items()}}
 
@@ -100,12 +114,16 @@ def validate_one_epoch(
     loader: Any,
     criterion: MicroAlignmentLoss,
     device: torch.device,
+    epoch: int = 0,
+    total_epochs: int = 0,
 ) -> dict[str, float]:
     predictor.eval()
     total_loss = 0.0
     per_scale_losses = {"C3": 0.0, "C4": 0.0, "C5": 0.0}
     count = 0
-    for batch in loader:
+    total_batches = len(loader)
+    t0 = time.time()
+    for idx, batch in enumerate(loader, 1):
         query = batch["query"].to(device)
         template = batch["template"].to(device)
         qf, tf = backbone(query, template)
@@ -116,5 +134,9 @@ def validate_one_epoch(
         for key in _STAGE_NAMES:
             per_scale_losses[key] += stats[f"loss_{key}"]
         count += 1
+    elapsed = time.time() - t0
+    avg = total_loss / count
+    print(f"  Val   [{epoch:3d}/{total_epochs:3d}] {total_batches:4d} batches | "
+          f"loss={avg:.6f} | elapsed={elapsed:.1f}s", flush=True)
     n = max(count, 1)
-    return {"val_loss": total_loss / n, **{f"val_loss_{k}": v / n for k, v in per_scale_losses.items()}}
+    return {"val_loss": avg, **{f"val_loss_{k}": v / n for k, v in per_scale_losses.items()}}

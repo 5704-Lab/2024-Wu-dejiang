@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import platform
+import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -119,6 +121,7 @@ def run_train_alignment(config: dict[str, Any]) -> dict[str, Any]:
         kernel_size=int(config["model"]["kernel_size"]),
         hidden_ratio=int(config["model"]["hidden_ratio"]),
         zero_init=bool(config["model"]["zero_init"]),
+        max_offset=float(config["model"].get("max_offset", 3.0)),
     )
 
     loss_weights = config["loss"]["per_scale_weights"]
@@ -138,21 +141,39 @@ def run_train_alignment(config: dict[str, Any]) -> dict[str, Any]:
     checkpoint_best_path = output_root / "checkpoint_best.pt"
     checkpoint_final_path = output_root / "checkpoint_final.pt"
 
+    print(f"\n{'='*60}")
+    print(f"  Step 3.4-C: OffsetPredictor 训练开始")
+    print(f"  Train: {len(train_dataset)} pairs | Val: {len(val_dataset)} pairs")
+    print(f"  Batch: {batch_size} | Epochs: {epochs} | LR: {lr} | Device: {device}")
+    print(f"  Trainable: OffsetPredictor ({sum(p.numel() for p in predictor.parameters()):,} params)")
+    print(f"  Output: {output_root}")
+    print(f"{'='*60}\n")
+
     for epoch in range(1, epochs + 1):
+        epoch_start = time.time()
         train_dataset.set_epoch(epoch - 1)
-        train_stats = train_one_epoch(backbone, predictor, warp, train_loader, optimizer, criterion, device)
+        train_stats = train_one_epoch(backbone, predictor, warp, train_loader, optimizer, criterion,
+                                      device, epoch=epoch, total_epochs=epochs)
         val_stats: dict[str, float] = {}
         if epoch % val_interval == 0 or epoch == epochs:
-            val_stats = validate_one_epoch(backbone, predictor, warp, val_loader, criterion, device)
+            val_stats = validate_one_epoch(backbone, predictor, warp, val_loader, criterion,
+                                           device, epoch=epoch, total_epochs=epochs)
         entry = {"epoch": epoch, **train_stats}
         if val_stats:
             entry.update(val_stats)
-            if val_stats.get("val_loss", float("inf")) < best_val_loss:
-                best_val_loss = val_stats["val_loss"]
+            val_loss = val_stats.get("val_loss", float("inf"))
+            improved = " *" if val_loss < best_val_loss else ""
+            print(f"  ── Epoch {epoch:3d}/{epochs}  train_loss={train_stats['train_loss']:.6f}  "
+                  f"val_loss={val_loss:.6f}{improved}  time={time.time() - epoch_start:.0f}s\n", flush=True)
+            if val_loss < best_val_loss:
+                best_val_loss = val_loss
                 best_epoch = epoch
                 torch.save({"epoch": epoch, "model_state_dict": predictor.state_dict(),
                             "optimizer_state_dict": optimizer.state_dict(),
                             "val_loss": best_val_loss}, checkpoint_best_path)
+        else:
+            print(f"  ── Epoch {epoch:3d}/{epochs}  train_loss={train_stats['train_loss']:.6f}  "
+                  f"time={time.time() - epoch_start:.0f}s\n", flush=True)
         if scheduler is not None:
             entry["lr"] = float(scheduler.get_last_lr()[0])
             scheduler.step()

@@ -39,10 +39,21 @@ class OffsetPredictor(nn.Module):
     offset_spec = OFFSET_SPEC
     key_order = [name for name, _, _ in OFFSET_SPEC]
 
-    def __init__(self, kernel_size: int = 3, hidden_ratio: int = 4, zero_init: bool = True) -> None:
+    def __init__(
+        self,
+        kernel_size: int = 3,
+        hidden_ratio: int = 4,
+        zero_init: bool = True,
+        max_offset: float = 3.0,
+    ) -> None:
         super().__init__()
         self.kernel_size = kernel_size
         self.hidden_ratio = hidden_ratio
+        # 偏移量上限（特征图像素单位）。原实现用 stride 作为缩放因子，
+        # 导致 C4/C5 允许的偏移过大（16/32 像素），tanh 输出冲到饱和区后
+        # warped 退化为常数张量、梯度消失，训练死锁。改为统一的小值，
+        # 让 DCN 只做 ±max_offset 像素的精细微调。
+        self.max_offset = float(max_offset)
         self.heads = nn.ModuleDict({
             name: _OffsetHead(channels, kernel_size, hidden_ratio)
             for name, channels, _ in OFFSET_SPEC
@@ -75,8 +86,8 @@ class OffsetPredictor(nn.Module):
             if q.dtype != t.dtype or q.device != t.device:
                 raise ValueError(f"dtype/device mismatch at {key}")
         offsets = {}
-        for name, _, stride in OFFSET_SPEC:
+        for name, _, _stride in OFFSET_SPEC:
             offset = self.heads[name](query_features[name], template_features[name])
-            offset = torch.tanh(offset) * stride
+            offset = torch.tanh(offset) * self.max_offset
             offsets[name] = offset
         return offsets

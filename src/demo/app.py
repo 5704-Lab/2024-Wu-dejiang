@@ -71,6 +71,7 @@ _aligner = SIFTAligner({
         "min_projected_area_ratio": 0.3,
         "max_projected_area_ratio": 3.0,
         "min_overlap_ratio": 0.5,
+        "max_abs_rotation_degrees": 180.0,  # demo 场景不限制旋转（两张不同印刷品可能方向不同）
     },
     "near_identity": {"enabled": False},  # 禁用 near-identity，确保始终尝试 warp
 })
@@ -197,6 +198,48 @@ def render_alignment_comparison(
     return canvas
 
 
+def transform_boxes_to_original(
+    boxes: np.ndarray,
+    H_inv: np.ndarray | None,
+    src_h: int,
+    src_w: int,
+) -> np.ndarray:
+    """将检测框从 aligned 坐标系映射回原始 query 坐标系。
+
+    参数:
+        boxes: [K, 4] xyxy 框，aligned 坐标系。
+        H_inv:  3×3 逆单应矩阵 (aligned → original)，为 None 时直通。
+        src_h, src_w: 原始 query 图像的高和宽。
+
+    返回:
+        [K, 4] xyxy 框，原始 query 坐标系。
+    """
+    if boxes.size == 0 or H_inv is None:
+        return boxes
+
+    # 矩形四角 → 透视变换 → 重新取包围盒
+    x1, y1, x2, y2 = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]
+    corners = np.stack([
+        np.column_stack([x1, y1]),
+        np.column_stack([x2, y1]),
+        np.column_stack([x2, y2]),
+        np.column_stack([x1, y2]),
+    ], axis=1).reshape(-1, 1, 2).astype(np.float32)
+
+    projected = cv2.perspectiveTransform(corners, H_inv)
+    projected = projected.reshape(-1, 4, 2)
+
+    projected[..., 0] = np.clip(projected[..., 0], 0, src_w - 1)
+    projected[..., 1] = np.clip(projected[..., 1], 0, src_h - 1)
+
+    x_min = projected[..., 0].min(axis=1)
+    y_min = projected[..., 1].min(axis=1)
+    x_max = projected[..., 0].max(axis=1)
+    y_max = projected[..., 1].max(axis=1)
+
+    return np.column_stack([x_min, y_min, x_max, y_max]).astype(np.float32)
+
+
 # ============================================================================
 # 核心推理流水线
 # ============================================================================
@@ -238,12 +281,13 @@ def run_full_pipeline(
 
     # ================ 第 1 步：SIFT+RANSAC 宏观几何配准 =====================
     # 将 query 透视变换对齐到 template，消除拍照位置偏差、旋转、缩放。
+    # 同时保存 H_inv 用于后续将检测框映射回原始 query 坐标系。
     align_info: dict = {"status": "未执行"}
     aligned_rgb = query_rgb  # 默认回退：不配准
+    H_inv: np.ndarray | None = None  # 逆单应矩阵: aligned → original query
 
     try:
         aligned_result, align_report = _aligner.align(query_rgb, template_rgb, sample_id="demo")
-        align_info["status"] = align_report.status or "unknown"
         align_info["kp_q"] = align_report.num_keypoints_query
         align_info["kp_t"] = align_report.num_keypoints_template
         align_info["good_matches"] = align_report.num_raw_matches
@@ -258,13 +302,49 @@ def run_full_pipeline(
         )
         align_info["success"] = align_report.success
 
+        # 打印所有验收项到控制台，方便排查
+        print(f"\n[demo] SIFTAligner 验收详情:")
+        for name, crit in align_report.criteria.items():
+            p = crit.get("passed")
+            icon = "PASS" if p else ("FAIL" if p is False else "N/A")
+            print(f"  [{icon}] {name}: value={crit.get('value')}  threshold={crit.get('threshold')}")
+        if align_report.reasons:
+            print(f"  reasons={align_report.reasons}")
+
+        # 获取 H 矩阵（aligned = warpPerspective(query, H)，即 H 将 query 映射到 aligned）
+        H = (
+            np.array(align_report.homography_matrix, dtype=np.float32)
+            if align_report.homography_matrix is not None
+            else None
+        )
+
+        # 优先使用 SIFTAligner 的标准结果
         if align_report.success and not align_report.already_aligned:
             aligned_rgb = aligned_result
             align_info["status"] = "配准成功 ✓"
-        elif align_report.already_aligned:
-            align_info["status"] = "已对齐（无需变换）"
+        # 回退方案：几何验收未通过但 RANSAC 有足够内点，直接用 H 矩阵 warp
+        elif (H is not None
+              and align_report.num_inlier_matches >= 10
+              and align_report.inlier_ratio is not None
+              and align_report.inlier_ratio >= 0.3):
+            h, w = template_rgb.shape[:2]
+            aligned_rgb = cv2.warpPerspective(
+                query_rgb, H, (w, h),
+                flags=cv2.INTER_LINEAR,
+                borderMode=cv2.BORDER_CONSTANT,
+                borderValue=(0, 0, 0),
+            )
+            align_info["status"] = f"配准成功（绕过几何验收: {', '.join(align_report.reasons)}）"
+            align_info["success"] = True
         else:
             align_info["status"] = f"配准失败: {align_report.error or '几何验收未通过'}"
+
+        # 保存逆矩阵: aligned → original query（后续将检测框映射回用户原始图像）
+        if H is not None and align_info["success"]:
+            H_inv = np.linalg.inv(H)
+            align_info["has_inverse"] = True
+        else:
+            align_info["has_inverse"] = False
     except Exception as exc:
         align_info["status"] = f"配准异常: {str(exc)}"
         align_info["success"] = False
@@ -304,9 +384,13 @@ def run_full_pipeline(
         adaptive_block=adaptive_block,
         adaptive_c=adaptive_c,
         morph_kernel=5,
-    )  # → [K, 4] xyxy
+    )  # → [K, 4] xyxy（aligned 坐标系）
 
     candidate_count = int(candidate_boxes.shape[0])
+
+    # ================ 第 8.5 步：SIFT 逆变换 → 原始 query 坐标系 ============
+    src_h, src_w = query_rgb.shape[:2]
+    original_boxes = transform_boxes_to_original(candidate_boxes, H_inv, src_h, src_w)
 
     # ================ 第 9 步：渲染多尺度热力图面板 ==========================
     panel_path = OUTPUT_DIR / "heatmap_panel.png"
@@ -317,29 +401,30 @@ def run_full_pipeline(
     # ================ 第 10 步：渲染 CBAM 增强热力图 =========================
     enhanced_heatmap_rgb = render_single_heatmap(enhanced_np)
 
-    # ================ 第 11 步：候选框叠加可视化 ==============================
-    candidate_overlay = draw_boxes(aligned_rgb, candidate_boxes, color=(255, 60, 60), thickness=2)
+    # ================ 第 11 步：候选框叠加可视化（画在原始 query 上）==========
+    candidate_overlay = draw_boxes(query_rgb, original_boxes, color=(255, 60, 60), thickness=2)
 
-    # ================ 第 12 步：最终检测结果叠加图 ===========================
+    # ================ 第 12 步：最终检测结果叠加图（画在原始 query 上）========
     # 注意：RT-DETR 分类权重尚未集成，当前统一标注为"候选"。
     # 后续接入 RT-DETR 后，用实际类别预测结果替换此处标签。
     labels = ["候选"] * max(candidate_count, 0)
     final_overlay = draw_boxes_with_labels(
-        aligned_rgb, candidate_boxes, labels, CLASS_COLORS, thickness=2,
+        query_rgb, original_boxes, labels, CLASS_COLORS, thickness=2,
     )
 
-    # ================ 生成结果 JSON =========================================
+    # ================ 生成结果 JSON（原始坐标系）=============================
     results_json = [
         {
             "框坐标": [float(x1), float(y1), float(x2), float(y2)],
             "面积": float((x2 - x1) * (y2 - y1)),
             "类别": "候选",
         }
-        for x1, y1, x2, y2 in candidate_boxes
+        for x1, y1, x2, y2 in original_boxes
     ]
 
     alignment_json = {
         "SIFT配准状态": align_info["status"],
+        "坐标映射": "已从 aligned 逆变换回原始 query 坐标系" if H_inv is not None else "无逆变换（SIFT 配准未执行）",
         "Query特征点数": align_info.get("kp_q", 0),
         "Template特征点数": align_info.get("kp_t", 0),
         "匹配点对数": align_info.get("matches", 0),
