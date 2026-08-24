@@ -170,7 +170,8 @@ def run_train_alignment(config: dict[str, Any]) -> dict[str, Any]:
                 best_epoch = epoch
                 torch.save({"epoch": epoch, "model_state_dict": predictor.state_dict(),
                             "optimizer_state_dict": optimizer.state_dict(),
-                            "val_loss": best_val_loss}, checkpoint_best_path)
+                            "val_loss": best_val_loss,
+                            "training_contract": "defect-masked-alignment-v1"}, checkpoint_best_path)
         else:
             print(f"  ── Epoch {epoch:3d}/{epochs}  train_loss={train_stats['train_loss']:.6f}  "
                   f"time={time.time() - epoch_start:.0f}s\n", flush=True)
@@ -180,7 +181,8 @@ def run_train_alignment(config: dict[str, Any]) -> dict[str, Any]:
         epochs_log.append(entry)
 
     torch.save({"epoch": epochs, "model_state_dict": predictor.state_dict(),
-                "optimizer_state_dict": optimizer.state_dict()}, checkpoint_final_path)
+                "optimizer_state_dict": optimizer.state_dict(),
+                "training_contract": "defect-masked-alignment-v1"}, checkpoint_final_path)
 
     # Check dataset integrity
     if before != snapshot_tree(dataset_root):
@@ -199,6 +201,7 @@ def run_train_alignment(config: dict[str, Any]) -> dict[str, Any]:
             "epochs": epochs, "batch_size": batch_size, "lr": lr,
             "weight_decay": weight_decay, "scheduler": training.get("scheduler"),
         },
+        "loss_contract": {"defect_regions_masked": True, "mask_source": "query_targets.boxes"},
         "epochs_log": epochs_log,
     }
     json.dumps(report, allow_nan=False)

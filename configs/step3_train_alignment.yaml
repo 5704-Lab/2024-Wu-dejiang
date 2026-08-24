@@ -27,6 +27,7 @@ training:
   scheduler: cosine
   validation_interval: 1
 loss:
+  mask_defect_regions: true
   per_scale_weights:
     C3: 1.0
     C4: 1.0

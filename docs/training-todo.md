@@ -1,6 +1,19 @@
 # 剩余工作待办文档
 
-最后更新：2026-08-12
+最后更新：2026-08-24
+
+## 当前必须执行的重新训练顺序
+
+模型代码已改为：对齐损失屏蔽 GT 缺陷区域，融合模块使用 GT 热力图监督训练，正式 proposals/crop/demo 强制加载两份训练权重。旧版 OffsetPredictor checkpoint 由未屏蔽缺陷区域的损失产生，不得用于新的正式评估。
+
+```bash
+python scripts/run_step3.py train-alignment --config configs/step3_train_alignment.yaml
+python scripts/run_step3.py train-fusion --config configs/step3_train_fusion.yaml
+python scripts/run_step3.py proposals-smoke --config configs/step3_proposals.yaml
+python scripts/run_step3.py crop-smoke --config configs/step3_crop.yaml
+```
+
+若 Predictor 或 Fusion checkpoint 缺失或结构不匹配，评估会 fail closed，不再回退到零初始化或随机初始化权重。
 
 ---
 

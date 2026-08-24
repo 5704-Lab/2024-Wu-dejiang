@@ -33,6 +33,7 @@ from step3_model.fusion import MultiScaleFusion
 from step3_model.heatmap import compute_diff_maps, render_heatmap_panel, upsample_diff_maps
 from step3_model.offset_predictor import OffsetPredictor
 from step3_model.proposals import postprocess_heatmap
+from step3_model.model_io import load_model_checkpoint
 from step2_dataset.transforms import pil_to_tensor
 
 # ============================================================================
@@ -94,12 +95,8 @@ CHECKPOINT_PATH = (
     Path(__file__).resolve().parent.parent.parent
     / "artifacts" / "step3" / "training" / "checkpoint_best.pt"
 )
-if CHECKPOINT_PATH.exists():
-    ckpt = torch.load(CHECKPOINT_PATH, map_location=DEVICE, weights_only=True)
-    predictor.load_state_dict(ckpt["model_state_dict"])
-    print(f"[demo] 已加载训练后的 OffsetPredictor: {CHECKPOINT_PATH}")
-else:
-    print("[demo] 使用零初始化 OffsetPredictor（未找到训练权重）")
+load_model_checkpoint(predictor, CHECKPOINT_PATH, DEVICE, "OffsetPredictor", "defect-masked-alignment-v1")
+print(f"[demo] 已加载训练后的 OffsetPredictor: {CHECKPOINT_PATH}")
 
 for p in predictor.parameters():
     p.requires_grad_(False)
@@ -111,6 +108,12 @@ for p in warp.parameters():
 
 # 多尺度融合模块
 fusion = MultiScaleFusion(hidden=128, reduction=16).eval().to(DEVICE)
+FUSION_CHECKPOINT_PATH = (
+    Path(__file__).resolve().parent.parent.parent
+    / "artifacts" / "step3" / "fusion_training" / "checkpoint_best.pt"
+)
+load_model_checkpoint(fusion, FUSION_CHECKPOINT_PATH, DEVICE, "MultiScaleFusion", "supervised-fusion-heatmap-v1")
+print(f"[demo] 已加载训练后的 MultiScaleFusion: {FUSION_CHECKPOINT_PATH}")
 for p in fusion.parameters():
     p.requires_grad_(False)
 
@@ -368,8 +371,8 @@ def run_full_pipeline(
         warped = warp(tf, offsets)
 
         # 第 6 步：差异特征 → 多尺度融合 → CBAM 增强热力图
-        diff_features = {k: warped[k] - qf[k] for k in ["C3", "C4", "C5"]}
-        enhanced = fusion(diff_features)  # [1, 1, 800, 800]
+        diff_features = {k: (warped[k] - qf[k]).abs() for k in ["C3", "C4", "C5"]}
+        enhanced = torch.sigmoid(fusion(diff_features))  # [1, 1, 800, 800]
 
         # 第 7 步：各尺度标量差异图（用于面板可视化）
         diff_maps = compute_diff_maps(warped, qf)

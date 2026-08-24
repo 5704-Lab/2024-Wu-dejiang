@@ -6,6 +6,7 @@ from step3_model.train_alignment import (
     _build_pipeline,
     train_one_epoch,
     validate_one_epoch,
+    build_normal_region_masks,
 )
 from step3_model.offset_predictor import OFFSET_SPEC
 from step3_model.feature_warp import WARP_SPEC
@@ -86,6 +87,18 @@ def test_loss_backward_through_loss():
     loss, _stats = criterion(warped, qf)
     loss.backward()
     assert any(v.grad is not None for v in warped.values())
+
+
+def test_defect_region_is_excluded_from_alignment_loss():
+    qf = _dummy_features(batch=1, height=64, width=64, seed=1)
+    warped = {key: value.clone() for key, value in qf.items()}
+    for value in warped.values():
+        value[:, :, : value.shape[-2] // 2, : value.shape[-1] // 2] += 10
+    targets = [{"boxes": torch.tensor([[0.0, 0.0, 32.0, 32.0]]), "size": torch.tensor([64, 64])}]
+    masks = build_normal_region_masks(targets, qf)
+    _loss, stats = MicroAlignmentLoss()(warped, qf, masks)
+    assert stats["loss_total"] == pytest.approx(0.0)
+    assert stats["normal_ratio_C3"] < 1.0
 
 
 def test_build_pipeline_cpu():

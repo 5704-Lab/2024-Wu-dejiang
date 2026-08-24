@@ -16,12 +16,13 @@ from .run_heatmap import load_heatmap_config, run_heatmap_smoke
 from .run_offset import load_offset_config, run_offset_smoke
 from .run_proposals import load_proposals_config, run_proposals_smoke
 from .run_train_alignment import load_train_config, run_train_alignment
+from .run_train_fusion import load_fusion_train_config, run_train_fusion
 from .test_evaluation import load_test_config, run_test_evaluation
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Step 3 alignment and model evaluation")
-    parser.add_argument("command", choices=("validate-freeze", "test-evaluate", "backbone-smoke", "offset-smoke", "feature-warp-smoke", "train-alignment", "heatmap-smoke", "fusion-smoke", "proposals-smoke", "crop-smoke", "export-coco", "detection-smoke"))
+    parser.add_argument("command", choices=("validate-freeze", "test-evaluate", "backbone-smoke", "offset-smoke", "feature-warp-smoke", "train-alignment", "train-fusion", "heatmap-smoke", "fusion-smoke", "proposals-smoke", "crop-smoke", "export-coco", "detection-smoke"))
     parser.add_argument("--config", type=Path)
     args = parser.parse_args()
     if args.command == "validate-freeze":
@@ -69,6 +70,9 @@ def main() -> int:
             "best_val_loss": result["best_val_loss"],
             "trainable_parameter_count": result["trainable_parameter_count"],
         }
+    elif args.command == "train-fusion":
+        result = run_train_fusion(load_fusion_train_config(args.config or Path("configs/step3_train_fusion.yaml")))
+        summary = {key: result[key] for key in ("schema_version", "processed", "best_epoch", "best_val_loss")}
     elif args.command == "heatmap-smoke":
         result = run_heatmap_smoke(load_heatmap_config(args.config or Path("configs/step3_heatmap.yaml")))
         summary = {

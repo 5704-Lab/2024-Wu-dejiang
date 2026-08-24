@@ -23,6 +23,7 @@ from .backbone import SharedSiameseBackbone
 from .feature_warp import FeatureWarp
 from .fusion import MultiScaleFusion, _STAGE_NAMES
 from .offset_predictor import OFFSET_SPEC, OffsetPredictor
+from .model_io import load_model_checkpoint
 from .proposals import evaluate_recall, postprocess_batch
 
 _EVIDENCE_KEYS = (
@@ -39,6 +40,8 @@ def load_proposals_config(path: Path) -> dict[str, Any]:
     config["_output_root"] = str(resolved(config["output"]["root"], workspace))
     config["_dataset_root"] = str(resolved(config["inputs"]["dataset_root"]))
     config["_step2_config"] = str(resolved(config["inputs"]["step2_config"], workspace))
+    config["_predictor_checkpoint"] = str(resolved(config["inputs"]["predictor_checkpoint"], workspace))
+    config["_fusion_checkpoint"] = str(resolved(config["inputs"]["fusion_checkpoint"], workspace))
     for key in _EVIDENCE_KEYS:
         config[f"_{key}"] = str(resolved(config["inputs"][key], workspace))
     _validate_config(config)
@@ -101,12 +104,17 @@ def run_proposals_smoke(config: dict[str, Any]) -> dict[str, Any]:
         kernel_size=int(config["model"]["kernel_size"]),
         hidden_ratio=int(config["model"]["hidden_ratio"]),
         zero_init=bool(config["model"]["zero_init"]),
+        max_offset=float(config["model"].get("max_offset", 3.0)),
     ).to(device).eval()
     warp = FeatureWarp(kernel_size=int(config["model"]["kernel_size"])).to(device).eval()
     fusion = MultiScaleFusion(
         hidden=int(config["fusion"]["hidden"]),
         reduction=int(config["fusion"]["reduction"]),
     ).to(device).eval()
+    load_model_checkpoint(predictor, Path(config["_predictor_checkpoint"]), device, "OffsetPredictor",
+                          "defect-masked-alignment-v1")
+    load_model_checkpoint(fusion, Path(config["_fusion_checkpoint"]), device, "MultiScaleFusion",
+                          "supervised-fusion-heatmap-v1")
 
     proposals_cfg = config["proposals"]
     iou_thresholds = tuple(config["evaluation"]["iou_thresholds"])
@@ -123,8 +131,8 @@ def run_proposals_smoke(config: dict[str, Any]) -> dict[str, Any]:
             qf, tf = backbone(query, template)
             offsets = predictor(qf, tf)
             warped = warp(tf, offsets)
-            diff_features = {key: warped[key] - qf[key] for key in [n for n, _, _ in OFFSET_SPEC]}
-            enhanced = fusion(diff_features)  # [B, 1, 800, 800]
+            diff_features = {key: (warped[key] - qf[key]).abs() for key in [n for n, _, _ in OFFSET_SPEC]}
+            enhanced = torch.sigmoid(fusion(diff_features))  # supervised defect probability
 
             pred_boxes = postprocess_batch(
                 enhanced,
@@ -180,6 +188,8 @@ def run_proposals_smoke(config: dict[str, Any]) -> dict[str, Any]:
         "verified": True, "processed_sample_count": len(sample_ids),
         "expected_sample_count": count, "selected_device": str(device),
         "recall_statistics": recall_stats, "per_sample": per_sample_stats,
+        "checkpoint_sha256": {"predictor": sha256_file(Path(config["_predictor_checkpoint"])),
+                              "fusion": sha256_file(Path(config["_fusion_checkpoint"]))},
     }
     json.dumps(contract, allow_nan=False); json.dumps(report, allow_nan=False)
     output_root.mkdir(parents=True, exist_ok=True)
@@ -195,10 +205,11 @@ def run_proposals_smoke(config: dict[str, Any]) -> dict[str, Any]:
         "inputs": {"config_sha256": sha256_file(Path(config["_config_path"])),
                    "step2_config_sha256": sha256_file(Path(config["_step2_config"])),
                    "source_snapshot_digest": source_digest, "step3_2_evidence_sha256": evidence_before},
+        "model_checkpoints": report["checkpoint_sha256"],
         "artifacts": {"proposals_contract.json": sha256_file(contract_path),
                       "smoke_report.json": sha256_file(report_path)},
         "controls": {"source_read_only_verified": True, "alignment_evidence_integrity_verified": True,
-                     "candidate_proposals_started": True, "step_3_5_c_started": True},
+                     "trained_weights_loaded": True, "candidate_proposals_started": True, "step_3_5_c_started": True},
     }
     write_json(output_root / "run_manifest.json", manifest)
     return report

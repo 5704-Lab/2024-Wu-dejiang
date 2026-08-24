@@ -1,0 +1,21 @@
+schema_version: step3-fusion-training-config-v1
+inputs:
+  step2_config: configs/step2_dataset.yaml
+  predictor_checkpoint: artifacts/step3/training/checkpoint_best.pt
+output:
+  root: artifacts/step3/fusion_training
+model:
+  max_offset: 3.0
+fusion:
+  hidden: 128
+  reduction: 16
+training:
+  epochs: 20
+  batch_size: 4
+  num_workers: 4
+  device: auto
+  lr: 0.0001
+  weight_decay: 0.0001
+loss:
+  positive_weight: 10.0
+  dice_weight: 1.0

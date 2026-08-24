@@ -10,12 +10,15 @@ inputs:
   alignment_validation_manifest: artifacts/step3/run_manifest.json
   alignment_test_report: artifacts/step3/test/alignment_report.json
   alignment_test_manifest: artifacts/step3/test/run_manifest.json
+  predictor_checkpoint: artifacts/step3/training/checkpoint_best.pt
+  fusion_checkpoint: artifacts/step3/fusion_training/checkpoint_best.pt
 output:
   root: artifacts/step3/crop
 model:
   kernel_size: 3
   hidden_ratio: 4
   zero_init: true
+  max_offset: 3.0
 fusion:
   hidden: 128
   reduction: 16

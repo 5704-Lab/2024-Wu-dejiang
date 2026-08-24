@@ -26,6 +26,7 @@ from .feature_warp import FeatureWarp
 from .fusion import MultiScaleFusion, _STAGE_NAMES
 from .heatmap import _imwrite, render_heatmap_panel
 from .offset_predictor import OFFSET_SPEC, OffsetPredictor
+from .model_io import load_model_checkpoint
 
 _EVIDENCE_KEYS = (
     "alignment_validation_report", "alignment_frozen_parameters",
@@ -41,6 +42,8 @@ def load_fusion_config(path: Path) -> dict[str, Any]:
     config["_output_root"] = str(resolved(config["output"]["root"], workspace))
     config["_dataset_root"] = str(resolved(config["inputs"]["dataset_root"]))
     config["_step2_config"] = str(resolved(config["inputs"]["step2_config"], workspace))
+    config["_predictor_checkpoint"] = str(resolved(config["inputs"]["predictor_checkpoint"], workspace))
+    config["_fusion_checkpoint"] = str(resolved(config["inputs"]["fusion_checkpoint"], workspace))
     for key in _EVIDENCE_KEYS:
         config[f"_{key}"] = str(resolved(config["inputs"][key], workspace))
     _validate_config(config)
@@ -134,7 +137,12 @@ def run_fusion_smoke(config: dict[str, Any]) -> dict[str, Any]:
         kernel_size=int(config["model"]["kernel_size"]),
         hidden_ratio=int(config["model"]["hidden_ratio"]),
         zero_init=bool(config["model"]["zero_init"]),
+        max_offset=float(config["model"].get("max_offset", 3.0)),
     ).to(device).eval()
+    load_model_checkpoint(predictor, Path(config["_predictor_checkpoint"]), device, "OffsetPredictor",
+                          "defect-masked-alignment-v1")
+    load_model_checkpoint(fusion, Path(config["_fusion_checkpoint"]), device, "MultiScaleFusion",
+                          "supervised-fusion-heatmap-v1")
     warp = FeatureWarp(kernel_size=int(config["model"]["kernel_size"])).to(device).eval()
     fusion = MultiScaleFusion(
         hidden=int(config["fusion"]["hidden"]),
@@ -157,8 +165,8 @@ def run_fusion_smoke(config: dict[str, Any]) -> dict[str, Any]:
             warped = warp(tf, offsets)
 
             # Compute diff features (raw tensor difference, not scalar)
-            diff_features = {key: warped[key] - qf[key] for key in predicted_names}
-            enhanced = fusion(diff_features)  # [B, 1, 800, 800]
+            diff_features = {key: (warped[key] - qf[key]).abs() for key in predicted_names}
+            enhanced = torch.sigmoid(fusion(diff_features))  # [B, 1, 800, 800]
 
             for name in predicted_names:
                 if not torch.isfinite(warped[name]).all():

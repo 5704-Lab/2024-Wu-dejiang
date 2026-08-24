@@ -33,16 +33,55 @@ class MicroAlignmentLoss(nn.Module):
         self,
         warped: dict[str, torch.Tensor],
         query_features: dict[str, torch.Tensor],
+        valid_masks: dict[str, torch.Tensor] | None = None,
     ) -> tuple[torch.Tensor, dict[str, float]]:
         total = torch.tensor(0.0, device=query_features["C3"].device)
         stats: dict[str, float] = {}
         for key in _STAGE_NAMES:
-            mse = F.mse_loss(warped[key], query_features[key])
+            squared = (warped[key] - query_features[key]).pow(2)
+            if valid_masks is None:
+                mse = squared.mean()
+                valid_ratio = 1.0
+            else:
+                mask = valid_masks[key].to(device=squared.device, dtype=squared.dtype)
+                if mask.ndim != 4 or mask.shape[0] != squared.shape[0] or mask.shape[1] != 1 or mask.shape[2:] != squared.shape[2:]:
+                    raise ValueError(f"Invalid normal-region mask shape at {key}: {mask.shape}")
+                denominator = mask.sum() * squared.shape[1]
+                if denominator.item() <= 0:
+                    raise ValueError(f"Normal-region mask at {key} contains no valid pixels")
+                mse = (squared * mask).sum() / denominator
+                valid_ratio = float(mask.mean().item())
             weighted = self.alphas[key] * mse
             total = total + weighted
             stats[f"loss_{key}"] = float(mse.item())
+            stats[f"normal_ratio_{key}"] = valid_ratio
         stats["loss_total"] = float(total.item())
         return total, stats
+
+
+def build_normal_region_masks(
+    targets: list[dict[str, torch.Tensor]],
+    features: dict[str, torch.Tensor],
+) -> dict[str, torch.Tensor]:
+    """Build per-scale masks whose value is one outside annotated defect boxes."""
+    masks: dict[str, torch.Tensor] = {}
+    for key, feature in features.items():
+        batch, _, height, width = feature.shape
+        if len(targets) != batch:
+            raise ValueError("Target count must match feature batch size")
+        mask = torch.ones((batch, 1, height, width), device=feature.device, dtype=feature.dtype)
+        for index, target in enumerate(targets):
+            image_h, image_w = [int(v) for v in target["size"].tolist()]
+            for box in target["boxes"]:
+                x1, y1, x2, y2 = [float(v) for v in box.tolist()]
+                fx1 = max(0, min(width, int(x1 * width / image_w)))
+                fy1 = max(0, min(height, int(y1 * height / image_h)))
+                fx2 = max(0, min(width, int(torch.ceil(torch.tensor(x2 * width / image_w)).item())))
+                fy2 = max(0, min(height, int(torch.ceil(torch.tensor(y2 * height / image_h)).item())))
+                if fx2 > fx1 and fy2 > fy1:
+                    mask[index, :, fy1:fy2, fx1:fx2] = 0
+        masks[key] = mask
+    return masks
 
 
 def _build_pipeline(
@@ -86,9 +125,10 @@ def train_one_epoch(
         template = batch["template"].to(device)
         with torch.no_grad():
             qf, tf = backbone(query, template)
+        normal_masks = build_normal_region_masks(batch["query_targets"], qf)
         offsets = predictor(qf, tf)
         warped = warp(tf, offsets)
-        loss, stats = criterion(warped, qf)
+        loss, stats = criterion(warped, qf, normal_masks)
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
@@ -127,9 +167,10 @@ def validate_one_epoch(
         query = batch["query"].to(device)
         template = batch["template"].to(device)
         qf, tf = backbone(query, template)
+        normal_masks = build_normal_region_masks(batch["query_targets"], qf)
         offsets = predictor(qf, tf)
         warped = warp(tf, offsets)
-        _loss, stats = criterion(warped, qf)
+        _loss, stats = criterion(warped, qf, normal_masks)
         total_loss += stats["loss_total"]
         for key in _STAGE_NAMES:
             per_scale_losses[key] += stats[f"loss_{key}"]
