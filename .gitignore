@@ -62,3 +62,7 @@ AGENTS.md
 
 
 artifacts/step3/training/
+artifacts/step3/fusion_training/
+artifacts/step3/tuning/
+artifacts/step3/proposals/
+artifacts/step3/crop/
