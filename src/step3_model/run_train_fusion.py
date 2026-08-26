@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import time
 from pathlib import Path
 from typing import Any
 
@@ -78,12 +79,33 @@ def run_train_fusion(config: dict[str, Any]) -> dict[str, Any]:
                                   weight_decay=float(training.get("weight_decay", 0.0)))
     output = Path(config["_output_root"]); output.mkdir(parents=True, exist_ok=True)
     best_loss = float("inf"); best_epoch = -1; log = []
-    for epoch in range(1, int(training["epochs"]) + 1):
+    epochs = int(training["epochs"])
+    trainable_params = sum(parameter.numel() for parameter in fusion.parameters() if parameter.requires_grad)
+    # 在耗时较长的双分支特征提取开始前输出完整运行上下文，便于确认设备、
+    # 数据规模、权重来源和产物目录均符合预期，避免训练数小时后才发现配置错误。
+    print(f"\n{'=' * 60}")
+    print("  Step 3.5-B: MultiScaleFusion 监督训练开始")
+    print(f"  Train: {len(train_data)} pairs | Val: {len(val_data)} pairs")
+    print(f"  Batch: {training['batch_size']} | Epochs: {epochs} | LR: {training['lr']} | Device: {device}")
+    print(f"  Trainable: MultiScaleFusion ({trainable_params:,} params)")
+    print(f"  Predictor: {config['_predictor_checkpoint']}")
+    print(f"  Output: {output}")
+    print(f"{'=' * 60}\n", flush=True)
+
+    training_start = time.time()
+    for epoch in range(1, epochs + 1):
+        epoch_start = time.time()
         train_data.set_epoch(epoch - 1)
         epoch_stats = {}
         for phase, loader in (("train", train_loader), ("val", val_loader)):
-            fusion.train(phase == "train"); total = 0.0; count = 0
-            for batch in loader:
+            fusion.train(phase == "train")
+            totals = {"loss": 0.0, "bce": 0.0, "dice": 0.0}
+            count = 0
+            phase_start = time.time()
+            total_batches = len(loader)
+            # 每个阶段约输出十次进度；小数据集至少每个 batch 输出一次。
+            log_every = max(1, total_batches // 10)
+            for batch_index, batch in enumerate(loader, 1):
                 query, template = batch["query"].to(device), batch["template"].to(device)
                 with torch.no_grad():
                     qf, tf = backbone(query, template)
@@ -92,24 +114,59 @@ def run_train_fusion(config: dict[str, Any]) -> dict[str, Any]:
                 targets = build_defect_heatmaps(batch["query_targets"], device=device)
                 with torch.set_grad_enabled(phase == "train"):
                     logits = fusion(differences)
-                    loss, _ = criterion(logits, targets)
+                    loss, loss_stats = criterion(logits, targets)
                     if phase == "train":
                         optimizer.zero_grad(); loss.backward(); optimizer.step()
-                total += float(loss.item()); count += 1
-            epoch_stats[f"{phase}_loss"] = total / max(count, 1)
+                totals["loss"] += loss_stats["loss_total"]
+                totals["bce"] += loss_stats["loss_bce"]
+                totals["dice"] += loss_stats["loss_dice"]
+                count += 1
+                if batch_index % log_every == 0 or batch_index == total_batches:
+                    # ETA 使用本阶段已经完成 batch 的平均耗时估算，仅用于观察训练状态，
+                    # 不参与训练调度或 checkpoint 选择。
+                    elapsed = time.time() - phase_start
+                    eta = elapsed / batch_index * (total_batches - batch_index)
+                    label = "Train" if phase == "train" else "Val  "
+                    print(
+                        f"  {label} [{epoch:3d}/{epochs:3d}] batch {batch_index:4d}/{total_batches:4d} | "
+                        f"loss={totals['loss'] / count:.6f} | "
+                        f"bce={totals['bce'] / count:.6f} | dice={totals['dice'] / count:.6f} | "
+                        f"elapsed={elapsed:.0f}s | ETA={eta:.0f}s",
+                        flush=True,
+                    )
+            denominator = max(count, 1)
+            epoch_stats[f"{phase}_loss"] = totals["loss"] / denominator
+            epoch_stats[f"{phase}_loss_bce"] = totals["bce"] / denominator
+            epoch_stats[f"{phase}_loss_dice"] = totals["dice"] / denominator
         log.append({"epoch": epoch, **epoch_stats})
+        # 先记录是否刷新最佳结果，再更新 best_loss，确保汇总行中的星号语义准确。
+        improved = epoch_stats["val_loss"] < best_loss
         if epoch_stats["val_loss"] < best_loss:
             best_loss, best_epoch = epoch_stats["val_loss"], epoch
             torch.save({"epoch": epoch, "model_state_dict": fusion.state_dict(), "val_loss": best_loss,
                         "training_contract": "supervised-fusion-heatmap-v1"}, output / "checkpoint_best.pt")
-    torch.save({"epoch": int(training["epochs"]), "model_state_dict": fusion.state_dict(),
+        print(
+            f"  ── Epoch {epoch:3d}/{epochs} | train={epoch_stats['train_loss']:.6f} | "
+            f"val={epoch_stats['val_loss']:.6f}{' *' if improved else ''} | "
+            f"time={time.time() - epoch_start:.0f}s | best_epoch={best_epoch}\n",
+            flush=True,
+        )
+    torch.save({"epoch": epochs, "model_state_dict": fusion.state_dict(),
                 "training_contract": "supervised-fusion-heatmap-v1"}, output / "checkpoint_final.pt")
     report = {"schema_version": "step3-fusion-training-report-v1", "processed": True,
               "best_epoch": best_epoch, "best_val_loss": best_loss, "epochs_log": log,
+              "epochs_completed": epochs, "selected_device": str(device),
+              "trainable_parameter_count": trainable_params,
+              "total_training_seconds": time.time() - training_start,
               "predictor_checkpoint_sha256": sha256_file(Path(config["_predictor_checkpoint"]))}
     write_json(output / "training_report.json", report)
     write_json(output / "run_manifest.json", {"config_sha256": sha256_file(Path(config["_config_path"])),
               "predictor_checkpoint_sha256": report["predictor_checkpoint_sha256"],
               "fusion_checkpoint_sha256": sha256_file(output / "checkpoint_best.pt")})
     json.dumps(report, allow_nan=False)
+    print(
+        f"\nFusion 训练完成：best_epoch={best_epoch}, best_val_loss={best_loss:.6f}, "
+        f"total_time={report['total_training_seconds'] / 60:.1f} min",
+        flush=True,
+    )
     return report
