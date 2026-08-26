@@ -54,3 +54,11 @@ opening_report.txt
 opening_report_strings.txt
 report_core_context.txt
 extract_report*.ps1
+
+
+# md
+AGENTS.md
+
+
+
+artifacts/step3/training/
