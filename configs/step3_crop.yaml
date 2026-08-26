@@ -23,14 +23,18 @@ fusion:
   hidden: 128
   reduction: 16
 proposals:
-  min_area: 64
-  max_aspect_ratio: 5.0
+  # 与冻结 Proposal 参数保持一致，确保 Crop 评估使用同一候选分布。
+  heatmap_method: probability_threshold
+  probability_threshold: 0.60
+  min_area: 128
+  max_aspect_ratio: 8.0
+  max_area_ratio: 0.8
   adaptive_block: 51
   adaptive_c: -5
-  morph_kernel: 5
+  morph_kernel: 9
 crop:
-  expand_k: 1.8
-  merge_iou_threshold: 0.3
+  expand_k: 4.5
+  merge_iou_threshold: 0.1
 run:
   purpose: crop_smoke
   split: val

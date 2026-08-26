@@ -114,6 +114,33 @@ def postprocess_heatmap(
     return _mask_to_boxes(mask, min_area, max_aspect_ratio)
 
 
+def postprocess_probability_heatmap(
+    heatmap: np.ndarray,
+    probability_threshold: float = 0.5,
+    min_area: float = 64.0,
+    max_aspect_ratio: float = 5.0,
+    max_area_ratio: float = 0.8,
+    morph_kernel: int = 5,
+) -> np.ndarray:
+    """将监督训练后的缺陷概率图按固定概率阈值转换为候选框。
+
+    与自适应阈值不同，本接口保留概率的统一语义，适合在 Validation 上冻结
+    单一阈值。形态学闭运算只负责连接相邻响应，不改变模型概率本身。
+    """
+    if heatmap.ndim != 2 or not np.isfinite(heatmap).all():
+        raise ValueError("heatmap 必须是有限值二维数组")
+    if not 0.0 < probability_threshold < 1.0:
+        raise ValueError("probability_threshold 必须位于 (0, 1)")
+    binary = (heatmap >= probability_threshold).astype(np.uint8) * 255
+    if morph_kernel >= 3:
+        kernel_size = int(morph_kernel)
+        if kernel_size % 2 == 0:
+            kernel_size += 1
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (kernel_size, kernel_size))
+        binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
+    return _mask_to_boxes(binary, min_area, max_aspect_ratio, max_area_ratio)
+
+
 def postprocess_batch(
     heatmaps: torch.Tensor,
     min_area: float = 64.0,
@@ -121,6 +148,9 @@ def postprocess_batch(
     adaptive_block: int = 51,
     adaptive_c: int = -5,
     morph_kernel: int = 5,
+    heatmap_method: str = "adaptive_threshold",
+    probability_threshold: float = 0.5,
+    max_area_ratio: float = 0.8,
 ) -> list[torch.Tensor]:
     """Convert [B, 1, H, W] enhanced heatmaps to per-sample candidate box lists.
 
@@ -130,7 +160,18 @@ def postprocess_batch(
     results: list[torch.Tensor] = []
     for idx in range(heatmaps.shape[0]):
         hm = heatmaps[idx, 0].detach().cpu().numpy()
-        boxes_np = postprocess_heatmap(hm, min_area, max_aspect_ratio, adaptive_block, adaptive_c, morph_kernel)
+        if heatmap_method == "probability_threshold":
+            boxes_np = postprocess_probability_heatmap(
+                hm, probability_threshold=probability_threshold, min_area=min_area,
+                max_aspect_ratio=max_aspect_ratio, max_area_ratio=max_area_ratio,
+                morph_kernel=morph_kernel,
+            )
+        elif heatmap_method == "adaptive_threshold":
+            boxes_np = postprocess_heatmap(
+                hm, min_area, max_aspect_ratio, adaptive_block, adaptive_c, morph_kernel,
+            )
+        else:
+            raise ValueError(f"不支持的热力图后处理方法：{heatmap_method}")
         results.append(torch.from_numpy(boxes_np))
     return results
 

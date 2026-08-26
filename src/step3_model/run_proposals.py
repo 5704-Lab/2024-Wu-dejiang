@@ -141,6 +141,9 @@ def run_proposals_smoke(config: dict[str, Any]) -> dict[str, Any]:
                 adaptive_block=int(proposals_cfg["adaptive_block"]),
                 adaptive_c=int(proposals_cfg["adaptive_c"]),
                 morph_kernel=int(proposals_cfg["morph_kernel"]),
+                heatmap_method=str(proposals_cfg.get("heatmap_method", "adaptive_threshold")),
+                probability_threshold=float(proposals_cfg.get("probability_threshold", 0.5)),
+                max_area_ratio=float(proposals_cfg.get("max_area_ratio", 0.8)),
             )
             gt_targets = batch["query_targets"]  # template_targets is identical
 

@@ -23,12 +23,15 @@ fusion:
   hidden: 128
   reduction: 16
 proposals:
-  min_area: 64
-  max_aspect_ratio: 5.0
+  # 以下参数由完整 Validation 自动搜索并冻结；Test 不得参与修改。
+  heatmap_method: probability_threshold
+  probability_threshold: 0.60
+  min_area: 128
+  max_aspect_ratio: 8.0
   max_area_ratio: 0.8
   adaptive_block: 51
   adaptive_c: -5
-  morph_kernel: 5
+  morph_kernel: 9
 evaluation:
   iou_thresholds: [0.3, 0.5, 0.7]
 run:

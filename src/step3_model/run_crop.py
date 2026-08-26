@@ -105,13 +105,15 @@ def run_crop_smoke(config: dict[str, Any]) -> dict[str, Any]:
     ).to(device).eval()
     load_model_checkpoint(predictor, Path(config["_predictor_checkpoint"]), device, "OffsetPredictor",
                           "defect-masked-alignment-v1")
-    load_model_checkpoint(fusion, Path(config["_fusion_checkpoint"]), device, "MultiScaleFusion",
-                          "supervised-fusion-heatmap-v1")
     warp = FeatureWarp(kernel_size=int(config["model"]["kernel_size"])).to(device).eval()
     fusion = MultiScaleFusion(
         hidden=int(config["fusion"]["hidden"]),
         reduction=int(config["fusion"]["reduction"]),
     ).to(device).eval()
+    # 必须先构造与训练配置一致的 Fusion 实例，再严格加载监督训练权重；
+    # 提前加载会引用尚未绑定的局部变量，且无法执行 state_dict 结构校验。
+    load_model_checkpoint(fusion, Path(config["_fusion_checkpoint"]), device, "MultiScaleFusion",
+                          "supervised-fusion-heatmap-v1")
 
     proposals_cfg = config["proposals"]
     crop_cfg = config["crop"]
@@ -137,6 +139,9 @@ def run_crop_smoke(config: dict[str, Any]) -> dict[str, Any]:
                 adaptive_block=int(proposals_cfg["adaptive_block"]),
                 adaptive_c=int(proposals_cfg["adaptive_c"]),
                 morph_kernel=int(proposals_cfg["morph_kernel"]),
+                heatmap_method=str(proposals_cfg.get("heatmap_method", "adaptive_threshold")),
+                probability_threshold=float(proposals_cfg.get("probability_threshold", 0.5)),
+                max_area_ratio=float(proposals_cfg.get("max_area_ratio", 0.8)),
             )
 
             for i in range(query.shape[0]):

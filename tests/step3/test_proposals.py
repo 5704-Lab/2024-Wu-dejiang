@@ -8,7 +8,19 @@ from step3_model.proposals import (
     evaluate_recall,
     postprocess_batch,
     postprocess_heatmap,
+    postprocess_probability_heatmap,
 )
+
+
+def test_probability_heatmap_generates_expected_box():
+    """固定概率阈值应从单个高响应矩形中恢复对应候选框。"""
+    heatmap = np.zeros((64, 64), dtype=np.float32)
+    heatmap[20:40, 10:30] = 0.9
+    boxes = postprocess_probability_heatmap(
+        heatmap, probability_threshold=0.5, min_area=16, morph_kernel=1,
+    )
+    assert boxes.shape == (1, 4)
+    assert boxes[0].tolist() == [10.0, 20.0, 30.0, 40.0]
 from step3_model.run_proposals import _resolve_device, _validate_config
 
 

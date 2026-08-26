@@ -1,3 +1,5 @@
+import inspect
+
 import pytest
 import torch
 
@@ -10,7 +12,7 @@ from step3_model.crop import (
     map_boxes_to_crop,
     merge_overlapping_boxes,
 )
-from step3_model.run_crop import _resolve_device, _validate_config
+from step3_model.run_crop import _resolve_device, _validate_config, run_crop_smoke
 
 
 # ---------------------------------------------------------------------------
@@ -237,3 +239,11 @@ def test_explicit_cuda_fails_when_unavailable(monkeypatch):
     monkeypatch.setattr("torch.cuda.is_available", lambda: False)
     with pytest.raises(RuntimeError, match="unavailable"):
         _resolve_device("cuda")
+
+
+def test_crop_runner_constructs_fusion_before_loading_checkpoint():
+    """回归检查：Fusion 必须先实例化，之后才能向实例加载监督训练权重。"""
+    source = inspect.getsource(run_crop_smoke)
+    construct_position = source.index("fusion = MultiScaleFusion(")
+    load_position = source.index("load_model_checkpoint(fusion")
+    assert construct_position < load_position
