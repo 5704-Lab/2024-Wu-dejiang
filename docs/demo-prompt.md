@@ -12,7 +12,7 @@
 
 3. **推理**：Siamese 筛选 → 候选框 → 上下文裁 → pad → RT-DETR → inverse_map_boxes → 全图坐标检测结果
 
-项目根目录：`d:\WuDJ\Desktop\工作室文档\毕业论文\SimeseUltraMaxPlus+`
+项目根目录：当前仓库根目录（所有项目内路径均相对此目录解析）
 
 ---
 

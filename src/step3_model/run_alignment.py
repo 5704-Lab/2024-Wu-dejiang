@@ -31,7 +31,7 @@ def load_config(config_path: Path) -> dict[str, Any]:
     config["_step1_root"] = str(resolved(config["inputs"]["step1_root"], workspace))
     config["_step2_root"] = str(resolved(config["inputs"]["step2_root"], workspace))
     config["_output_root"] = str(resolved(config["output"]["root"], workspace))
-    config["_dataset_root"] = str(resolved(config["inputs"]["dataset_root"]))
+    config["_dataset_root"] = str(resolved(config["inputs"]["dataset_root"], workspace))
     return config
 
 

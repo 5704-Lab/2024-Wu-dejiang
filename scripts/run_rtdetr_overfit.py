@@ -15,13 +15,18 @@ from ultralytics import RTDETR
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA_ROOT = Path(r"D:/WuDJ/Desktop/工作室文档/project/数据集/VOCdevkit/VOC2007")
+STEP2_CONFIG = ROOT / "configs/step2_dataset.yaml"
 COCO = ROOT / "artifacts/step3/detection/coco_train.json"
 OUT = ROOT / "artifacts/step5/rtdetr_overfit"
 
 
 def build_subset(sample_count: int = 16) -> Path:
     """生成独立的小样本 YOLO 数据集，并严格保持原始图片及标注坐标。"""
+    step2 = yaml.safe_load(STEP2_CONFIG.read_text(encoding="utf-8"))
+    # 与完整数据转换共用唯一数据入口，避免本机绝对路径进入可移植训练代码。
+    data_root = (ROOT / step2["inputs"]["dataset_root"]).resolve()
+    if not data_root.is_dir():
+        raise FileNotFoundError(f"配置的数据集根目录不存在：{data_root}")
     coco = json.loads(COCO.read_text(encoding="utf-8"))
     anns = {}
     for ann in coco["annotations"]:
@@ -47,7 +52,7 @@ def build_subset(sample_count: int = 16) -> Path:
     for split in ("images/train", "labels/train"):
         (OUT / split).mkdir(parents=True, exist_ok=True)
     for image in images:
-        source = DATA_ROOT / image["file_name"].replace("\\", "/")
+        source = data_root / image["file_name"].replace("\\", "/")
         target = OUT / "images/train" / source.name
         shutil.copy2(source, target)
         lines = []

@@ -4,7 +4,7 @@
 → 用 SIFTAligner.align() 尝试配准 → 检查配准质量、可视化对比。
 
 用法:
-    cd D:\WuDJ\Desktop\工作室文档\毕业论文\SimeseUltraMaxPlus+
+    cd <仓库根目录>
     python -X utf8 test_sift_aligner.py
 """
 

@@ -25,7 +25,7 @@ def load_config(config_path: Path) -> dict[str, Any]:
     workspace = config_path.resolve().parent.parent
     config["_config_path"] = str(config_path.resolve())
     config["_workspace"] = str(workspace)
-    config["_dataset_root"] = str(resolved(config["dataset"]["root"]))
+    config["_dataset_root"] = str(resolved(config["dataset"]["root"], workspace))
     config["_output_root"] = str(resolved(config["output"]["root"], workspace))
     validate_roots(Path(config["_dataset_root"]), Path(config["_output_root"]))
     return config

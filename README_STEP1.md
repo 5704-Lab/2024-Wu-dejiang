@@ -4,7 +4,7 @@
 
 ## 数据源
 
-`D:/WuDJ/Desktop/工作室文档/project/数据集/VOCdevkit/VOC2007`
+`../../project/数据集/VOCdevkit/VOC2007`（相对仓库根目录）
 
 程序不会修改、移动、重命名、删除或复制其中的图片、模板、XML和原始划分。
 

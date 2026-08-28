@@ -3,7 +3,7 @@ inputs:
   samples: samples.jsonl
   splits_dir: splits
   step1_manifest: run_manifest.json
-  dataset_root: "D:/WuDJ/Desktop/工作室文档/project/数据集/VOCdevkit/VOC2007"
+  dataset_root: "../../project/数据集/VOCdevkit/VOC2007"
 output:
   root: artifacts/step2
 classes: [broke, dirty, double, miss]

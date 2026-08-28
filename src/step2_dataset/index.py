@@ -23,7 +23,7 @@ def load_config(config_path: Path) -> dict[str, Any]:
     config["_config_path"] = str(config_path.resolve())
     config["_step1_root"] = str(resolved(config["inputs"]["step1_root"], workspace))
     config["_output_root"] = str(resolved(config["output"]["root"], workspace))
-    config["_dataset_root"] = str(resolved(config["inputs"]["dataset_root"]))
+    config["_dataset_root"] = str(resolved(config["inputs"]["dataset_root"], workspace))
     if tuple(config["classes"]) != CLASS_NAMES:
         raise ValueError(f"Class order must be {CLASS_NAMES}")
     dataset_root = Path(config["_dataset_root"])

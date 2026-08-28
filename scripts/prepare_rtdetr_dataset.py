@@ -12,7 +12,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA_ROOT = Path(r"D:/WuDJ/Desktop/工作室文档/project/数据集/VOCdevkit/VOC2007")
+STEP2_CONFIG = ROOT / "configs/step2_dataset.yaml"
 COCO_ROOT = ROOT / "artifacts/step3/detection"
 OUT = ROOT / "artifacts/step5/rtdetr_dataset"
 NAMES = {0: "broke", 1: "dirty", 2: "double", 3: "miss"}
@@ -49,6 +49,12 @@ def convert_split(split: str) -> dict[str, int]:
 
 def main() -> None:
     """重建完整数据目录并写入固定数据集配置。"""
+    global DATA_ROOT
+    # 数据根目录只从统一配置读取；相对路径始终以仓库根目录为基准解析。
+    step2 = yaml.safe_load(STEP2_CONFIG.read_text(encoding="utf-8"))
+    DATA_ROOT = (ROOT / step2["inputs"]["dataset_root"]).resolve()
+    if not DATA_ROOT.is_dir():
+        raise FileNotFoundError(f"配置的数据集根目录不存在：{DATA_ROOT}")
     if OUT.exists():
         shutil.rmtree(OUT)
     stats = {split: convert_split(split) for split in ("train", "val", "test")}

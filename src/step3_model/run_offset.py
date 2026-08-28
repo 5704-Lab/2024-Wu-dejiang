@@ -34,7 +34,7 @@ def load_offset_config(path: Path) -> dict[str, Any]:
     config["_config_path"] = str(path.resolve())
     config["_workspace"] = str(workspace)
     config["_output_root"] = str(resolved(config["output"]["root"], workspace))
-    config["_dataset_root"] = str(resolved(config["inputs"]["dataset_root"]))
+    config["_dataset_root"] = str(resolved(config["inputs"]["dataset_root"], workspace))
     config["_step2_config"] = str(resolved(config["inputs"]["step2_config"], workspace))
     for key in _EVIDENCE_KEYS:
         config[f"_{key}"] = str(resolved(config["inputs"][key], workspace))
