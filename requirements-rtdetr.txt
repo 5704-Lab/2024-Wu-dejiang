@@ -1,0 +1,2 @@
+# RT-DETR 基线实验固定依赖；PyTorch/torchvision 继续使用当前 CUDA 12.8 环境版本。
+ultralytics==8.3.230

@@ -9,6 +9,7 @@ htmlcov/
 .venv/
 venv/
 env/
+.venv-rtdetr/
 .env
 .env.*
 
@@ -66,3 +67,5 @@ artifacts/step3/fusion_training/
 artifacts/step3/tuning/
 artifacts/step3/proposals/
 artifacts/step3/crop/
+artifacts/step5/
+rtdetr-l.pt

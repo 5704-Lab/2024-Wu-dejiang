@@ -1,0 +1,28 @@
+# RT-DETR 基线训练冻结配置：仅使用原始 800×800 COCO 图像，不使用 Crop 数据。
+schema_version: rtdetr-baseline-v1
+# 正式训练必须使用官方 COCO 预训练权重；文件缺失时训练入口必须直接失败，禁止随机初始化降级。
+model: rtdetr-l.pt
+data: artifacts/step5/rtdetr_dataset/dataset.yaml
+imgsz: 800
+classes: [broke, dirty, double, miss]
+train:
+  epochs: 100
+  # RTX 4060 Laptop 8GB 先冻结为 batch=2，后续仅在显存 smoke 通过后才允许提高。
+  batch: 2
+  device: 0
+  workers: 0
+  amp: true
+  seed: 20260828
+  pretrained: true
+  patience: 20
+  project: artifacts/step5/rtdetr_baseline
+  name: train
+overfit_smoke:
+  sample_count: 16
+  epochs: 80
+  batch: 1
+  device: 0
+  workers: 0
+  # 小样本过拟合禁用所有随机增强，确保模型面对的是固定的 16 张原图。
+  augment: false
+  cache: false
