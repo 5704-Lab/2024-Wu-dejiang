@@ -70,3 +70,5 @@ artifacts/step3/crop/
 artifacts/step5/
 artifacts/pytest-temp/
 rtdetr-l.pt
+data
+runs/

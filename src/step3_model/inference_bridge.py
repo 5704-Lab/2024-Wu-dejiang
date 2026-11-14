@@ -64,7 +64,7 @@ def run_inference(
         qf, tf = backbone(qi, ti)
         offsets = predictor(qf, tf)
         warped = warp(tf, offsets)
-        diff_features = {key: warped[key] - qf[key] for key in ["C3", "C4", "C5"]}
+        diff_features = {key: (warped[key] - qf[key]).abs() for key in ["C3", "C4", "C5"]}
         enhanced = fusion(diff_features)
 
         candidate_boxes = postprocess_batch(
@@ -74,6 +74,9 @@ def run_inference(
             adaptive_block=int(proposals_cfg.get("adaptive_block", 51)),
             adaptive_c=int(proposals_cfg.get("adaptive_c", -5)),
             morph_kernel=int(proposals_cfg.get("morph_kernel", 5)),
+            heatmap_method=str(proposals_cfg.get("heatmap_method", "probability_threshold")),
+            probability_threshold=float(proposals_cfg.get("probability_threshold", 0.5)),
+            max_area_ratio=float(proposals_cfg.get("max_area_ratio", 0.8)),
         )[0]  # single sample
 
         if candidate_boxes.numel() == 0:
@@ -121,15 +124,25 @@ def _nms_detections(
     detections: list[dict],
     iou_threshold: float = 0.5,
 ) -> list[dict]:
-    """Apply class-agnostic IoU NMS to a list of detection dicts."""
+    """Apply class-aware IoU NMS to a list of detection dicts."""
     if len(detections) <= 1:
         return detections
 
-    boxes = torch.tensor([d["box"] for d in detections], dtype=torch.float32)
-    scores = torch.tensor([d["score"] for d in detections])
+    from torchvision.ops import nms
 
-    keep = torchvision_ops_nms(boxes, scores, iou_threshold)
-    return [detections[int(i)] for i in keep]
+    by_class: dict[int, list[tuple[int, dict]]] = {}
+    for index, detection in enumerate(detections):
+        by_class.setdefault(int(detection["class"]), []).append((index, detection))
+
+    keep_indices: list[int] = []
+    for same_class in by_class.values():
+        boxes = torch.tensor([item["box"] for _, item in same_class], dtype=torch.float32)
+        scores = torch.tensor([item["score"] for _, item in same_class], dtype=torch.float32)
+        for index in nms(boxes, scores, iou_threshold):
+            keep_indices.append(same_class[int(index)][0])
+
+    keep = sorted(keep_indices)
+    return [detections[index] for index in keep]
 
 
 def torchvision_ops_nms(

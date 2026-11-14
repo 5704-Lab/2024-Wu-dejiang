@@ -4,7 +4,7 @@ inputs:
   step2_config: configs/step2_dataset.yaml
   step1_root: artifacts/step1
   step2_root: artifacts/step2
-  dataset_root: "../../project/数据集/VOCdevkit/VOC2007"
+  dataset_root: "data/VOC2007"
   alignment_validation_report: artifacts/step3/alignment_report.json
   alignment_frozen_parameters: artifacts/step3/alignment_parameters_frozen.json
   alignment_validation_manifest: artifacts/step3/run_manifest.json

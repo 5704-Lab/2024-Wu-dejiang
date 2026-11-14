@@ -1,6 +1,6 @@
 dataset:
   # 相对仓库根目录解析，服务器迁移时只需保持数据目录层级或修改此单一入口。
-  root: "../../project/数据集/VOCdevkit/VOC2007"
+  root: "data/VOC2007"
   query_dir: JPEGImages
   template_dir: TemplateImages
   annotation_dir: Annotations

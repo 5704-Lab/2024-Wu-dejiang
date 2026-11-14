@@ -1,0 +1,35 @@
+schema_version: step3-test-eval-config-v1
+roadmap_step: 3.5-C-test
+inputs:
+  step2_config: configs/step2_dataset.yaml
+  step1_root: artifacts/step1
+  step2_root: artifacts/step2
+  dataset_root: "data/VOC2007"
+  alignment_validation_report: artifacts/step3/alignment_report.json
+  alignment_frozen_parameters: artifacts/step3/alignment_parameters_frozen.json
+  alignment_validation_manifest: artifacts/step3/run_manifest.json
+  alignment_test_report: artifacts/step3/test/alignment_report.json
+  alignment_test_manifest: artifacts/step3/test/run_manifest.json
+  predictor_checkpoint: artifacts/step3/training/checkpoint_best.pt
+  fusion_checkpoint: artifacts/step3/fusion_training/checkpoint_best.pt
+  proposal_frozen_parameters: artifacts/step3/tuning/proposal_parameters_frozen.json
+output:
+  root: artifacts/step3/test_eval
+model:
+  kernel_size: 3
+  hidden_ratio: 4
+  zero_init: true
+  max_offset: 3.0
+fusion:
+  hidden: 128
+  reduction: 16
+evaluation:
+  iou_thresholds: [0.3, 0.5, 0.7]
+run:
+  purpose: test_evaluation
+  split: test
+  selection: full_split
+  expected_sample_count: 400
+  batch_size: 1
+  num_workers: 0
+  device: auto

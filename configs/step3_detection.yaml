@@ -1,0 +1,27 @@
+schema_version: step3-detection-config-v1
+roadmap_step: 5-A
+inputs:
+  step2_config: configs/step2_dataset.yaml
+  step1_root: artifacts/step1
+  step2_root: artifacts/step2
+  dataset_root: data/VOC2007
+  alignment_validation_report: artifacts/step3/alignment_report.json
+  alignment_frozen_parameters: artifacts/step3/alignment_parameters_frozen.json
+  alignment_validation_manifest: artifacts/step3/run_manifest.json
+  alignment_test_report: artifacts/step3/test/alignment_report.json
+  alignment_test_manifest: artifacts/step3/test/run_manifest.json
+output:
+  root: artifacts/step3/detection
+proposals:
+  min_area: 128
+  max_aspect_ratio: 8.0
+  adaptive_block: 51
+  adaptive_c: -5
+  morph_kernel: 9
+run:
+  purpose: detection_smoke
+  split: val
+  sample_count: 4
+  batch_size: 1
+  num_workers: 0
+  device: cuda

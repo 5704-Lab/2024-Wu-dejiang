@@ -4,7 +4,7 @@ inputs:
   step2_config: configs/step2_dataset.yaml
   step1_root: artifacts/step1
   step2_root: artifacts/step2
-  dataset_root: "../../project/数据集/VOCdevkit/VOC2007"
+  dataset_root: "data/VOC2007"
   alignment_validation_report: artifacts/step3/alignment_report.json
   alignment_frozen_parameters: artifacts/step3/alignment_parameters_frozen.json
   alignment_validation_manifest: artifacts/step3/run_manifest.json
@@ -25,13 +25,13 @@ fusion:
 proposals:
   # 以下参数由完整 Validation 自动搜索并冻结；Test 不得参与修改。
   heatmap_method: probability_threshold
-  probability_threshold: 0.60
+  probability_threshold: 0.55
   min_area: 128
   max_aspect_ratio: 8.0
   max_area_ratio: 0.8
   adaptive_block: 51
   adaptive_c: -5
-  morph_kernel: 9
+  morph_kernel: 3
 evaluation:
   iou_thresholds: [0.3, 0.5, 0.7]
 run:

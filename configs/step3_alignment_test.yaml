@@ -3,7 +3,7 @@ roadmap_step: 3.2-D
 inputs:
   step1_root: artifacts/step1
   step2_root: artifacts/step2
-  dataset_root: "../../project/数据集/VOCdevkit/VOC2007"
+  dataset_root: "data/VOC2007"
   samples: samples.jsonl
   splits_dir: splits
   split_manifest: split_manifest.json
