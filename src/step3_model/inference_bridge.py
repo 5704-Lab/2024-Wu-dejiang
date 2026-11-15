@@ -39,6 +39,7 @@ def run_inference(
     proposals_cfg: dict,
     image_size: tuple[int, int] = (800, 800),
     device: torch.device | None = None,
+    pair_aware: bool = False,
 ) -> list[dict]:
     """End-to-end inference: Siamese screening -> context crops -> RT-DETR.
 
@@ -97,7 +98,15 @@ def run_inference(
             padded = pad_image_to_size(q_crop, image_size)
 
             # Run RT-DETR on the padded crop
-            dets = rtdetr_model(padded.unsqueeze(0).to(device))
+            if pair_aware:
+                t_crop = crop["template_crop"]
+                t_padded = pad_image_to_size(t_crop, image_size)
+                dets = rtdetr_model(
+                    padded.unsqueeze(0).to(device),
+                    t_padded.unsqueeze(0).to(device),
+                )
+            else:
+                dets = rtdetr_model(padded.unsqueeze(0).to(device))
             if isinstance(dets, torch.Tensor) and dets.numel() > 0 and dets.shape[1] >= 6:
                 # dets: [K, 6] = [x1, y1, x2, y2, score, class]
                 crop_boxes = dets[:, :4].cpu()

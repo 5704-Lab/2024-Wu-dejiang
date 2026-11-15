@@ -1,0 +1,16 @@
+schema_version: rtdetr-paired-baseline-v1
+model: rtdetr-l.pt
+data: artifacts/step5/rtdetr_paired_dataset/dataset.yaml
+imgsz: 800
+classes: [broke, dirty, double, miss]
+train:
+  epochs: 100
+  batch: 2
+  device: 0
+  workers: 0
+  amp: true
+  seed: 20260828
+  pretrained: true
+  patience: 20
+  project: artifacts/step5/rtdetr_paired_baseline
+  name: train

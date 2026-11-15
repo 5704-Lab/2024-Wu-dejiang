@@ -13,7 +13,7 @@ inputs:
   predictor_checkpoint: artifacts/step3/training/checkpoint_best.pt
   fusion_checkpoint: artifacts/step3/fusion_training/checkpoint_best.pt
   proposal_frozen_parameters: artifacts/step3/tuning/proposal_parameters_frozen.json
-  rtdetr_checkpoint: artifacts/step5/rtdetr_baseline/train/weights/best.pt
+  rtdetr_checkpoint: artifacts/step5/rtdetr_paired_baseline/train/weights/best.pt
 output:
   root: artifacts/step3/e2e_eval
 model:
@@ -29,6 +29,7 @@ detection:
   conf: 0.25
   iou: 0.7
   iou_eval: 0.5
+  diff_scale: 3.0
 run:
   split: val
   batch_size: 1

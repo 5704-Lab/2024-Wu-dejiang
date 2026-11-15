@@ -82,11 +82,25 @@ def _build_rtdetr_callable(model: RTDETR, config: dict[str, Any], device: torch.
     imgsz = int(config["detection"]["imgsz"])
     conf = float(config["detection"]["conf"])
     iou = float(config["detection"]["iou"])
+    diff_scale = float(config["detection"].get("diff_scale", 3.0))
 
-    def callable_model(padded: torch.Tensor) -> torch.Tensor:
-        # Ultralytics prediction accepts a numpy HWC uint8 image reliably.
-        image = padded[0].detach().cpu().permute(1, 2, 0).numpy()
-        image = np.clip(np.rint(image * 255.0), 0, 255).astype(np.uint8)
+    def _to_gray(tensor: torch.Tensor) -> np.ndarray:
+        gray = (
+            0.299 * tensor[0]
+            + 0.587 * tensor[1]
+            + 0.114 * tensor[2]
+        )
+        return np.clip(np.rint(gray.detach().cpu().numpy() * 255.0), 0, 255).astype(np.float32)
+
+    def callable_model(query_padded: torch.Tensor, template_padded: torch.Tensor) -> torch.Tensor:
+        query_gray = _to_gray(query_padded[0])
+        template_gray = _to_gray(template_padded[0])
+        diff = np.clip(np.abs(query_gray - template_gray) * diff_scale, 0, 255)
+        # `model.predict` assumes BGR numpy input and converts it to RGB before
+        # forward.  The paired model was trained on channel order [query, template,
+        # diff], so feed [diff, template, query] (BGR) to let the predictor convert
+        # it back to the trained order.
+        image = np.stack([diff, template_gray, query_gray], axis=2).astype(np.uint8)
         results = model.predict(
             source=image,
             imgsz=imgsz,
@@ -113,7 +127,7 @@ def _detection_metrics(
 ) -> dict[str, Any]:
     """Compute greedy class-aware precision/recall at a fixed IoU threshold."""
     per_class: dict[int, dict[str, int | float]] = {
-        index: {"gt": 0, "tp": 0, "fp": 0, "fn": 0}
+        index: {"gt": 0, "tp": 0, "fp": 0}
         for index, _ in enumerate(class_names)
     }
     total_gt = total_pred = 0
@@ -123,6 +137,11 @@ def _detection_metrics(
         gt_labels = target["labels"]
         total_gt += int(gt_boxes.shape[0])
         total_pred += len(predictions)
+
+        for label in range(len(class_names)):
+            per_class[label]["gt"] = int(per_class[label]["gt"]) + int(
+                (gt_labels == label).sum().item()
+            )
 
         # Track which GT boxes have already been matched.
         matched = torch.zeros(gt_boxes.shape[0], dtype=torch.bool)
@@ -136,10 +155,9 @@ def _detection_metrics(
             label = int(item["class"])
             box = torch.tensor(item["box"], dtype=torch.float32).reshape(1, 4)
             if label < 0 or label >= len(class_names):
-                per_class.setdefault(label, {"gt": 0, "tp": 0, "fp": 0, "fn": 0})
+                per_class.setdefault(label, {"gt": 0, "tp": 0, "fp": 0})
                 per_class[label]["fp"] = int(per_class[label]["fp"]) + 1
                 continue
-            per_class[label]["gt"] = per_class[label].get("gt", 0)
 
             candidate_indices = (gt_labels == label).nonzero(as_tuple=False).squeeze(1)
             if candidate_indices.numel() == 0:
@@ -156,20 +174,16 @@ def _detection_metrics(
             else:
                 per_class[label]["fp"] = int(per_class[label]["fp"]) + 1
 
-        for label in range(len(class_names)):
-            gt_count = int((gt_labels == label).sum().item())
-            tp = int(per_class[label]["tp"])
-            per_class[label]["gt"] = gt_count
-            per_class[label]["fn"] = gt_count - tp
-
     class_rows = []
-    micro_tp = micro_fp = micro_fn = 0
+    micro_tp = sum(int(per_class[index]["tp"]) for index in range(len(class_names)))
+    micro_fp = sum(int(per_class[index]["fp"]) for index in range(len(class_names)))
+    micro_fn = total_gt - micro_tp
     for index, name in enumerate(class_names):
         row = per_class[index]
         gt = int(row["gt"])
         tp = int(row["tp"])
         fp = int(row["fp"])
-        fn = int(row["fn"])
+        fn = gt - tp
         precision = tp / max(tp + fp, 1)
         recall = tp / max(tp + fn, 1)
         f1 = 2 * precision * recall / max(precision + recall, 1e-9)
@@ -184,9 +198,6 @@ def _detection_metrics(
             "recall": recall,
             "f1": f1,
         })
-        micro_tp += tp
-        micro_fp += fp
-        micro_fn += fn
 
     micro_precision = micro_tp / max(micro_tp + micro_fp, 1)
     micro_recall = micro_tp / max(micro_tp + micro_fn, 1)
@@ -278,6 +289,7 @@ def run_e2e_eval(config: dict[str, Any], split: str | None = None) -> dict[str, 
                 proposals_cfg=proposals_cfg,
                 image_size=(800, 800),
                 device=device,
+                pair_aware=True,
             )
             target = batch["query_targets"][0]
             all_predictions.append(detections)

@@ -21,7 +21,7 @@ from .feature_warp import FeatureWarp
 from .fusion import MultiScaleFusion
 from .model_io import load_model_checkpoint
 from .offset_predictor import OFFSET_SPEC, OffsetPredictor
-from .train_fusion import FusionHeatmapLoss, build_defect_heatmaps
+from .train_fusion import FusionHeatmapLoss, build_defect_heatmaps_with_weights
 
 
 def load_fusion_train_config(path: Path) -> dict[str, Any]:
@@ -74,7 +74,16 @@ def run_train_fusion(config: dict[str, Any]) -> dict[str, Any]:
     for module in (backbone, predictor, warp):
         for parameter in module.parameters():
             parameter.requires_grad_(False)
-    criterion = FusionHeatmapLoss(float(config["loss"]["positive_weight"]), float(config["loss"]["dice_weight"]))
+    loss_cfg = config["loss"]
+    base_positive_weight = float(loss_cfg.get("positive_weight", 10.0))
+    miss_positive_weight = float(loss_cfg.get("miss_positive_weight", base_positive_weight))
+    class_positive_weights = {
+        0: base_positive_weight,
+        1: base_positive_weight,
+        2: base_positive_weight,
+        3: miss_positive_weight,
+    }
+    criterion = FusionHeatmapLoss(base_positive_weight, float(loss_cfg["dice_weight"]))
     optimizer = torch.optim.AdamW(fusion.parameters(), lr=float(training["lr"]),
                                   weight_decay=float(training.get("weight_decay", 0.0)))
     output = Path(config["_output_root"]); output.mkdir(parents=True, exist_ok=True)
@@ -111,10 +120,14 @@ def run_train_fusion(config: dict[str, Any]) -> dict[str, Any]:
                     qf, tf = backbone(query, template)
                     warped = warp(tf, predictor(qf, tf))
                     differences = {name: (warped[name] - qf[name]).abs() for name, _, _ in OFFSET_SPEC}
-                targets = build_defect_heatmaps(batch["query_targets"], device=device)
+                targets, pixel_weights = build_defect_heatmaps_with_weights(
+                    batch["query_targets"],
+                    class_positive_weights=class_positive_weights,
+                    device=device,
+                )
                 with torch.set_grad_enabled(phase == "train"):
                     logits = fusion(differences)
-                    loss, loss_stats = criterion(logits, targets)
+                    loss, loss_stats = criterion(logits, targets, pixel_weights=pixel_weights)
                     if phase == "train":
                         optimizer.zero_grad(); loss.backward(); optimizer.step()
                 totals["loss"] += loss_stats["loss_total"]
