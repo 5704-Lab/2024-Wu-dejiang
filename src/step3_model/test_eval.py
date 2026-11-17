@@ -17,6 +17,7 @@ from typing import Any
 import torch
 import torchvision
 import yaml
+from torchvision.ops import box_iou
 
 from step1_audit.hashing import sha256_file, snapshot_digest, snapshot_tree
 from step1_audit.paths import resolved, validate_roots, write_json
@@ -102,6 +103,45 @@ def _load_frozen_proposal_parameters(path: Path) -> dict[str, Any]:
     if not isinstance(parameters, dict):
         raise ValueError("Frozen parameters are missing")
     return parameters
+
+
+def _per_class_recall(
+    pred_boxes_list: list[torch.Tensor],
+    gt_targets_list: list[dict],
+    class_names: list[str],
+    iou_threshold: float = 0.5,
+) -> list[dict[str, Any]]:
+    """Compute candidate-stage recall per class at a fixed IoU threshold."""
+    counts: dict[int, dict[str, int]] = {
+        index: {"gt": 0, "matched": 0}
+        for index, _ in enumerate(class_names)
+    }
+    for pred_boxes, target in zip(pred_boxes_list, gt_targets_list):
+        gt_boxes = target["boxes"]
+        gt_labels = target["labels"]
+        if gt_boxes.numel() == 0:
+            continue
+        if pred_boxes.numel() > 0:
+            best_iou = box_iou(pred_boxes, gt_boxes).max(dim=0).values
+        else:
+            best_iou = torch.zeros(gt_boxes.shape[0])
+        for index, label in enumerate(gt_labels):
+            class_id = int(label.item())
+            if class_id >= len(class_names):
+                continue
+            counts[class_id]["gt"] += 1
+            if float(best_iou[index]) >= iou_threshold:
+                counts[class_id]["matched"] += 1
+    return [
+        {
+            "class_id": index,
+            "class_name": name,
+            "gt_boxes": counts[index]["gt"],
+            "matched_boxes": counts[index]["matched"],
+            "recall": counts[index]["matched"] / max(counts[index]["gt"], 1),
+        }
+        for index, name in enumerate(class_names)
+    ]
 
 
 def run_test_eval(config: dict[str, Any]) -> dict[str, Any]:
@@ -213,6 +253,15 @@ def run_test_eval(config: dict[str, Any]) -> dict[str, Any]:
         all_pred_boxes, all_gt_targets, tuple(config["evaluation"]["iou_thresholds"])
     )
     crop_stats = crop_statistics(all_crops, all_gt_targets)
+    per_class_recall = {
+        str(threshold): _per_class_recall(
+            all_pred_boxes,
+            all_gt_targets,
+            list(step2["classes"]),
+            iou_threshold=float(threshold),
+        )
+        for threshold in config["evaluation"]["iou_thresholds"]
+    }
 
     if before != snapshot_tree(dataset_root):
         raise RuntimeError("Read-only dataset changed during Test evaluation")
@@ -238,6 +287,7 @@ def run_test_eval(config: dict[str, Any]) -> dict[str, Any]:
         "selected_device": str(device),
         "recall_statistics": recall_stats,
         "crop_statistics": crop_stats,
+        "per_class_recall": per_class_recall,
         "per_sample": per_sample_stats,
         "frozen_proposal_parameters": {
             "path": config["_proposal_frozen_parameters"],

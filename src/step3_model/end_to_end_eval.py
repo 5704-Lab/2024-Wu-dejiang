@@ -52,6 +52,9 @@ def load_e2e_config(path: Path) -> dict[str, Any]:
         resolved(config["inputs"]["proposal_frozen_parameters"], workspace)
     )
     config["_rtdetr_checkpoint"] = str(resolved(config["inputs"]["rtdetr_checkpoint"], workspace))
+    config["_test_annotation_patch"] = str(
+        resolved(config["inputs"].get("test_annotation_patch", "artifacts/step1/test_annotation_patch.jsonl"), workspace)
+    )
     for key in _EVIDENCE_KEYS:
         config[f"_{key}"] = str(resolved(config["inputs"][key], workspace))
     _validate_config(config)
@@ -76,6 +79,25 @@ def _resolve_device(name: str) -> torch.device:
     if name == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("CUDA was requested but is unavailable")
     return torch.device(name)
+
+
+def _load_test_annotation_patch(path: Path, class_names: list[str]) -> dict[str, list[dict]]:
+    if not path.is_file():
+        return {}
+    by_id: dict[str, list[dict]] = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        class_name = row.get("class_name")
+        class_id = row.get("class_id", class_names.index(class_name) if class_name in class_names else -1)
+        if class_id < 0:
+            continue
+        by_id.setdefault(row["sample_id"], []).append({
+            "class_id": int(class_id),
+            "box": [float(v) for v in row["bbox_xyxy"]],
+        })
+    return by_id
 
 
 def _build_rtdetr_callable(model: RTDETR, config: dict[str, Any], device: torch.device):
@@ -213,7 +235,11 @@ def _detection_metrics(
     }
 
 
-def run_e2e_eval(config: dict[str, Any], split: str | None = None) -> dict[str, Any]:
+def run_e2e_eval(
+    config: dict[str, Any],
+    split: str | None = None,
+    expand_k: float | None = None,
+) -> dict[str, Any]:
     _validate_config(config)
     split = split or str(config["run"]["split"])
     if split not in {"val", "test"}:
@@ -229,6 +255,11 @@ def run_e2e_eval(config: dict[str, Any], split: str | None = None) -> dict[str, 
     dataset = PairedQueryTemplateDataset(index, split, step2, training=False)
     if len(dataset) != 400:
         raise ValueError(f"Unexpected {split} sample count: {len(dataset)} != 400")
+    annotation_patch = (
+        _load_test_annotation_patch(Path(config["_test_annotation_patch"]), list(step2["classes"]))
+        if split == "test"
+        else {}
+    )
     loader = build_dataloader(
         dataset,
         batch_size=int(config["run"]["batch_size"]),
@@ -267,9 +298,10 @@ def run_e2e_eval(config: dict[str, Any], split: str | None = None) -> dict[str, 
         "min_area": float(proposal_parameters["min_area"]),
         "max_aspect_ratio": float(proposal_parameters["max_aspect_ratio"]),
         "max_area_ratio": float(proposal_parameters.get("max_area_ratio", 0.8)),
-        "expand_k": float(proposal_parameters.get("expand_k", 1.8)),
+        "expand_k": float(expand_k) if expand_k is not None else float(proposal_parameters.get("expand_k", 1.8)),
         "merge_iou": float(proposal_parameters.get("merge_iou_threshold", 0.3)),
     }
+    proposals_cfg.update(config.get("gating", {}))
 
     rtdetr = RTDETR(str(Path(config["_rtdetr_checkpoint"])))
     rtdetr_callable = _build_rtdetr_callable(rtdetr, config, device)
@@ -292,10 +324,23 @@ def run_e2e_eval(config: dict[str, Any], split: str | None = None) -> dict[str, 
                 pair_aware=True,
             )
             target = batch["query_targets"][0]
+            sample_id = batch["meta"][0]["sample_id"]
+            if sample_id in annotation_patch:
+                patch_rows = annotation_patch[sample_id]
+                target = {key: value.clone() for key, value in target.items()}
+                if patch_rows:
+                    extra_boxes = torch.tensor(
+                        [row["box"] for row in patch_rows], dtype=torch.float32
+                    )
+                    extra_labels = torch.tensor(
+                        [row["class_id"] for row in patch_rows], dtype=torch.int64
+                    )
+                    target["boxes"] = torch.cat([target["boxes"], extra_boxes], dim=0)
+                    target["labels"] = torch.cat([target["labels"], extra_labels], dim=0)
             all_predictions.append(detections)
             all_targets.append(target)
             per_sample.append({
-                "sample_id": batch["meta"][0]["sample_id"],
+                "sample_id": sample_id,
                 "gt_box_count": int(target["boxes"].shape[0]),
                 "detection_count": len(detections),
             })

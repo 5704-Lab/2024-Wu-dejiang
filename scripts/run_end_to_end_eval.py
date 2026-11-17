@@ -17,9 +17,10 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="End-to-end Siamese + RT-DETR evaluation")
     parser.add_argument("--config", type=Path, default=Path("configs/step3_end_to_end_eval.yaml"))
     parser.add_argument("--split", choices=("val", "test"))
+    parser.add_argument("--expand-k", type=float, default=None)
     args = parser.parse_args()
     config = load_e2e_config(args.config)
-    report = run_e2e_eval(config, split=args.split)
+    report = run_e2e_eval(config, split=args.split, expand_k=args.expand_k)
     print(json.dumps({
         "split": report["split"],
         "processed_sample_count": report["processed_sample_count"],

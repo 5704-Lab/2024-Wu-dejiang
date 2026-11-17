@@ -21,7 +21,7 @@ from .feature_warp import FeatureWarp
 from .fusion import MultiScaleFusion
 from .model_io import load_model_checkpoint
 from .offset_predictor import OFFSET_SPEC, OffsetPredictor
-from .train_fusion import FusionHeatmapLoss, build_defect_heatmaps_with_weights
+from .train_fusion import FusionHeatmapLoss, build_defect_heatmaps, build_defect_heatmaps_with_weights
 
 
 def load_fusion_train_config(path: Path) -> dict[str, Any]:
@@ -83,6 +83,9 @@ def run_train_fusion(config: dict[str, Any]) -> dict[str, Any]:
         2: base_positive_weight,
         3: miss_positive_weight,
     }
+    balanced_class_weights = all(
+        weight == base_positive_weight for weight in class_positive_weights.values()
+    )
     criterion = FusionHeatmapLoss(base_positive_weight, float(loss_cfg["dice_weight"]))
     optimizer = torch.optim.AdamW(fusion.parameters(), lr=float(training["lr"]),
                                   weight_decay=float(training.get("weight_decay", 0.0)))
@@ -120,11 +123,15 @@ def run_train_fusion(config: dict[str, Any]) -> dict[str, Any]:
                     qf, tf = backbone(query, template)
                     warped = warp(tf, predictor(qf, tf))
                     differences = {name: (warped[name] - qf[name]).abs() for name, _, _ in OFFSET_SPEC}
-                targets, pixel_weights = build_defect_heatmaps_with_weights(
-                    batch["query_targets"],
-                    class_positive_weights=class_positive_weights,
-                    device=device,
-                )
+                if balanced_class_weights:
+                    targets = build_defect_heatmaps(batch["query_targets"], device=device)
+                    pixel_weights = None
+                else:
+                    targets, pixel_weights = build_defect_heatmaps_with_weights(
+                        batch["query_targets"],
+                        class_positive_weights=class_positive_weights,
+                        device=device,
+                    )
                 with torch.set_grad_enabled(phase == "train"):
                     logits = fusion(differences)
                     loss, loss_stats = criterion(logits, targets, pixel_weights=pixel_weights)

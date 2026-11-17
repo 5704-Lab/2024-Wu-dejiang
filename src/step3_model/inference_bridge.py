@@ -40,6 +40,7 @@ def run_inference(
     image_size: tuple[int, int] = (800, 800),
     device: torch.device | None = None,
     pair_aware: bool = False,
+    return_proposals: bool = False,
 ) -> list[dict]:
     """End-to-end inference: Siamese screening -> context crops -> RT-DETR.
 
@@ -81,7 +82,8 @@ def run_inference(
         )[0]  # single sample
 
         if candidate_boxes.numel() == 0:
-            return []
+            empty_result: list[dict] = []
+            return (empty_result, candidate_boxes) if return_proposals else empty_result
 
         # Build crops (contextual expansion, no GT target needed)
         crops = build_crops(
@@ -125,8 +127,46 @@ def run_inference(
                         "source_crop_rect": list(crop_rect),
                     })
 
+        if proposals_cfg.get("gate_heatmap", False):
+            all_detections = _gate_detections_by_heatmap(
+                all_detections,
+                enhanced[0, 0],
+                probability_threshold=float(proposals_cfg.get("gate_prob_threshold", 0.5)),
+                max_min=float(proposals_cfg.get("gate_max_min", 0.5)),
+                min_positive_fraction=float(proposals_cfg.get("gate_min_positive_fraction", 0.03)),
+            )
+
         # Simple IoU-based NMS to remove duplicate detections from overlapping crops
-        return _nms_detections(all_detections, iou_threshold=0.5)
+        detections = _nms_detections(all_detections, iou_threshold=0.5)
+        return (detections, candidate_boxes) if return_proposals else detections
+
+
+def _gate_detections_by_heatmap(
+    detections: list[dict],
+    heatmap: torch.Tensor,
+    probability_threshold: float,
+    max_min: float,
+    min_positive_fraction: float,
+) -> list[dict]:
+    """Keep only detections whose box overlaps a strong Siamese heatmap response."""
+    if heatmap.ndim != 2:
+        raise ValueError("gate heatmap must be a 2D tensor")
+    height, width = heatmap.shape
+    gated = []
+    for detection in detections:
+        x1, y1, x2, y2 = [float(v) for v in detection["box"]]
+        left = max(0, min(width, int(x1)))
+        right = max(left + 1, min(width, int(x2 + 0.999999)))
+        top = max(0, min(height, int(y1)))
+        bottom = max(top + 1, min(height, int(y2 + 0.999999)))
+        roi = heatmap[top:bottom, left:right]
+        if roi.numel() == 0:
+            continue
+        positive_fraction = float((roi >= probability_threshold).float().mean().item())
+        max_probability = float(roi.max().item())
+        if max_probability >= max_min and positive_fraction >= min_positive_fraction:
+            gated.append(detection)
+    return gated
 
 
 def _nms_detections(
