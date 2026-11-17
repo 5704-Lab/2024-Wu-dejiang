@@ -74,5 +74,15 @@ rtdetr-l.pt
 data
 runs/
 
+# Local agent skills
+.agents/
+
+# Regenerable analysis and evaluation outputs
+artifacts/analysis/
+artifacts/step3/e2e_eval/
+artifacts/step3/test_eval/
+artifacts/step3/detection/coco_export_manifest.json
+artifacts/step3/demo/heatmap_panel.png
+
 
 
